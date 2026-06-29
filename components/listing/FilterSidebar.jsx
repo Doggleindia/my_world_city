@@ -34,15 +34,36 @@ function Switch({ on, onClick }) {
   )
 }
 
-export default function FilterSidebar() {
-  const [checked, setChecked] = useState(['Sitapura'])
+const BUDGET_BOUNDS = {
+  '40L - 60L': [4_000_000, 6_000_000],
+  '60L - 80L': [6_000_000, 8_000_000],
+  '80L - 1Cr': [8_000_000, 10_000_000],
+  '1Cr - 1.5Cr': [10_000_000, 15_000_000],
+  '1.5Cr+': [15_000_000, undefined],
+}
+
+export default function FilterSidebar({ onApply }) {
+  const [checked, setChecked] = useState([])
   const [ptype, setPtype] = useState('Residential')
   const [timeline, setTimeline] = useState('Immediately')
-  const [verified, setVerified] = useState(true)
+  const [verified, setVerified] = useState(false)
   const [rera, setRera] = useState(false)
+  const [budget, setBudget] = useState(budgetRanges[0])
 
   const toggleLocality = (l) =>
     setChecked((prev) => (prev.includes(l) ? prev.filter((x) => x !== l) : [...prev, l]))
+
+  const apply = () => {
+    const [minPrice, maxPrice] = BUDGET_BOUNDS[budget] || []
+    onApply?.({
+      category: ptype || undefined,
+      locality: checked[0] || undefined, // API filters by a single locality
+      verified: verified || undefined,
+      rera: rera || undefined,
+      minPrice,
+      maxPrice,
+    })
+  }
 
   const clearAll = () => {
     setChecked([])
@@ -50,6 +71,8 @@ export default function FilterSidebar() {
     setTimeline('')
     setVerified(false)
     setRera(false)
+    setBudget(budgetRanges[0])
+    onApply?.({})
   }
 
   return (
@@ -81,7 +104,11 @@ export default function FilterSidebar() {
       <div className="mt-6">
         <SectionLabel>Budget</SectionLabel>
         <div className="relative mt-2.5">
-          <select className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13.5px] text-slate-700 focus:border-brand focus:outline-none">
+          <select
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+            className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13.5px] text-slate-700 focus:border-brand focus:outline-none"
+          >
             {budgetRanges.map((b) => (
               <option key={b}>{b}</option>
             ))}
@@ -171,7 +198,10 @@ export default function FilterSidebar() {
         </div>
       </div>
 
-      <button className="mt-6 w-full rounded-lg bg-navy-800 py-3 text-[14px] font-semibold text-white transition hover:bg-navy-700">
+      <button
+        onClick={apply}
+        className="mt-6 w-full rounded-lg bg-navy-800 py-3 text-[14px] font-semibold text-white transition hover:bg-navy-700"
+      >
         Apply Filters
       </button>
     </div>

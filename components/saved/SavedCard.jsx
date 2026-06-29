@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { MapPin, Share2, Heart } from 'lucide-react'
+import { MapPin, Heart } from 'lucide-react'
+import ShareButton from '@/components/ShareButton'
 
-export default function SavedCard({ tag, title, loc, img, onUnsave }) {
+export default function SavedCard({ tag, title, loc, img, href = '/find-property', onUnsave }) {
   return (
     <article className="overflow-hidden rounded-2xl bg-white shadow-card">
       <div className="h-64 w-full overflow-hidden">
@@ -18,14 +19,11 @@ export default function SavedCard({ tag, title, loc, img, onUnsave }) {
         </p>
 
         <div className="mt-5 flex items-center gap-3">
-          <button
-            aria-label="Share"
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200"
-          >
-            <Share2 className="h-[18px] w-[18px]" />
-          </button>
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200">
+            <ShareButton url={href} title={title} size={18} />
+          </span>
           <Link
-            href="/property"
+            href={href}
             className="flex-1 rounded-full bg-brand py-3 text-center text-[15px] font-semibold text-white transition hover:bg-brand-700"
           >
             Details

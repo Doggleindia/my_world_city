@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { ownershipSteps } from '@/data'
 
 export default function ExpertStepper() {
@@ -16,9 +17,12 @@ export default function ExpertStepper() {
             </div>
             <h3 className="mt-4 text-[15px] font-bold text-navy-800">{s.title}</h3>
             <p className="mt-1.5 max-w-[170px] text-[12px] leading-relaxed text-slate-500">{s.desc}</p>
-            <button className="mt-3 rounded-md border border-slate-200 bg-white px-4 py-1.5 text-[12.5px] font-semibold text-brand transition hover:border-brand/40 hover:bg-brand/5">
+            <Link
+              href="/experts"
+              className="mt-3 rounded-md border border-slate-200 bg-white px-4 py-1.5 text-[12.5px] font-semibold text-brand transition hover:border-brand/40 hover:bg-brand/5"
+            >
               Connect
-            </button>
+            </Link>
           </div>
         ))}
       </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { categories } from '../data'
 
 export default function BrowseByCategory() {
@@ -8,9 +9,9 @@ export default function BrowseByCategory() {
 
         <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {categories.map((c) => (
-            <a
+            <Link
               key={c.title}
-              href="#"
+              href={`/find-property?category=${encodeURIComponent(c.title)}`}
               className="group relative h-44 overflow-hidden rounded-2xl"
             >
               <img
@@ -23,7 +24,7 @@ export default function BrowseByCategory() {
                 <h3 className="text-lg font-bold text-white">{c.title}</h3>
                 <p className="text-[12px] text-slate-200/90">{c.listings}</p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

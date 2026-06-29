@@ -12,6 +12,9 @@ import Insights from '@/components/Insights'
 import BottomCTA from '@/components/BottomCTA'
 import Footer from '@/components/Footer'
 
+// Revalidate so DB-backed Featured properties stay fresh in production.
+export const revalidate = 60
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-slate-900">

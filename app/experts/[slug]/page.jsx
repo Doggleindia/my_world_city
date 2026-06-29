@@ -5,14 +5,7 @@ import ProfileAbout from '@/components/experts/ProfileAbout'
 import ProfileSkills from '@/components/experts/ProfileSkills'
 import ProfileShowcase from '@/components/experts/ProfileShowcase'
 import SiteFooter from '@/components/property/SiteFooter'
-import { expertProfile, expertList } from '@/data'
-
-const navLinks = [
-  { label: 'Find Property', href: '/find-property' },
-  { label: 'Build Property', href: '/develop' },
-  { label: 'Services', href: '/services' },
-  { label: 'Premium', href: '#' },
-]
+import { expertList, expertContentByCat, expertProfileFallback } from '@/data'
 
 const TITLES = ['Ar.', 'Adv.', 'Er.', 'Dr.', 'Mr.', 'Ms.', 'Mrs.', 'Pandit']
 const firstNameOf = (name) => {
@@ -20,12 +13,12 @@ const firstNameOf = (name) => {
   return TITLES.includes(parts[0]) ? parts[1] : parts[0]
 }
 
-// Build a profile: the rich template (Neha) with the matched expert's identity overlaid.
+// Build a profile: category-appropriate content with the matched expert's identity overlaid.
 function buildProfile(slug) {
-  const match = expertList.find((e) => e.slug === slug)
-  if (!match) return expertProfile
+  const match = expertList.find((e) => e.slug === slug) ?? expertList[0]
+  const content = expertContentByCat[match.cat] ?? expertProfileFallback
   return {
-    ...expertProfile,
+    ...content,
     slug: match.slug,
     name: match.name,
     role: match.role,
@@ -35,6 +28,10 @@ function buildProfile(slug) {
     specialty: match.specialty,
     firstName: firstNameOf(match.name),
   }
+}
+
+export function generateStaticParams() {
+  return expertList.map((e) => ({ slug: e.slug }))
 }
 
 export async function generateMetadata({ params }) {
@@ -53,7 +50,7 @@ export default async function ExpertProfilePage({ params }) {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <TopBar />
-      <Navbar links={navLinks} cta="brand" />
+      <Navbar cta="brand" />
       <ProfileHero p={p} />
       <ProfileAbout p={p} />
       <ProfileSkills p={p} />

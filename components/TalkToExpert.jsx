@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight, ArrowRight,
 } from 'lucide-react'
 import { useRef } from 'react'
+import Link from 'next/link'
 import { experts } from '../data'
 
 const icons = { Scale, Ruler, PencilRuler, Wrench, Stamp, Truck, Sofa, Compass }
@@ -68,9 +69,12 @@ export default function TalkToExpert() {
         </div>
 
         <div className="mt-8 flex justify-center">
-          <button className="inline-flex items-center gap-1.5 rounded-full bg-navy-800 px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-navy-900">
+          <Link
+            href="/experts"
+            className="inline-flex items-center gap-1.5 rounded-full bg-navy-800 px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-navy-900"
+          >
             View all experts <ArrowRight className="h-4 w-4" />
-          </button>
+          </Link>
         </div>
       </div>
     </section>

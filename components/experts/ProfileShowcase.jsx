@@ -4,10 +4,11 @@ import ExpertCard from './ExpertCard'
 import { expertList } from '@/data'
 
 export default function ProfileShowcase({ p }) {
-  const others = expertList.filter((e) => e.slug !== p.slug).slice(-4)
+  const sameCat = expertList.filter((e) => e.slug !== p.slug && e.cat === p.cat)
+  const others = (sameCat.length ? sameCat : expertList.filter((e) => e.slug !== p.slug)).slice(0, 4)
 
   return (
-    <section className="bg-indigo-50">
+    <section id="selected-work" className="scroll-mt-24 bg-indigo-50">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         {/* Selected work */}
         <h2 className="text-[24px] font-extrabold text-navy-800 sm:text-[28px]">
@@ -33,7 +34,7 @@ export default function ProfileShowcase({ p }) {
 
         {/* Other experts */}
         <h2 className="mt-16 text-[24px] font-extrabold text-navy-800 sm:text-[28px]">
-          Other architects in Jaipur
+          Other {p.cat} experts in Jaipur
         </h2>
         <div className="mt-7 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {others.map((e) => (

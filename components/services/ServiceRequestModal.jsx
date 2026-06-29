@@ -24,6 +24,7 @@ export default function ServiceRequestModal({ open, service, onClose }) {
   const [sent, setSent] = useState(false)
   const [refId, setRefId] = useState('')
   const [time, setTime] = useState('Anytime')
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -47,12 +48,37 @@ export default function ServiceRequestModal({ open, service, onClose }) {
 
   const Icon = iconMap[service.icon] ?? Scale
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const year = new Date().getFullYear()
-    const num = String(Math.floor(Math.random() * 100000)).padStart(5, '0')
-    setRefId(`MWC-${year}-${num}`)
-    setSent(true)
+    const fd = new FormData(e.currentTarget)
+    const related = fd.get('relatedProperty')
+    const payload = {
+      type: 'service',
+      serviceKey: service?.title,
+      name: fd.get('name'),
+      phone: fd.get('phone'),
+      email: fd.get('email') || '',
+      message:
+        (fd.get('message') || '') + (related ? `\nRelated property: ${related}` : ''),
+      preferredTime: time,
+    }
+    setBusy(true)
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed')
+      setRefId(data.refId)
+    } catch {
+      const year = new Date().getFullYear()
+      setRefId(`MWC-${year}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}`)
+    } finally {
+      setBusy(false)
+      setSent(true)
+    }
   }
 
   return createPortal(
@@ -104,13 +130,14 @@ export default function ServiceRequestModal({ open, service, onClose }) {
             {/* Form */}
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <Field label="Full name">
-                <input type="text" required placeholder="e.g. Rahul Sharma" className={inputCls} />
+                <input name="name" type="text" required placeholder="e.g. Rahul Sharma" className={inputCls} />
               </Field>
 
               <Field label="Phone number">
                 <div className="flex items-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 focus-within:border-brand focus-within:bg-white">
                   <span className="px-4 py-3.5 text-[15px] font-semibold text-slate-600">+91</span>
                   <input
+                    name="phone"
                     type="tel"
                     required
                     inputMode="numeric"
@@ -122,15 +149,16 @@ export default function ServiceRequestModal({ open, service, onClose }) {
               </Field>
 
               <Field label="Email address (optional)">
-                <input type="email" placeholder="rahul.sharma@example.com" className={inputCls} />
+                <input name="email" type="email" placeholder="rahul.sharma@example.com" className={inputCls} />
               </Field>
 
               <Field label="What do you need help with?">
-                <textarea rows={3} defaultValue={service.need} className={`${inputCls} resize-none`} />
+                <textarea name="message" rows={3} defaultValue={service.need} className={`${inputCls} resize-none`} />
               </Field>
 
               <Field label="Related property (optional)">
                 <input
+                  name="relatedProperty"
                   type="text"
                   placeholder="e.g. Modern 3BHK Villa, Jagatpura"
                   className={inputCls}
@@ -162,9 +190,10 @@ export default function ServiceRequestModal({ open, service, onClose }) {
 
               <button
                 type="submit"
-                className="mt-2 w-full rounded-full bg-navy-800 py-4 text-[17px] font-bold text-white transition hover:bg-navy-700"
+                disabled={busy}
+                className="mt-2 w-full rounded-full bg-navy-800 py-4 text-[17px] font-bold text-white transition hover:bg-navy-700 disabled:opacity-60"
               >
-                Request help
+                {busy ? 'Sending…' : 'Request help'}
               </button>
             </form>
 

@@ -1,4 +1,5 @@
-import { MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { MessageSquare } from 'lucide-react'
 import { insights } from '../data'
 
 export default function Insights() {
@@ -30,21 +31,24 @@ export default function Insights() {
                 <p className="mt-2 line-clamp-3 text-[12px] leading-relaxed text-slate-500">
                   {p.desc}
                 </p>
-                <button className="mt-4 self-start rounded-full border border-slate-300 px-4 py-1.5 text-[12px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand">
+                <Link
+                  href={`/insights#post-${i}`}
+                  className="mt-4 self-start rounded-full border border-slate-300 px-4 py-1.5 text-[12px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+                >
                   Read more
-                </button>
+                </Link>
               </div>
             </article>
           ))}
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <button className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition hover:border-brand hover:text-brand">
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white">
-            <ChevronRight className="h-4 w-4" />
-          </button>
+        <div className="mt-8 flex justify-center">
+          <Link
+            href="/insights"
+            className="rounded-full border border-slate-300 bg-white px-6 py-2.5 text-[13px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+          >
+            View all insights
+          </Link>
         </div>
       </div>
     </section>

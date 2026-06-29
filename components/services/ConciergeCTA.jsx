@@ -1,3 +1,5 @@
+import ContactButton from '@/components/contact/ContactButton'
+
 const officeImg =
   'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1100&q=80'
 
@@ -14,9 +16,14 @@ export default function ConciergeCTA() {
               Our concierge team is available to source specific partners for unique property
               requirements. We maintain the highest standards of vetting for every referral.
             </p>
-            <button className="mt-7 rounded-full border border-brand/40 bg-white px-6 py-3 text-[14px] font-semibold text-brand transition hover:border-brand hover:bg-brand/5">
+            <ContactButton
+              topic="Concierge service request"
+              title="Connect to us"
+              subtitle="Tell us what you’re looking for and our concierge team will source it."
+              className="mt-7 rounded-full border border-brand/40 bg-white px-6 py-3 text-[14px] font-semibold text-brand transition hover:border-brand hover:bg-brand/5"
+            >
               Connect to us
-            </button>
+            </ContactButton>
           </div>
 
           <div className="overflow-hidden rounded-3xl shadow-card">

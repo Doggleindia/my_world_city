@@ -1,3 +1,6 @@
+import Link from 'next/link'
+import ContactButton from '@/components/contact/ContactButton'
+
 export default function BottomCTA() {
   return (
     <section className="bg-white">
@@ -10,9 +13,12 @@ export default function BottomCTA() {
               List your property for free and get direct leads from verified buyers without
               any middleman.
             </p>
-            <button className="mt-6 rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-brand transition hover:bg-sky-50">
+            <Link
+              href="/list-property"
+              className="mt-6 inline-block rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-brand transition hover:bg-sky-50"
+            >
               List Property — Free
-            </button>
+            </Link>
           </div>
 
           {/* Developers & brokers */}
@@ -22,9 +28,14 @@ export default function BottomCTA() {
               Reach thousands of active property seekers every day. Premium dashboard to track
               all your listings.
             </p>
-            <button className="mt-6 rounded-full border border-white px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-white/10">
+            <ContactButton
+              topic="Dealer Program"
+              title="Join the Dealer Program"
+              subtitle="Tell us about your agency and we’ll set you up with verified buyer leads."
+              className="mt-6 rounded-full border border-white px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-white/10"
+            >
               Dealer Program
-            </button>
+            </ContactButton>
           </div>
         </div>
       </div>

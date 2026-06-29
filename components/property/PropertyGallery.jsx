@@ -1,6 +1,9 @@
-import { BadgeCheck, Heart, Share2, Grid2x2 } from 'lucide-react'
+import { Heart } from 'lucide-react'
+import SaveButton from '@/components/SaveButton'
+import ShareButton from '@/components/ShareButton'
+import PhotoLightbox from '@/components/property/PhotoLightbox'
 
-export default function PropertyGallery({ gallery, verified, photoCount }) {
+export default function PropertyGallery({ gallery, verified, photoCount, propertyId }) {
   return (
     <div className="grid gap-3 md:grid-cols-[1.55fr_1fr]">
       {/* Main image */}
@@ -18,18 +21,21 @@ export default function PropertyGallery({ gallery, verified, photoCount }) {
         )}
 
         <div className="absolute right-4 top-4 flex items-center gap-2">
-          <button
-            aria-label="Save"
-            className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-slate-600 shadow-sm transition hover:text-ember"
-          >
-            <Heart className="h-[18px] w-[18px]" />
-          </button>
-          <button
-            aria-label="Share"
-            className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-slate-600 shadow-sm transition hover:text-brand"
-          >
-            <Share2 className="h-[18px] w-[18px]" />
-          </button>
+          {propertyId ? (
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-white/95 shadow-sm">
+              <SaveButton id={propertyId} />
+            </span>
+          ) : (
+            <button
+              aria-label="Save"
+              className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-slate-600 shadow-sm transition hover:text-ember"
+            >
+              <Heart className="h-[18px] w-[18px]" />
+            </button>
+          )}
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-slate-600 shadow-sm">
+            <ShareButton className="hover:text-brand" size={18} />
+          </span>
         </div>
       </div>
 
@@ -43,11 +49,7 @@ export default function PropertyGallery({ gallery, verified, photoCount }) {
               className="h-[145px] w-full object-cover sm:h-[185px] md:h-[204px]"
             />
             {i === gallery.thumbs.length - 1 && (
-              <button className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 to-transparent p-3">
-                <span className="inline-flex items-center gap-1.5 rounded-lg bg-black/55 px-3 py-1.5 text-[12.5px] font-semibold text-white backdrop-blur-sm">
-                  <Grid2x2 className="h-4 w-4" /> View all {photoCount} photos
-                </span>
-              </button>
+              <PhotoLightbox images={[gallery.main, ...gallery.thumbs]} count={photoCount} />
             )}
           </div>
         ))}

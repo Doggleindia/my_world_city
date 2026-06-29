@@ -48,9 +48,12 @@ export default function ProfileHero({ p }) {
               >
                 Connect Now <ArrowRight className="h-4 w-4" />
               </ExpertConnectButton>
-              <button className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-[14px] font-semibold text-slate-700 transition hover:border-slate-400">
+              <a
+                href="#selected-work"
+                className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-[14px] font-semibold text-slate-700 transition hover:border-slate-400"
+              >
                 View past projects
-              </button>
+              </a>
             </div>
 
             <div className="mt-7 grid max-w-2xl grid-cols-2 gap-6 border-t border-slate-100 pt-6 sm:grid-cols-4">

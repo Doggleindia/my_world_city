@@ -9,17 +9,10 @@ export const metadata = {
     'Trusted professionals for every step of buying, building and owning property in the Pink City.',
 }
 
-const navLinks = [
-  { label: 'Find Property', href: '/find-property' },
-  { label: 'Build Property', href: '/develop' },
-  { label: 'Services', href: '/services' },
-  { label: 'Premium', href: '#' },
-]
-
 export default function ExpertsPage() {
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
-      <Navbar links={navLinks} cta="brand" />
+      <Navbar cta="brand" />
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <h1 className="text-[34px] font-extrabold tracking-tight text-navy-900 sm:text-[44px]">

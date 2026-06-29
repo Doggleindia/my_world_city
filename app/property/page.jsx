@@ -13,18 +13,11 @@ export const metadata = {
   description: property.about,
 }
 
-const navLinks = [
-  { label: 'Find Property', href: '/find-property' },
-  { label: 'Build Property', href: '/develop' },
-  { label: 'Services', href: '/services' },
-  { label: 'Premium', href: '#' },
-]
-
 export default function PropertyPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <TopBar />
-      <Navbar links={navLinks} cta="brand" />
+      <Navbar cta="brand" />
 
       <div className="mx-auto max-w-7xl px-4 pb-12 pt-5 sm:px-6">
         {/* Breadcrumb */}

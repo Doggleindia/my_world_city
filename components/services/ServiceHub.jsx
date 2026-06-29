@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, SlidersHorizontal, ShieldCheck } from 'lucide-react'
+import { Search, ShieldCheck } from 'lucide-react'
 import ServiceCard from './ServiceCard'
 import ServiceRequestModal from './ServiceRequestModal'
 import { services } from '@/data'
@@ -30,12 +30,6 @@ export default function ServiceHub() {
           </div>
 
           <div className="flex w-full items-center gap-2.5 sm:w-auto">
-            <button
-              aria-label="Filter"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-300 bg-white text-slate-600 transition hover:border-slate-400"
-            >
-              <SlidersHorizontal className="h-[18px] w-[18px]" />
-            </button>
             <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 focus-within:border-brand sm:w-72">
               <Search className="h-4 w-4 text-slate-400" />
               <input

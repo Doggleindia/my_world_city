@@ -1,6 +1,12 @@
-import { GraduationCap, BadgeCheck, Leaf, Newspaper } from 'lucide-react'
+import {
+  GraduationCap, BadgeCheck, Leaf, Newspaper, Scale, FileCheck, Award,
+  ShieldCheck, HardHat, Sofa, Landmark, Banknote, Compass, BookOpen, Sun,
+} from 'lucide-react'
 
-const iconMap = { GraduationCap, BadgeCheck, Leaf, Newspaper }
+const iconMap = {
+  GraduationCap, BadgeCheck, Leaf, Newspaper, Scale, FileCheck, Award,
+  ShieldCheck, HardHat, Sofa, Landmark, Banknote, Compass, BookOpen, Sun,
+}
 
 export default function ProfileSkills({ p }) {
   return (

@@ -35,6 +35,7 @@ const copy = {
 export default function EnquiryModal({ open, onClose, tab, onTabChange, property }) {
   const [sent, setSent] = useState(false)
   const [refId, setRefId] = useState('')
+  const [busy, setBusy] = useState(false)
   const [dateIdx, setDateIdx] = useState(0)
   const [timeSlot, setTimeSlot] = useState('12–2 PM')
   const [callTime, setCallTime] = useState('Afternoon (12–4)')
@@ -73,12 +74,44 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
   const Icon = c.icon
   const shortLoc = property.location.split(',')[0]
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const year = new Date().getFullYear()
-    const num = String(Math.floor(Math.random() * 100000)).padStart(5, '0')
-    setRefId(`MWC-${year}-${num}`)
-    setSent(true)
+    const fd = new FormData(e.currentTarget)
+    const type = tab === 'Schedule visit' ? 'visit' : tab === 'Request callback' ? 'callback' : 'enquiry'
+    const payload = {
+      type,
+      name: fd.get('name'),
+      phone: fd.get('phone'),
+      email: fd.get('email') || '',
+      message: fd.get('message') || undefined,
+    }
+    if (property?.id) payload.propertyId = property.id
+    if (type === 'visit') {
+      payload.visitDate = `${days[dateIdx].wd} ${days[dateIdx].date}`
+      payload.timeSlot = timeSlot
+    }
+    if (type === 'callback') {
+      payload.preferredTime = callTime
+      payload.preferredDay = callDay
+    }
+
+    setBusy(true)
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed')
+      setRefId(data.refId)
+    } catch {
+      const year = new Date().getFullYear()
+      setRefId(`MWC-${year}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}`)
+    } finally {
+      setBusy(false)
+      setSent(true)
+    }
   }
 
   return createPortal(
@@ -146,7 +179,7 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
 
               <div className="mt-5 space-y-4">
                 <Field label="Full name">
-                  <input type="text" required placeholder="e.g. Rahul Sharma" className={inputCls} />
+                  <input name="name" type="text" required placeholder="e.g. Rahul Sharma" className={inputCls} />
                 </Field>
 
                 <Field label="Phone number">
@@ -155,6 +188,7 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
                       +91
                     </span>
                     <input
+                      name="phone"
                       type="tel"
                       required
                       inputMode="numeric"
@@ -166,7 +200,7 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
                 </Field>
 
                 <Field label="Email address" optional>
-                  <input type="email" placeholder="rahul@example.com" className={inputCls} />
+                  <input name="email" type="email" placeholder="rahul@example.com" className={inputCls} />
                 </Field>
 
                 {tab === 'Schedule visit' && (
@@ -264,6 +298,7 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
                 {tab === 'Enquire' && (
                   <Field label="Your message">
                     <textarea
+                      name="message"
                       rows={3}
                       defaultValue="Hi, I'm interested in this property. Please share more details."
                       className={`${inputCls} resize-none`}
@@ -274,9 +309,10 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
 
               <button
                 type="submit"
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700"
+                disabled={busy}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-60"
               >
-                {c.cta} <Icon className="h-[18px] w-[18px]" />
+                {busy ? 'Sending…' : <>{c.cta} <Icon className="h-[18px] w-[18px]" /></>}
               </button>
             </form>
 

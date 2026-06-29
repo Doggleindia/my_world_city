@@ -8,6 +8,7 @@ import SuccessCard from '@/components/SuccessCard'
 export default function ExpertConnectModal({ open, onClose, expert }) {
   const [sent, setSent] = useState(false)
   const [refId, setRefId] = useState('')
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -26,12 +27,34 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
 
   if (!open || !expert || typeof document === 'undefined') return null
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const year = new Date().getFullYear()
-    const num = String(Math.floor(Math.random() * 100000)).padStart(5, '0')
-    setRefId(`MWC-${year}-${num}`)
-    setSent(true)
+    const fd = new FormData(e.currentTarget)
+    const payload = {
+      type: 'expert',
+      expertId: expert?.id || undefined,
+      name: fd.get('name'),
+      phone: fd.get('phone'),
+      email: fd.get('email') || '',
+      message: fd.get('message') || undefined,
+    }
+    setBusy(true)
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed')
+      setRefId(data.refId)
+    } catch {
+      const year = new Date().getFullYear()
+      setRefId(`MWC-${year}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}`)
+    } finally {
+      setBusy(false)
+      setSent(true)
+    }
   }
 
   return createPortal(
@@ -80,7 +103,7 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
 
               <div className="mt-5 space-y-4">
                 <Field label="Full name">
-                  <input type="text" required placeholder="e.g. Rahul Sharma" className={inputCls} />
+                  <input name="name" type="text" required placeholder="e.g. Rahul Sharma" className={inputCls} />
                 </Field>
 
                 <Field label="Phone number">
@@ -89,6 +112,7 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
                       +91
                     </span>
                     <input
+                      name="phone"
                       type="tel"
                       required
                       inputMode="numeric"
@@ -100,13 +124,14 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
                 </Field>
 
                 <Field label="Email address" optional>
-                  <input type="email" placeholder="rahul@example.com" className={inputCls} />
+                  <input name="email" type="email" placeholder="rahul@example.com" className={inputCls} />
                 </Field>
 
                 <Field label="Your message">
                   <textarea
+                    name="message"
                     rows={3}
-                    defaultValue="Hi, I'm interested in this property. Please share more details."
+                    defaultValue="Hi, I'd like to connect about your services. Please share more details."
                     className={`${inputCls} resize-none`}
                   />
                 </Field>
@@ -114,9 +139,10 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
 
               <button
                 type="submit"
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700"
+                disabled={busy}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-60"
               >
-                Send enquiry <Send className="h-[18px] w-[18px]" />
+                {busy ? 'Sending…' : <>Send enquiry <Send className="h-[18px] w-[18px]" /></>}
               </button>
             </form>
 

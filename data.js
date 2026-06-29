@@ -2,6 +2,14 @@
 const img = (id, w = 900) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
 
+// Shared primary navigation (used by Navbar across every page).
+export const navLinks = [
+  { label: 'Find Property', href: '/find-property' },
+  { label: 'Build Property', href: '/develop' },
+  { label: 'Services', href: '/services' },
+  { label: 'Premium', href: '/find-property' },
+]
+
 export const hero = {
   bg: img('1503387762-592deb58ef4e', 1600),
 }
@@ -205,7 +213,7 @@ export const expertCategories = [
 ]
 
 export const expertList = [
-  { slug: 'neha-sharma', initials: 'AS', cat: 'Architecture', tag: 'ARCHITECTURE', name: 'Ar. Neha Sharma', role: 'Senior Architect', specialty: 'Residential & commercial design' },
+  { slug: 'neha-sharma', initials: 'NS', cat: 'Architecture', tag: 'ARCHITECTURE', name: 'Ar. Neha Sharma', role: 'Senior Architect', specialty: 'Residential & commercial design' },
   { slug: 'rajesh-mehta', initials: 'RM', cat: 'Legal', tag: 'LEGAL', name: 'Adv. Rajesh Mehta', role: 'Legal Advisor', specialty: 'Title verification & registration' },
   { slug: 'vikram-singh', initials: 'VS', cat: 'Engineering', tag: 'ENGINEERING', name: 'Er. Vikram Singh', role: 'Structural Engineer', specialty: 'RCC & structural design' },
   { slug: 'suresh-kumar', initials: 'SK', cat: 'Construction', tag: 'CONSTRUCTION', name: 'Suresh Kumar', role: 'Civil Contractor', specialty: 'Turnkey home construction' },
@@ -216,60 +224,382 @@ export const expertList = [
   { slug: 'deepak-verma', initials: 'DV', cat: 'Solar', tag: 'ENERGY', name: 'Deepak Verma', role: 'Solar Installer', specialty: 'Rooftop solar systems' },
 ]
 
-export const expertProfile = {
-  slug: 'neha-sharma',
-  firstName: 'Neha',
-  name: 'Ar. Neha Sharma',
-  role: 'Senior Architect',
-  cat: 'Architecture',
-  tag: 'ARCHITECTURE',
-  initials: 'NS',
-  specialty: 'Residential & commercial design',
-  photo: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80',
-  location: 'Vaishali Nagar',
-  experience: '12 years exp',
-  languages: 'Hindi / English',
-  intro:
-    'Specializing in contemporary residential landmarks and large-scale commercial infrastructures, Neha blends traditional Rajasthani structural wisdom with modern geometric precision.',
-  stats: [
-    { value: '80+', label: 'Projects' },
-    { value: '12 yrs', label: 'Experience' },
-    { value: '12', label: 'Cities' },
-    { value: '100%', label: 'Delivery Rate' },
-  ],
-  about: [
-    "Ar. Neha Sharma's journey in architecture is deeply rooted in the Pink City's unique blend of heritage and ambition. After graduating from the prestigious SPA, she dedicated over 12 years to perfecting the art of 'Vernacular Modernism' — a style that respects Jaipur's climate and history while meeting the demands of global citizens.",
-    'Her approach is holistic, managing projects from the first sketch to the final brick. She believes that a building should not only be a functional space but a legacy piece that grows in value and character over time.',
-  ],
-  quickFacts: [
-    'Specialize in luxury residential and boutique retail interiors.',
-    'Expert in Vastu-Shastra integration with modern floor plans.',
-    "Recipient of the 'Rajasthan Architect Excellence' Award 2023.",
-    'Active consultant for smart-city infrastructure projects.',
-  ],
-  worksOn: [
-    'Residential villas',
-    'Vastu-aligned design',
-    'Heritage restoration',
-    'Boutique retail',
-    'Commercial skyscrapers',
-    'Sustainable landscaping',
-    'Turnkey execution',
-    'Smart home integration',
-  ],
-  qualifications: [
-    { icon: 'GraduationCap', title: 'B Arch', desc: 'School of Planning and Architecture, New Delhi.', bg: 'bg-emerald-500' },
-    { icon: 'BadgeCheck', title: 'COA Registered', desc: 'Member of Council of Architecture (India).', bg: 'bg-amber-500' },
-    { icon: 'Leaf', title: 'IGBC Accredited', desc: 'Indian Green Building Council Professional.', bg: 'bg-brand' },
-    { icon: 'Newspaper', title: 'AD Featured', desc: 'Featured in Architectural Digest — Top 50 Architects.', bg: 'bg-red-600' },
-  ],
-  projects: [
-    { year: '2025', title: 'Verma Residence', meta: 'Jagatpura • Residential Villa', desc: 'A 6,000 sq. ft. private estate focused on indoor-outdoor living with a central light-well atrium.', img: img('1564013799919-ab600027ffc6', 1000) },
-    { year: '2024', title: 'RIICO Office Tower', meta: 'Sitapura • Commercial', desc: 'Sustainable corporate headquarters featuring a LEED Gold-certified double-skin facade.', img: img('1486406146926-c627a92ad1ab', 1000) },
-    { year: '2024', title: 'C-Scheme Boutique Floor', meta: 'C-Scheme • Interior Design', desc: 'High-end residential floor renovation blending colonial proportions with minimalist aesthetics.', img: img('1586023492125-27b2c045efd7', 1000) },
-    { year: '2023', title: 'Mansarovar Twin Villas', meta: 'Mansarovar • Residential', desc: 'A pair of mirrored residences designed for an extended family, sharing a central landscaped court.', img: img('1568605114967-8130f3a36994', 1000) },
-  ],
+// Profile content keyed by expert category. buildProfile() (in the [slug] route)
+// overlays each expert's identity (name, role, initials…) on top of the matching
+// block, so a lawyer renders legal content and an architect renders design content.
+export const expertContentByCat = {
+  Architecture: {
+    photo: 'https://i.pravatar.cc/600?img=47',
+    location: 'Vaishali Nagar',
+    experience: '12 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Specializing in contemporary residential landmarks and large-scale commercial infrastructure, blending traditional Rajasthani structural wisdom with modern geometric precision.',
+    stats: [
+      { value: '80+', label: 'Projects' },
+      { value: '12 yrs', label: 'Experience' },
+      { value: '12', label: 'Cities' },
+      { value: '100%', label: 'Delivery Rate' },
+    ],
+    about: [
+      "This architect's journey is deeply rooted in the Pink City's unique blend of heritage and ambition. After graduating from a top school of planning, they dedicated over a decade to perfecting 'Vernacular Modernism' — a style that respects Jaipur's climate and history while meeting the demands of global citizens.",
+      'Their approach is holistic, managing projects from the first sketch to the final brick — a building should not only be a functional space but a legacy piece that grows in value and character over time.',
+    ],
+    quickFacts: [
+      'Specialize in luxury residential and boutique retail design.',
+      'Expert in Vastu-Shastra integration with modern floor plans.',
+      "Recipient of the 'Rajasthan Architect Excellence' Award 2023.",
+      'Active consultant for smart-city infrastructure projects.',
+    ],
+    worksOn: [
+      'Residential villas', 'Vastu-aligned design', 'Heritage restoration', 'Boutique retail',
+      'Commercial skyscrapers', 'Sustainable landscaping', 'Turnkey execution', 'Smart home integration',
+    ],
+    qualifications: [
+      { icon: 'GraduationCap', title: 'B Arch', desc: 'School of Planning and Architecture, New Delhi.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'COA Registered', desc: 'Member of Council of Architecture (India).', bg: 'bg-amber-500' },
+      { icon: 'Leaf', title: 'IGBC Accredited', desc: 'Indian Green Building Council Professional.', bg: 'bg-brand' },
+      { icon: 'Newspaper', title: 'AD Featured', desc: 'Featured in Architectural Digest — Top 50 Architects.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Verma Residence', meta: 'Jagatpura • Residential Villa', desc: 'A 6,000 sq. ft. private estate focused on indoor-outdoor living with a central light-well atrium.', img: img('1564013799919-ab600027ffc6', 1000) },
+      { year: '2024', title: 'RIICO Office Tower', meta: 'Sitapura • Commercial', desc: 'Sustainable corporate headquarters featuring a LEED Gold-certified double-skin facade.', img: img('1486406146926-c627a92ad1ab', 1000) },
+      { year: '2024', title: 'C-Scheme Boutique Floor', meta: 'C-Scheme • Interior Design', desc: 'High-end residential floor renovation blending colonial proportions with minimalist aesthetics.', img: img('1586023492125-27b2c045efd7', 1000) },
+      { year: '2023', title: 'Mansarovar Twin Villas', meta: 'Mansarovar • Residential', desc: 'A pair of mirrored residences designed for an extended family, sharing a central landscaped court.', img: img('1568605114967-8130f3a36994', 1000) },
+    ],
+  },
+
+  Legal: {
+    photo: 'https://i.pravatar.cc/600?img=12',
+    location: 'C-Scheme',
+    experience: '15 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Property-law specialist focused on watertight title verification, RERA compliance and registration — so your purchase is secure from the very first rupee.',
+    stats: [
+      { value: '600+', label: 'Matters' },
+      { value: '15 yrs', label: 'Experience' },
+      { value: '98%', label: 'Clearance Rate' },
+      { value: '7 days', label: 'Avg Turnaround' },
+    ],
+    about: [
+      'With over fifteen years at the Rajasthan High Court and district registry offices, this advisor has reviewed thousands of title chains and caught the encumbrances that derail deals after money changes hands.',
+      'The practice is built on a simple promise: no client signs a sale deed until every link in the ownership history is verified and every statutory clearance is in hand.',
+    ],
+    quickFacts: [
+      'Specialize in title search and encumbrance verification.',
+      'Empanelled for RERA agreement drafting and review.',
+      'Handles registration, mutation and stamp-duty assessment end-to-end.',
+      'Advisor on 200+ dispute-free property transfers.',
+    ],
+    worksOn: [
+      'Title verification', 'RERA agreements', 'Sale & gift deeds', 'Encumbrance checks',
+      'Property registration', 'Dispute resolution', 'Power of attorney', 'Due diligence',
+    ],
+    qualifications: [
+      { icon: 'Scale', title: 'LL.B', desc: 'University of Rajasthan, Faculty of Law.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'Bar Council', desc: 'Enrolled with the Bar Council of Rajasthan.', bg: 'bg-amber-500' },
+      { icon: 'FileCheck', title: 'RERA Empanelled', desc: 'Listed legal counsel for RERA matters.', bg: 'bg-brand' },
+      { icon: 'Award', title: 'Notary Public', desc: 'Government-appointed Notary, Jaipur district.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Sitapura Land Aggregation', meta: 'Sitapura • Title Due Diligence', desc: 'Cleared a 12-acre industrial assembly across nine owners, resolving two pending litigations before transfer.', img: img('1500382017468-9049fed747ef', 1000) },
+      { year: '2024', title: 'Mansarovar Society Conveyance', meta: 'Mansarovar • Registration', desc: 'Structured the deemed-conveyance and registration for a 64-flat housing society.', img: img('1486406146926-c627a92ad1ab', 1000) },
+      { year: '2024', title: 'NRI Estate Settlement', meta: 'C-Scheme • Succession', desc: 'Drafted partition and power-of-attorney instruments for an overseas family estate.', img: img('1564013799919-ab600027ffc6', 1000) },
+      { year: '2023', title: 'Commercial Lease Audit', meta: 'Malviya Nagar • Documentation', desc: 'Audited and re-papered 30+ retail leases for a commercial plaza ahead of sale.', img: img('1497366216548-37526070297c', 1000) },
+    ],
+  },
+
+  Engineering: {
+    photo: 'https://i.pravatar.cc/600?img=33',
+    location: 'Malviya Nagar',
+    experience: '14 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Structural engineer specializing in RCC design, seismic analysis and on-site quality control for residential and industrial builds across Rajasthan.',
+    stats: [
+      { value: '200+', label: 'Structures' },
+      { value: '14 yrs', label: 'Experience' },
+      { value: '0', label: 'Failures' },
+      { value: '100%', label: 'Code Compliant' },
+    ],
+    about: [
+      'A licensed structural engineer who treats every drawing as a safety promise — designs are load-tested, seismic-checked for Zone II, and detailed down to the bar-bending schedule before a single column is cast.',
+      'Years of site supervision mean designs that are not just sound on paper but buildable, economical, and verified at every pour.',
+    ],
+    quickFacts: [
+      'Specialize in RCC framed structures and foundations.',
+      'Seismic and wind-load analysis for mid-rise buildings.',
+      'On-site quality audits and concrete-mix verification.',
+      'Retrofitting and structural-stability certification.',
+    ],
+    worksOn: [
+      'RCC structural design', 'Foundation design', 'Seismic analysis', 'Soil & geotech review',
+      'Bar-bending schedules', 'Site supervision', 'Structural audits', 'Retrofitting',
+    ],
+    qualifications: [
+      { icon: 'GraduationCap', title: 'B.Tech Civil', desc: 'MNIT Jaipur — Civil Engineering.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'IE(I) Member', desc: 'Member, Institution of Engineers (India).', bg: 'bg-amber-500' },
+      { icon: 'ShieldCheck', title: 'Licensed Engineer', desc: 'Registered structural engineer, JDA panel.', bg: 'bg-brand' },
+      { icon: 'Award', title: 'M.Tech Structures', desc: 'Specialization in Structural Engineering.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Sitapura Warehouse Frame', meta: 'Sitapura • Industrial', desc: 'Designed a clear-span pre-engineered structure for a 40,000 sq. ft. logistics warehouse.', img: img('1581094794329-c8112a89af12', 1000) },
+      { year: '2024', title: 'Jagatpura G+3 Apartments', meta: 'Jagatpura • Residential', desc: 'RCC framed design and foundation system for a four-storey apartment block on soft soil.', img: img('1564013799919-ab600027ffc6', 1000) },
+      { year: '2024', title: 'Heritage Haveli Retrofit', meta: 'Old City • Restoration', desc: 'Structural retrofitting and stability certification for a 90-year-old stone haveli.', img: img('1586023492125-27b2c045efd7', 1000) },
+      { year: '2023', title: 'C-Scheme Office Slab', meta: 'C-Scheme • Commercial', desc: 'Post-tensioned slab design enabling a column-free conference floor.', img: img('1486406146926-c627a92ad1ab', 1000) },
+    ],
+  },
+
+  Construction: {
+    photo: 'https://i.pravatar.cc/600?img=51',
+    location: 'Jagatpura',
+    experience: '18 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Civil contractor delivering turnkey homes and commercial builds — from foundation to finishing — with transparent costing and milestone-based execution.',
+    stats: [
+      { value: '120+', label: 'Homes Built' },
+      { value: '18 yrs', label: 'Experience' },
+      { value: '95%', label: 'On-Time' },
+      { value: '4.8★', label: 'Client Rating' },
+    ],
+    about: [
+      'Eighteen years of building across Jaipur means a crew that knows local soil, labour and material rates cold — and a project manager who keeps the site running to schedule.',
+      'Every project runs on a published milestone plan with quality checks at each stage, so clients always know what is being built, when, and for how much.',
+    ],
+    quickFacts: [
+      'Specialize in turnkey residential construction.',
+      'Transparent BOQ and milestone-linked billing.',
+      'In-house crews for civil, plumbing and electrical.',
+      'Dedicated site engineer on every project.',
+    ],
+    worksOn: [
+      'Turnkey home construction', 'Civil & RCC work', 'Renovation & extension', 'Project scheduling',
+      'Material procurement', 'Quality control', 'Waterproofing', 'Site management',
+    ],
+    qualifications: [
+      { icon: 'HardHat', title: 'Class-A Contractor', desc: 'Registered Class-A civil contractor, Rajasthan.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'Verified Crews', desc: 'Background-checked in-house labour teams.', bg: 'bg-amber-500' },
+      { icon: 'ShieldCheck', title: 'Quality Certified', desc: 'ISO-aligned site quality processes.', bg: 'bg-brand' },
+      { icon: 'Award', title: '120+ Handovers', desc: 'Completed homes across Jaipur since 2007.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Jagatpura Duplex', meta: 'Jagatpura • Turnkey Villa', desc: 'A 3,200 sq. ft. duplex delivered in 11 months, foundation to handover.', img: img('1568605114967-8130f3a36994', 1000) },
+      { year: '2024', title: 'Mansarovar Rowhouses', meta: 'Mansarovar • Residential', desc: 'Six rowhouses built in parallel with shared procurement to cut costs 12%.', img: img('1564013799919-ab600027ffc6', 1000) },
+      { year: '2024', title: 'Vaishali Retail Shell', meta: 'Vaishali Nagar • Commercial', desc: 'Core-and-shell construction for a ground-plus-two retail block.', img: img('1497366216548-37526070297c', 1000) },
+      { year: '2023', title: 'Bagru Farmhouse', meta: 'Bagru • Farm Build', desc: 'Off-grid farmhouse with rainwater harvesting and a solar-ready roof.', img: img('1416879595882-3373a0480b5b', 1000) },
+    ],
+  },
+
+  Interior: {
+    photo: 'https://i.pravatar.cc/600?img=45',
+    location: 'C-Scheme',
+    experience: '10 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Interior designer crafting luxury residential and boutique retail spaces — warm material palettes, smart storage and lighting that makes a home feel finished.',
+    stats: [
+      { value: '90+', label: 'Spaces' },
+      { value: '10 yrs', label: 'Experience' },
+      { value: '40+', label: 'Repeat Clients' },
+      { value: '4.9★', label: 'Client Rating' },
+    ],
+    about: [
+      'A decade of designing homes that feel personal rather than staged — every brief starts with how a family actually lives, then layers in material, light and proportion.',
+      'From modular kitchens to full turnkey fit-outs, the studio manages design, procurement and on-site execution under one roof.',
+    ],
+    quickFacts: [
+      'Specialize in luxury residential interiors.',
+      'Turnkey fit-outs with in-house execution.',
+      'Vastu-aware layouts and lighting design.',
+      'Bespoke modular kitchens and wardrobes.',
+    ],
+    worksOn: [
+      'Residential interiors', 'Modular kitchens', 'Lighting design', 'Boutique retail',
+      'Furniture & styling', 'Space planning', 'Turnkey fit-outs', 'Material consulting',
+    ],
+    qualifications: [
+      { icon: 'GraduationCap', title: 'B.Des Interior', desc: 'Bachelor of Design — Interior Architecture.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'IIID Member', desc: 'Institute of Indian Interior Designers.', bg: 'bg-amber-500' },
+      { icon: 'Sofa', title: 'Turnkey Studio', desc: 'In-house carpentry and execution team.', bg: 'bg-brand' },
+      { icon: 'Newspaper', title: 'Published Work', desc: 'Featured in regional design publications.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'C-Scheme Apartment', meta: 'C-Scheme • Residential', desc: 'A warm-minimalist 3BHK fit-out with a custom oak-and-brass kitchen.', img: img('1586023492125-27b2c045efd7', 1000) },
+      { year: '2024', title: 'Boutique Jewellery Store', meta: 'Johari Bazaar • Retail', desc: 'Lighting-led retail design that doubled dwell time at the counter.', img: img('1545324418-cc1a3fa10c00', 1000) },
+      { year: '2024', title: 'Mansarovar Villa Interiors', meta: 'Mansarovar • Residential', desc: 'Full turnkey interiors across four bedrooms and a home theatre.', img: img('1568605114967-8130f3a36994', 1000) },
+      { year: '2023', title: 'Café Fit-out', meta: 'Vaishali Nagar • Hospitality', desc: 'A 40-cover café with a terrazzo bar and layered warm lighting.', img: img('1502672260266-1c1ef2d93688', 1000) },
+    ],
+  },
+
+  Approvals: {
+    photo: 'https://i.pravatar.cc/600?img=59',
+    location: 'Lal Kothi',
+    experience: '16 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Government-liaison specialist who secures JDA and RIICO building-plan sanctions, NOCs and completion certificates — so your project breaks ground on time.',
+    stats: [
+      { value: '500+', label: 'Approvals' },
+      { value: '16 yrs', label: 'Experience' },
+      { value: '95%', label: 'First-Pass' },
+      { value: '6 wks', label: 'Avg Sanction' },
+    ],
+    about: [
+      'Sixteen years navigating JDA, RIICO and municipal departments means knowing exactly which file goes where, what each officer needs, and how to keep an application from stalling.',
+      'The service compiles the full submission package, files it, follows up, and answers every departmental query until the sanctioned plan and NOCs are in your hand.',
+    ],
+    quickFacts: [
+      'Specialize in JDA and RIICO clearances.',
+      'Handles fire, environment and utility NOCs.',
+      'Land-use conversion and map approvals.',
+      'Completion and occupancy certificates.',
+    ],
+    worksOn: [
+      'Building plan sanction', 'JDA liaison', 'RIICO clearances', 'Fire & environment NOC',
+      'Land-use conversion', 'Map approval', 'Completion certificate', 'Utility connections',
+    ],
+    qualifications: [
+      { icon: 'Landmark', title: 'JDA Empanelled', desc: 'Registered liaison agent with the JDA.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'RIICO Panel', desc: 'Empanelled for RIICO industrial clearances.', bg: 'bg-amber-500' },
+      { icon: 'FileCheck', title: 'NOC Specialist', desc: 'Fire, environment and water NOC handling.', bg: 'bg-brand' },
+      { icon: 'Award', title: '500+ Sanctions', desc: 'Plans cleared across Jaipur since 2009.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Sitapura Factory Sanction', meta: 'Sitapura • RIICO', desc: 'Secured building-plan sanction and fire NOC for a 2-acre manufacturing unit.', img: img('1581094794329-c8112a89af12', 1000) },
+      { year: '2024', title: 'Jagatpura Group Housing', meta: 'Jagatpura • JDA', desc: 'Cleared map approval and environment NOC for a 90-unit housing project.', img: img('1486406146926-c627a92ad1ab', 1000) },
+      { year: '2024', title: 'Agri-to-Residential Conversion', meta: 'Bagru • Land Use', desc: 'Completed land-use conversion for a 4-acre residential layout.', img: img('1500382017468-9049fed747ef', 1000) },
+      { year: '2023', title: 'C-Scheme Occupancy', meta: 'C-Scheme • Completion', desc: 'Obtained completion and occupancy certificates for a commercial tower.', img: img('1497366216548-37526070297c', 1000) },
+    ],
+  },
+
+  Finance: {
+    photo: 'https://i.pravatar.cc/600?img=68',
+    location: 'Bani Park',
+    experience: '11 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Home-loan advisor matching buyers and builders to the right lender — best rates, clean documentation, and fast sanctions on home and construction finance.',
+    stats: [
+      { value: '₹450 Cr+', label: 'Loans Facilitated' },
+      { value: '11 yrs', label: 'Experience' },
+      { value: '30+', label: 'Lender Tie-ups' },
+      { value: '92%', label: 'Sanction Rate' },
+    ],
+    about: [
+      'Eleven years across leading banks and NBFCs means knowing which lender says yes to which profile — salaried, self-employed, or NRI — and at what rate.',
+      'The service is end-to-end: eligibility assessment, document prep, application, and follow-up through disbursement, including PMAY subsidy where eligible.',
+    ],
+    quickFacts: [
+      'Specialize in home and construction loans.',
+      'Access to 30+ banks and NBFCs.',
+      'PMAY subsidy and balance-transfer advisory.',
+      'NRI and self-employed loan structuring.',
+    ],
+    worksOn: [
+      'Home loans', 'Construction loans', 'Balance transfer', 'Loan eligibility',
+      'Documentation', 'PMAY subsidy', 'Credit advisory', 'NRI loans',
+    ],
+    qualifications: [
+      { icon: 'GraduationCap', title: 'MBA Finance', desc: 'Post-graduate in Finance & Banking.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'AMFI / IRDAI', desc: 'Certified financial products advisor.', bg: 'bg-amber-500' },
+      { icon: 'Banknote', title: '30+ Lenders', desc: 'Direct tie-ups with banks and NBFCs.', bg: 'bg-brand' },
+      { icon: 'Award', title: '₹450 Cr+', desc: 'Cumulative loans facilitated to date.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Self-Employed Villa Loan', meta: 'Jagatpura • Home Loan', desc: 'Structured a ₹1.4 Cr loan for a self-employed buyer at a market-best rate.', img: img('1564013799919-ab600027ffc6', 1000) },
+      { year: '2024', title: 'Construction Finance', meta: 'Mansarovar • Build Loan', desc: 'Staged construction-linked disbursement for a ground-up home build.', img: img('1568605114967-8130f3a36994', 1000) },
+      { year: '2024', title: 'PMAY Subsidy Case', meta: 'Bagru • Subsidy', desc: 'Secured a CLSS subsidy that cut the borrower’s effective rate sharply.', img: img('1586023492125-27b2c045efd7', 1000) },
+      { year: '2023', title: 'NRI Apartment Loan', meta: 'C-Scheme • NRI Loan', desc: 'Arranged repatriable home finance for an overseas investor.', img: img('1502672260266-1c1ef2d93688', 1000) },
+    ],
+  },
+
+  Vastu: {
+    photo: 'https://i.pravatar.cc/600?img=60',
+    location: 'Raja Park',
+    experience: '20 years exp',
+    languages: 'Hindi / Sanskrit / English',
+    intro:
+      'Vastu consultant aligning homes, factories and commercial spaces with directional energy — practical remedies that work alongside modern floor plans.',
+    stats: [
+      { value: '1,000+', label: 'Consults' },
+      { value: '20 yrs', label: 'Experience' },
+      { value: '15', label: 'Cities' },
+      { value: '4.9★', label: 'Client Rating' },
+    ],
+    about: [
+      'Two decades of Vastu practice grounded in classical texts but applied pragmatically — remedies that respect the architecture instead of demanding demolition.',
+      'Works hand-in-hand with architects and interior designers so directional alignment is built in from the layout stage rather than patched in later.',
+    ],
+    quickFacts: [
+      'Specialize in residential and commercial Vastu.',
+      'Plot selection and entrance-direction guidance.',
+      'Non-destructive remedies and energy balancing.',
+      'Collaborates directly with architects.',
+    ],
+    worksOn: [
+      'Residential Vastu', 'Commercial Vastu', 'Plot selection', 'Entrance direction',
+      'Energy balancing', 'Vastu remedies', 'Factory Vastu', 'Renovation Vastu',
+    ],
+    qualifications: [
+      { icon: 'Compass', title: 'Vastu Acharya', desc: 'Formal training in classical Vastu Shastra.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: '20 yrs Practice', desc: 'Two decades of consulting experience.', bg: 'bg-amber-500' },
+      { icon: 'BookOpen', title: 'Author', desc: 'Published guides on applied Vastu.', bg: 'bg-brand' },
+      { icon: 'Award', title: '1,000+ Consults', desc: 'Homes and businesses across India.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Mansarovar Home Audit', meta: 'Mansarovar • Residential', desc: 'Re-planned entrance and kitchen orientation without structural changes.', img: img('1568605114967-8130f3a36994', 1000) },
+      { year: '2024', title: 'Sitapura Factory Layout', meta: 'Sitapura • Industrial', desc: 'Directional layout of production and storage zones for a new unit.', img: img('1581094794329-c8112a89af12', 1000) },
+      { year: '2024', title: 'C-Scheme Office Vastu', meta: 'C-Scheme • Commercial', desc: 'Seating and cabin alignment for a corporate office floor.', img: img('1486406146926-c627a92ad1ab', 1000) },
+      { year: '2023', title: 'Plot Selection Advisory', meta: 'Jagatpura • Pre-purchase', desc: 'Evaluated three plots and shortlisted the most auspicious for a family build.', img: img('1500382017468-9049fed747ef', 1000) },
+    ],
+  },
+
+  Solar: {
+    photo: 'https://i.pravatar.cc/600?img=64',
+    location: 'Vaishali Nagar',
+    experience: '9 years exp',
+    languages: 'Hindi / English',
+    intro:
+      'Solar installer designing rooftop systems that pay for themselves — clean sizing, net-metering setup, and subsidy paperwork handled for homes and businesses.',
+    stats: [
+      { value: '3 MW+', label: 'Installed' },
+      { value: '9 yrs', label: 'Experience' },
+      { value: '700+', label: 'Rooftops' },
+      { value: '25 yr', label: 'Panel Warranty' },
+    ],
+    about: [
+      'Nine years and several megawatts of rooftop solar across Jaipur — systems sized to actual consumption, not oversold, with realistic payback projections up front.',
+      'Handles the full journey: site survey, system design, installation, net-metering with the discom, and the state and central subsidy paperwork.',
+    ],
+    quickFacts: [
+      'Specialize in rooftop on-grid solar.',
+      'Net-metering and discom liaison.',
+      'State and central subsidy assistance.',
+      'Annual maintenance and monitoring.',
+    ],
+    worksOn: [
+      'Rooftop solar', 'On-grid systems', 'Off-grid systems', 'Net metering',
+      'Inverters & batteries', 'Solar water heaters', 'System maintenance', 'Subsidy assistance',
+    ],
+    qualifications: [
+      { icon: 'GraduationCap', title: 'B.Tech EEE', desc: 'Electrical & Electronics Engineering.', bg: 'bg-emerald-500' },
+      { icon: 'BadgeCheck', title: 'MNRE Channel Partner', desc: 'Approved renewable-energy installer.', bg: 'bg-amber-500' },
+      { icon: 'Sun', title: '3 MW+ Installed', desc: 'Cumulative rooftop capacity commissioned.', bg: 'bg-brand' },
+      { icon: 'Leaf', title: 'Green Certified', desc: 'Clean-energy compliance and safety certified.', bg: 'bg-red-600' },
+    ],
+    projects: [
+      { year: '2025', title: 'Vaishali Rooftop 10kW', meta: 'Vaishali Nagar • Residential', desc: 'A 10kW on-grid system with net metering, ~70% bill reduction.', img: img('1518780664697-55e3ad937233', 1000) },
+      { year: '2024', title: 'Sitapura Factory 250kW', meta: 'Sitapura • Industrial', desc: 'Large rooftop array for a manufacturing unit with load monitoring.', img: img('1581094794329-c8112a89af12', 1000) },
+      { year: '2024', title: 'Society Solar Common Area', meta: 'Mansarovar • Residential', desc: 'Common-area solar for a housing society’s lifts and lighting.', img: img('1564013799919-ab600027ffc6', 1000) },
+      { year: '2023', title: 'Farmhouse Off-grid', meta: 'Bagru • Off-grid', desc: 'Battery-backed off-grid system for a farmhouse beyond the grid.', img: img('1416879595882-3373a0480b5b', 1000) },
+    ],
+  },
 }
+
+// Default profile content when a category has no dedicated block.
+export const expertProfileFallback = expertContentByCat.Architecture
 
 export const expertDomains = ['Architecture', 'Legal', 'Engineering', 'Construction']
 export const expertExperience = ['Any', '5+ Years', '10+ Years', '15+ Years']

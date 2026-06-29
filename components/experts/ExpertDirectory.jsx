@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, ChevronDown } from 'lucide-react'
+import { Search } from 'lucide-react'
 import ExpertCard from './ExpertCard'
 import ExpertFilters from './ExpertFilters'
 import { expertList, expertCategories } from '@/data'
@@ -69,14 +69,6 @@ export default function ExpertDirectory() {
             <p className="py-16 text-center text-[14px] text-slate-500">
               No experts match your filters.
             </p>
-          )}
-
-          {filtered.length > 0 && (
-            <div className="mt-10 flex justify-center">
-              <button className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-[14px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand">
-                Load More Properties <ChevronDown className="h-4 w-4" />
-              </button>
-            </div>
           )}
         </div>
       </div>

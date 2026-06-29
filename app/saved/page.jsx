@@ -7,17 +7,10 @@ export const metadata = {
   description: 'Your shortlisted properties on My World City.',
 }
 
-const navLinks = [
-  { label: 'Find Property', href: '/find-property' },
-  { label: 'Develop Property', href: '/develop' },
-  { label: 'Services', href: '/services' },
-  { label: 'Premium', href: '#' },
-]
-
 export default function SavedPage() {
   return (
     <main className="flex min-h-screen flex-col bg-slate-100 text-slate-900">
-      <Navbar links={navLinks} cta="brand" />
+      <Navbar cta="brand" />
       <div className="flex-1">
         <SavedProperties />
       </div>

@@ -11,17 +11,10 @@ export const metadata = {
     'From legal clearances to the final Vastu check, My World City orchestrates every professional and permit to turn your land into a masterpiece.',
 }
 
-const navLinks = [
-  { label: 'Find Property', href: '/find-property' },
-  { label: 'Build Property', href: '/develop' },
-  { label: 'Services', href: '/services' },
-  { label: 'Premium', href: '#' },
-]
-
 export default function DevelopPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      <Navbar links={navLinks} cta="brand" />
+      <Navbar cta="brand" />
       <DevelopHero />
       <DevelopFeatures />
       <DevelopTimeline />

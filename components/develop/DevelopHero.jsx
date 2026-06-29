@@ -1,4 +1,5 @@
 import { developHeroImg } from '@/data'
+import ContactButton from '@/components/contact/ContactButton'
 
 export default function DevelopHero() {
   return (
@@ -22,9 +23,14 @@ export default function DevelopHero() {
             From legal clearances to the final Vastu check, we orchestrate every professional and
             permit required to turn your land into a masterpiece.
           </p>
-          <button className="mt-7 rounded-full border border-slate-300 bg-white/90 px-6 py-3 text-[14px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand">
+          <ContactButton
+            topic="Develop a property"
+            title="Talk to our team"
+            subtitle="Tell us about your land or project and we’ll guide you through the build."
+            className="mt-7 rounded-full border border-slate-300 bg-white/90 px-6 py-3 text-[14px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+          >
             Talk to our team
-          </button>
+          </ContactButton>
         </div>
       </div>
     </section>

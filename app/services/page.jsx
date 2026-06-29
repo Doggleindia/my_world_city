@@ -11,17 +11,10 @@ export const metadata = {
     'From search to possession, handled. Browse My World City’s verified service partners — legal, surveyor, architect, contractor and more across Jaipur.',
 }
 
-const navLinks = [
-  { label: 'Find Property', href: '/find-property' },
-  { label: 'Build Property', href: '/develop' },
-  { label: 'Services', href: '/services' },
-  { label: 'Premium', href: '#' },
-]
-
 export default function ServicesPage() {
   return (
     <main className="min-h-screen bg-indigo-50 text-slate-900">
-      <Navbar links={navLinks} cta="brand" />
+      <Navbar cta="brand" />
       <ServicesHero />
       <ServiceHub />
       <ConciergeCTA />

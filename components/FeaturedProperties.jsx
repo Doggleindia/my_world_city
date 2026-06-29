@@ -1,8 +1,33 @@
 import Link from 'next/link'
-import { Heart, Share2, MapPin, ArrowRight } from 'lucide-react'
-import { featured } from '../data'
+import { Heart, MapPin, ArrowRight } from 'lucide-react'
+import SaveButton from '@/components/SaveButton'
+import ShareButton from '@/components/ShareButton'
+import { featured as staticFeatured } from '../data'
+import { dbConnect } from '@/lib/db'
+import Property from '@/lib/models/Property'
+import { toPropertyCard } from '@/lib/serialize'
 
-export default function FeaturedProperties() {
+async function getFeatured() {
+  try {
+    await dbConnect()
+    const docs = await Property.find({ status: 'active', featured: true })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .lean()
+    if (docs.length) {
+      return docs.map((d) => {
+        const c = toPropertyCard(d)
+        return { id: c.id, tag: c.tag, title: c.title, loc: c.loc, img: c.img, href: c.href }
+      })
+    }
+  } catch {
+    // DB unavailable — fall back to static content.
+  }
+  return staticFeatured.map((f) => ({ ...f, href: '/find-property' }))
+}
+
+export default async function FeaturedProperties() {
+  const featured = await getFeatured()
   return (
     <section className="bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
@@ -27,7 +52,7 @@ export default function FeaturedProperties() {
               key={i}
               className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:shadow-card"
             >
-              <Link href="/property" className="block h-44 w-full overflow-hidden">
+              <Link href={p.href} className="block h-44 w-full overflow-hidden">
                 <img
                   src={p.img}
                   alt={p.title}
@@ -36,7 +61,7 @@ export default function FeaturedProperties() {
               </Link>
               <div className="p-4">
                 <span className="text-[10.5px] font-bold tracking-wide text-brand">{p.tag}</span>
-                <Link href="/property" className="mt-1 block">
+                <Link href={p.href} className="mt-1 block">
                   <h3 className="text-[16px] font-bold text-navy-800 transition hover:text-brand">{p.title}</h3>
                 </Link>
                 <p className="mt-1 flex items-center gap-1 text-[12.5px] text-slate-500">
@@ -44,18 +69,24 @@ export default function FeaturedProperties() {
                 </p>
 
                 <div className="mt-4 flex items-center gap-2">
-                  <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-ember hover:text-ember">
-                    <Heart className="h-4 w-4" />
-                  </button>
+                  {p.id ? (
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200">
+                      <SaveButton id={p.id} size={16} />
+                    </span>
+                  ) : (
+                    <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-ember hover:text-ember">
+                      <Heart className="h-4 w-4" />
+                    </button>
+                  )}
                   <Link
-                    href="/property"
+                    href={p.href}
                     className="flex-1 rounded-lg bg-navy-800 py-2 text-center text-[13px] font-semibold text-white transition hover:bg-navy-700"
                   >
                     Details
                   </Link>
-                  <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-brand hover:text-brand">
-                    <Share2 className="h-4 w-4" />
-                  </button>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-brand hover:text-brand">
+                    <ShareButton url={p.href} title={p.title} size={16} />
+                  </span>
                 </div>
               </div>
             </article>
