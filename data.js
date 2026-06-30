@@ -94,24 +94,60 @@ export const gallery = [
 
 export const insights = [
   {
-    title: "UrbanNest's Smart Home Integration Streamlines Living Experience for New Homeowners",
-    desc: 'Integration services that allow new homeowners to control appliances, lighting, and security systems.',
+    slug: 'smart-home-integration-new-homeowners',
+    title: "Smart Home Integration Streamlines the Living Experience for New Homeowners",
+    desc: 'Integration services that let new homeowners control appliances, lighting, and security from a single app.',
     img: img('1558002038-1055907df827'),
+    category: 'Smart Living',
+    date: 'June 2026',
+    readTime: '4 min read',
+    body: [
+      'For families moving into a new home in Jaipur, the first few weeks are usually spent wiring up a patchwork of disconnected gadgets — a smart bulb here, a video doorbell there, a thermostat that only talks to its own app. Integration changes that. A properly integrated home brings lighting, climate, security cameras, door locks and entertainment under one roof, controllable from a phone or a voice assistant.',
+      'The practical wins show up fast. Lighting and air-conditioning schedules cut electricity bills through the long Jaipur summer. Motion-aware cameras and smart locks mean you can let a verified service partner in remotely and watch the work happen. And because everything reports to a single dashboard, a fault — a left-open gate, a running geyser — surfaces immediately instead of after the bill arrives.',
+      'Our advice to first-time buyers is to plan the backbone before the furniture. Decide on one ecosystem, run the wiring and Wi-Fi coverage during fit-out rather than after, and insist that your contractor leaves clean documentation of every connected device. Done right, integration is invisible: the house simply does the obvious thing at the obvious time.',
+    ],
   },
   {
-    title: "GreenHaven's Sustainable Housing Development Redefines Eco-Friendly Living",
-    desc: 'Sustainable housing, focusing on energy efficient designs and materials that minimise environmental impact.',
+    slug: 'sustainable-housing-eco-friendly-living',
+    title: "Sustainable Housing Development Redefines Eco-Friendly Living",
+    desc: 'Energy-efficient designs and low-impact materials that cut running costs and carbon together.',
     img: img('1518780664697-55e3ad937233'),
+    category: 'Sustainability',
+    date: 'June 2026',
+    readTime: '5 min read',
+    body: [
+      'Sustainable housing is no longer a premium add-on — in a city as sun-rich and water-stressed as Jaipur, it is simply good engineering. The newest developments lead with passive design: orientation that keeps walls out of the harshest afternoon sun, cross-ventilation that reduces the hours an air-conditioner has to run, and high-albedo roofing that keeps the top floor liveable.',
+      'On top of the passive layer comes the active one. Rooftop solar now pays for itself within a few years at current tariffs, rainwater harvesting recharges groundwater that the whole locality depends on, and greywater recycling turns kitchen and bath runoff into garden irrigation. Material choices matter too — fly-ash bricks, low-VOC paints and locally sourced stone shrink both the carbon footprint and the transport cost.',
+      'For investors, the case is straightforward: lower running costs make a home easier to rent and easier to resell, and green-certified buildings increasingly command a premium. Every sustainable listing on My World City is checked for the claims it makes, so buyers know an "eco-friendly" tag reflects real systems, not marketing.',
+    ],
   },
   {
-    title: "SecureSpace's Advanced Security Solutions Enhance Property Safety for Real Estate Investors",
-    desc: 'Security solutions provide real estate investors with peace of mind through surveillance and monitoring technologies.',
+    slug: 'advanced-security-solutions-investors',
+    title: "Advanced Security Solutions Enhance Property Safety for Real Estate Investors",
+    desc: 'Surveillance, access control and monitoring that protect properties owners cannot watch every day.',
     img: img('1496307653780-42ee777d4833'),
+    category: 'Security',
+    date: 'May 2026',
+    readTime: '4 min read',
+    body: [
+      'For an investor holding a plot in Sitapura or a villa in Jagatpura that sits empty between tenants, security is the difference between a passive asset and a constant worry. Modern systems are built for exactly this absentee-owner reality — cloud cameras that stream to a phone, motion sensors that distinguish a stray dog from a person, and smart locks that issue time-limited codes to caretakers and contractors.',
+      'The shift from recording to prevention is the real change. Older CCTV only told you what had already gone wrong. Today’s monitoring pushes a live alert the moment a boundary is crossed, and many setups pair with a local response service that can reach the site in minutes. Access logs also settle disputes: you know exactly who entered, when, and for how long.',
+      'Before buying any security package, owners should confirm three things — that footage is stored off-site so it survives tampering, that the system keeps working through a power cut, and that someone is contractually responsible for responding to alerts. A camera nobody watches is just a deterrent sticker.',
+    ],
   },
   {
+    slug: 'proptech-digitizing-real-estate-transactions',
     title: 'PropTech Innovations Digitize Real Estate Transactions for a Seamless Buying Experience',
-    desc: 'Real estate transactions by utilizing blockchain technology, ensuring transparency and safety for buyers and sellers.',
+    desc: 'Verified records, digital documentation and transparent workflows that make buying faster and safer.',
     img: img('1451187580459-43490279c0fa'),
+    category: 'PropTech',
+    date: 'May 2026',
+    readTime: '6 min read',
+    body: [
+      'Property in India has historically been bought on paper and on trust — physical files, cash-heavy negotiations and a title history that takes weeks to untangle. PropTech is rewriting that workflow. Digitised land records, e-stamping and online registration appointments have already cut the friction at the government counter, and verified digital listings are doing the same for the search itself.',
+      'The biggest gain is transparency. When a listing carries a verified tag, a buyer can see that the title, the measurements and the ownership chain have been checked before the first site visit. Digital documentation keeps every agreement, payment receipt and approval in one timeline, so nobody is reconstructing the deal from a shoebox of papers six months later.',
+      'This is the thesis My World City is built on: every property real, every partner verified, every step recorded. By moving enquiries, document checks and payments onto one transparent platform, the goal is simple — make a property transaction in Jaipur feel as predictable as any other major purchase, with no surprises hiding in the fine print.',
+    ],
   },
 ]
 

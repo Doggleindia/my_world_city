@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Search, ShieldCheck } from 'lucide-react'
 import ServiceCard from './ServiceCard'
 import ServiceRequestModal from './ServiceRequestModal'
@@ -9,6 +10,17 @@ import { services } from '@/data'
 export default function ServiceHub() {
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(null)
+  const searchParams = useSearchParams()
+
+  // Deep link: /services?service=Legal opens that service's request modal.
+  useEffect(() => {
+    const wanted = searchParams.get('service')
+    if (!wanted) return
+    const match = services.find(
+      (s) => s.title.toLowerCase() === wanted.trim().toLowerCase(),
+    )
+    if (match) setActive(match)
+  }, [searchParams])
 
   const filtered = services.filter(
     (s) =>

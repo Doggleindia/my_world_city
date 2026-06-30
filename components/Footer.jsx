@@ -23,10 +23,10 @@ const cols = [
   {
     head: 'Services',
     items: [
-      { label: 'Legal', href: '/services' },
-      { label: 'Surveyor', href: '/services' },
-      { label: 'Architect', href: '/services' },
-      { label: 'Vastu', href: '/services' },
+      { label: 'Legal', href: '/services?service=Legal' },
+      { label: 'Surveyor', href: '/services?service=Surveyor' },
+      { label: 'Architect', href: '/services?service=Architect' },
+      { label: 'Vastu', href: '/services?service=Consultant' },
     ],
   },
 ]

@@ -1,6 +1,3 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
 import { Home, Building2, Users, TrendingUp } from 'lucide-react'
 import { actionCards } from '../data'
@@ -14,33 +11,11 @@ const hrefs = {
 }
 
 export default function ActionSelector() {
-  const [tab, setTab] = useState('find')
-
   return (
-    <section className="relative z-10 -mt-9">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        {/* Toggle pills */}
-        <div className="flex w-full max-w-xl overflow-hidden rounded-full border border-slate-200 bg-white p-1 shadow-card">
-          <button
-            onClick={() => setTab('find')}
-            className={`flex-1 rounded-full px-6 py-2.5 text-[14px] font-semibold transition ${
-              tab === 'find' ? 'bg-brand text-white' : 'text-slate-600 hover:text-navy-800'
-            }`}
-          >
-            Find Solution
-          </button>
-          <button
-            onClick={() => setTab('post')}
-            className={`flex-1 rounded-full px-6 py-2.5 text-[14px] font-semibold transition ${
-              tab === 'post' ? 'bg-brand text-white' : 'text-slate-600 hover:text-navy-800'
-            }`}
-          >
-            Post Requirement
-          </button>
-        </div>
-
+    <section className="relative z-10">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         {/* Four action cards */}
-        <div className="mt-7 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {actionCards.map((c) => {
             const Icon = icons[c.icon]
             return (

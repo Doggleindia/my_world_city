@@ -78,9 +78,10 @@ export default function AuthButtons({ cta = 'navy' }) {
 
       <button
         onClick={() => requireAuth(() => router.push('/list-property'))}
-        className={`rounded-full px-4 py-2 text-[13px] font-semibold text-white transition ${ctaClass}`}
+        className={`whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold text-white transition sm:px-4 ${ctaClass}`}
       >
-        List Property — Free
+        <span className="sm:hidden">List Free</span>
+        <span className="hidden sm:inline">List Property — Free</span>
       </button>
     </div>
   )

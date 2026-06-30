@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Globe } from 'lucide-react'
 import { navLinks } from '@/data'
 import AuthButtons from '@/components/auth/AuthButtons'
+import MobileNav from '@/components/MobileNav'
 
 export default function Navbar({ links = navLinks, cta = 'navy' }) {
   return (
@@ -24,7 +25,10 @@ export default function Navbar({ links = navLinks, cta = 'navy' }) {
           ))}
         </nav>
 
-        <AuthButtons cta={cta} />
+        <div className="flex items-center gap-2">
+          <AuthButtons cta={cta} />
+          <MobileNav links={links} />
+        </div>
       </div>
     </header>
   )

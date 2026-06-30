@@ -118,7 +118,7 @@ function Listings() {
               <p className="mt-1 text-[12.5px] text-red-600">Reason: {p.rejectionReason}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <PromoteButton id={p.id} premium={p.premium} featured={p.featured} onDone={load} />
             {p.status === 'active' && (
               <Link

@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Navbar from '@/components/Navbar'
 import ServicesHero from '@/components/services/ServicesHero'
 import ServiceHub from '@/components/services/ServiceHub'
@@ -16,7 +17,9 @@ export default function ServicesPage() {
     <main className="min-h-screen bg-indigo-50 text-slate-900">
       <Navbar cta="brand" />
       <ServicesHero />
-      <ServiceHub />
+      <Suspense fallback={null}>
+        <ServiceHub />
+      </Suspense>
       <ConciergeCTA />
       <SiteFooter />
       <ChatFab />

@@ -1,13 +1,14 @@
 import { hero } from '../data'
+import HeroTabs from './HeroTabs'
 
 export default function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div
-        className="relative h-[440px] w-full bg-cover bg-center sm:h-[480px]"
+        className="relative h-[80vh] w-full bg-cover bg-center"
         style={{ backgroundImage: `url(${hero.bg})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/90 via-navy-900/70 to-navy-900/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/55 via-navy-900/30 to-transparent" />
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6">
           <div className="max-w-2xl">
             <h1 className="text-4xl font-extrabold leading-tight text-white sm:text-5xl">
@@ -19,6 +20,7 @@ export default function Hero() {
               With Verified Residential, Commercial, Industrial And Agricultural
               Opportunities Across The City.
             </p>
+            <HeroTabs />
           </div>
         </div>
       </div>

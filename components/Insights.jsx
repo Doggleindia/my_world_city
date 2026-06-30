@@ -15,9 +15,9 @@ export default function Insights() {
         </div>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {insights.map((p, i) => (
+          {insights.map((p) => (
             <article
-              key={i}
+              key={p.slug}
               className="flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:shadow-card"
             >
               <div className="relative h-36 w-full overflow-hidden">
@@ -32,7 +32,7 @@ export default function Insights() {
                   {p.desc}
                 </p>
                 <Link
-                  href={`/insights#post-${i}`}
+                  href={`/insights/${p.slug}`}
                   className="mt-4 self-start rounded-full border border-slate-300 px-4 py-1.5 text-[12px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
                 >
                   Read more

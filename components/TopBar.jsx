@@ -3,11 +3,12 @@ import ContactButton from '@/components/contact/ContactButton'
 
 export default function TopBar() {
   return (
-    <div className="bg-navy-900 text-white text-[13px]">
-      <div className="mx-auto flex max-w-7xl items-center justify-center gap-4 px-4 py-2 text-center">
-        <span className="text-slate-200">
+    <div className="bg-navy-900 text-white text-[12px] sm:text-[13px]">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1.5 px-4 py-2 text-center">
+        <span className="hidden text-slate-200 sm:inline">
           Are you a dealer? Get verified buyer leads delivered instantly to your phone.
         </span>
+        <span className="text-slate-200 sm:hidden">Dealer? Get free buyer leads.</span>
         <ContactButton
           topic="Dealer free trial — 5 leads"
           title="Try free for 5 leads"
