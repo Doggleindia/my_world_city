@@ -4,8 +4,11 @@ import ExpertCard from './ExpertCard'
 import { expertList } from '@/data'
 
 export default function ProfileShowcase({ p }) {
-  const sameCat = expertList.filter((e) => e.slug !== p.slug && e.cat === p.cat)
-  const others = (sameCat.length ? sameCat : expertList.filter((e) => e.slug !== p.slug)).slice(0, 4)
+  const others = (p.related?.length
+    ? p.related
+    : expertList.filter((e) => e.slug !== p.slug && e.cat === p.cat).slice(0, 4)
+  )
+  const projects = p.projects || []
 
   return (
     <section id="selected-work" className="scroll-mt-24 bg-indigo-50">
@@ -15,7 +18,7 @@ export default function ProfileShowcase({ p }) {
           Selected work across Jaipur &amp; Rajasthan
         </h2>
         <div className="mt-7 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {p.projects.map((pr) => (
+          {projects.map((pr) => (
             <article key={pr.title} className="overflow-hidden rounded-2xl bg-white shadow-sm">
               <div className="relative">
                 <img src={pr.img} alt={pr.title} className="h-52 w-full object-cover sm:h-56" />

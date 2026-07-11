@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Send, ShieldCheck } from 'lucide-react'
 import SuccessCard from '@/components/SuccessCard'
+import { submitLead } from '@/lib/leads'
 
 /*
  * A reusable CTA that opens a general enquiry modal and posts a lead.
@@ -67,22 +68,9 @@ function ContactModal({ open, onClose, topic, title, subtitle }) {
       message: `[${topic}] ${fd.get('message') || ''}`.trim(),
     }
     setBusy(true)
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed')
-      setRefId(data.refId)
-    } catch {
-      const year = new Date().getFullYear()
-      setRefId(`MWC-${year}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}`)
-    } finally {
-      setBusy(false)
-      setSent(true)
-    }
+    setRefId(await submitLead(payload))
+    setBusy(false)
+    setSent(true)
   }
 
   const inputCls =

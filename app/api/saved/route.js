@@ -1,7 +1,7 @@
 import { dbConnect } from '@/lib/db'
 import SavedProperty from '@/lib/models/SavedProperty'
 import Property from '@/lib/models/Property'
-import { handler, ok, fail, requireUser } from '@/lib/api'
+import { handler, ok, fail, requireUser, isObjectId } from '@/lib/api'
 import { toPropertyCard } from '@/lib/serialize'
 
 // GET /api/saved — the current user's saved properties (full cards + id list).
@@ -26,7 +26,7 @@ export const GET = handler(async () => {
 export const POST = handler(async (req) => {
   const session = await requireUser()
   const { propertyId } = await req.json().catch(() => ({}))
-  if (!propertyId) return fail('propertyId required', 400)
+  if (!isObjectId(propertyId)) return fail('Valid propertyId required', 400)
   await dbConnect()
 
   await SavedProperty.updateOne(
@@ -41,7 +41,7 @@ export const POST = handler(async (req) => {
 export const DELETE = handler(async (req) => {
   const session = await requireUser()
   const propertyId = new URL(req.url).searchParams.get('propertyId')
-  if (!propertyId) return fail('propertyId required', 400)
+  if (!isObjectId(propertyId)) return fail('Valid propertyId required', 400)
   await dbConnect()
 
   await SavedProperty.deleteOne({ userId: session.uid, propertyId })

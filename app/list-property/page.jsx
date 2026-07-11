@@ -8,7 +8,7 @@ import SiteFooter from '@/components/property/SiteFooter'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { compressImage } from '@/lib/image'
 import {
-  Check, Upload, X, Loader2, ArrowRight, ArrowLeft, LogIn, PartyPopper,
+  Check, Upload, X, Loader2, ArrowRight, ArrowLeft, PartyPopper,
 } from 'lucide-react'
 
 const CATEGORIES = ['Residential', 'Commercial', 'Industrial', 'Farm & Agri']
@@ -33,12 +33,14 @@ function priceLabel(n) {
 }
 
 export default function ListPropertyPage() {
-  const { user, loading, openLogin } = useAuth()
+  const { user, loading, refresh } = useAuth()
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
+  const [result, setResult] = useState(null)
   const [error, setError] = useState('')
+  const [existingAccount, setExistingAccount] = useState(false)
 
   const [form, setForm] = useState({
     title: '',
@@ -52,6 +54,10 @@ export default function ListPropertyPage() {
     badges: [],
     amenities: [],
     description: '',
+    // Contact — only collected from guests (used to open their owner account).
+    name: '',
+    phone: '',
+    email: '',
   })
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
   const toggleIn = (k, v) =>
@@ -91,6 +97,7 @@ export default function ListPropertyPage() {
   const submit = async () => {
     setSubmitting(true)
     setError('')
+    setExistingAccount(false)
     try {
       const price = form.price ? Number(form.price) : undefined
       const payload = {
@@ -106,13 +113,24 @@ export default function ListPropertyPage() {
         gallery: { main: form.main, thumbs: form.thumbs },
         description: form.description || undefined,
       }
-      const res = await fetch('/api/properties', {
+      // Guests supply contact details — this opens their owner account.
+      if (!user) {
+        payload.name = form.name.trim()
+        payload.phone = form.phone
+        payload.email = form.email || undefined
+      }
+      const res = await fetch('/api/listings/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not create listing')
+      if (!res.ok) {
+        if (data.existingAccount) setExistingAccount(true)
+        throw new Error(data.error || 'Could not submit listing')
+      }
+      if (!user) await refresh() // pick up the freshly created session
+      setResult(data)
       setDone(true)
     } catch (e) {
       setError(e.message)
@@ -120,6 +138,9 @@ export default function ListPropertyPage() {
       setSubmitting(false)
     }
   }
+
+  // On the final step, guests must give a name + valid phone.
+  const canSubmit = user || (form.name.trim().length >= 2 && form.phone.length === 10)
 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
@@ -130,10 +151,8 @@ export default function ListPropertyPage() {
           <div className="flex justify-center py-24 text-slate-400">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
-        ) : !user ? (
-          <Gate onLogin={openLogin} />
         ) : done ? (
-          <Success onDashboard={() => router.push('/dashboard')} />
+          <Success result={result} onDashboard={() => router.push('/dashboard')} />
         ) : (
           <>
             <h1 className="text-[28px] font-extrabold tracking-tight text-navy-900 sm:text-[34px]">
@@ -170,6 +189,14 @@ export default function ListPropertyPage() {
               {error && (
                 <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">
                   {error}
+                  {existingAccount && (
+                    <>
+                      {' '}
+                      <Link href="/login" className="font-bold underline">
+                        Log in
+                      </Link>
+                    </>
+                  )}
                 </p>
               )}
 
@@ -178,7 +205,7 @@ export default function ListPropertyPage() {
                 <Photos form={form} set={set} upload={upload} uploading={uploading} />
               )}
               {step === 2 && <Details form={form} set={set} toggleIn={toggleIn} />}
-              {step === 3 && <Review form={form} />}
+              {step === 3 && <Review form={form} set={set} needsContact={!user} />}
 
               <div className="mt-7 flex items-center justify-between">
                 <button
@@ -200,7 +227,7 @@ export default function ListPropertyPage() {
                 ) : (
                   <button
                     onClick={submit}
-                    disabled={submitting}
+                    disabled={submitting || !canSubmit}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
                   >
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit for review'}
@@ -415,7 +442,7 @@ function Chip({ active, onClick, children }) {
   )
 }
 
-function Review({ form }) {
+function Review({ form, set, needsContact }) {
   const rows = [
     ['Title', form.title],
     ['Category', form.category],
@@ -439,6 +466,54 @@ function Review({ form }) {
           </div>
         ))}
       </dl>
+
+      {needsContact && (
+        <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <h3 className="text-[14px] font-bold text-navy-800">Your contact details</h3>
+          <p className="mt-0.5 text-[12.5px] text-slate-500">
+            We’ll create your owner account with these — you’ll get a password to manage your listings.
+          </p>
+          <div className="mt-3 space-y-3">
+            <label className="block">
+              <Label>Full name</Label>
+              <input
+                value={form.name}
+                onChange={(e) => set('name', e.target.value)}
+                placeholder="e.g. Rishabh Jain"
+                className={inputCls}
+              />
+            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block">
+                <Label>Mobile number</Label>
+                <div className="flex items-center overflow-hidden rounded-xl border border-slate-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
+                  <span className="border-r border-slate-200 px-3 py-3 text-[13px] font-semibold text-slate-600">+91</span>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={form.phone}
+                    onChange={(e) => set('phone', e.target.value.replace(/\D/g, ''))}
+                    placeholder="10-digit number"
+                    className="w-full px-3 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                  />
+                </div>
+              </label>
+              <label className="block">
+                <Label>Email (optional)</Label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => set('email', e.target.value)}
+                  placeholder="you@example.com"
+                  className={inputCls}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+
       <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] text-amber-700">
         Your listing will be reviewed by our team before going live.
       </p>
@@ -446,35 +521,37 @@ function Review({ form }) {
   )
 }
 
-function Gate({ onLogin }) {
+function Success({ result, onDashboard }) {
+  const tempPassword = result?.tempPassword
   return (
-    <div className="mt-10 flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center">
-      <LogIn className="h-9 w-9 text-slate-300" />
-      <h2 className="mt-3 text-[18px] font-bold text-navy-800">Login to list your property</h2>
-      <p className="mt-1.5 max-w-xs text-[14px] text-slate-500">
-        We’ll send a one-time code to your phone to get started.
-      </p>
-      <button
-        onClick={onLogin}
-        className="mt-6 rounded-full bg-brand px-6 py-3 text-[14px] font-semibold text-white transition hover:bg-brand-700"
-      >
-        Login
-      </button>
-    </div>
-  )
-}
-
-function Success({ onDashboard }) {
-  return (
-    <div className="mt-10 flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-20 text-center shadow-card">
+    <div className="mt-10 flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-16 text-center shadow-card">
       <span className="grid h-16 w-16 place-items-center rounded-full bg-emerald-500 text-white">
         <PartyPopper className="h-8 w-8" />
       </span>
       <h2 className="mt-5 text-[24px] font-extrabold text-navy-800">Listing submitted!</h2>
-      <p className="mt-2 max-w-sm text-[14px] text-slate-500">
-        It’s now pending review. You’ll find it under your dashboard, and it goes live once approved.
+      <p className="mt-2 max-w-sm px-6 text-[14px] text-slate-500">
+        It’s now pending review. It goes live once our team approves it, and you’ll find it in your dashboard.
       </p>
-      <div className="mt-6 flex gap-3">
+
+      {tempPassword && (
+        <div className="mt-6 w-full max-w-sm px-6">
+          <div className="rounded-xl border border-brand/30 bg-brand/5 p-5 text-left">
+            <h3 className="text-[14px] font-bold text-navy-800">Your account is ready</h3>
+            <p className="mt-0.5 text-[12.5px] text-slate-500">
+              Log in any time with your mobile number and this temporary password. Save it now — it’s shown only once.
+            </p>
+            <div className="mt-3 space-y-2">
+              <CredRow label="Mobile" value={`+91 ${result.phone}`} />
+              <CredRow label="Password" value={tempPassword} mono />
+            </div>
+            <p className="mt-3 text-[11.5px] text-slate-400">
+              You can change it later from your dashboard.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
         <button
           onClick={onDashboard}
           className="rounded-full bg-navy-800 px-6 py-3 text-[14px] font-semibold text-white transition hover:bg-navy-700"
@@ -488,6 +565,17 @@ function Success({ onDashboard }) {
           Browse properties
         </Link>
       </div>
+    </div>
+  )
+}
+
+function CredRow({ label, value, mono }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-lg bg-white px-3 py-2">
+      <span className="text-[12px] font-semibold uppercase tracking-wide text-slate-400">{label}</span>
+      <span className={`text-[15px] font-bold text-navy-800 ${mono ? 'font-mono tracking-widest' : ''}`}>
+        {value}
+      </span>
     </div>
   )
 }

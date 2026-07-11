@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { BadgeCheck, X, Send, ArrowRight, Phone } from 'lucide-react'
 import SuccessCard from '@/components/SuccessCard'
+import { submitLead } from '@/lib/leads'
 
 const TABS = ['Enquire', 'Schedule visit', 'Request callback']
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -96,22 +97,9 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
     }
 
     setBusy(true)
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed')
-      setRefId(data.refId)
-    } catch {
-      const year = new Date().getFullYear()
-      setRefId(`MWC-${year}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}`)
-    } finally {
-      setBusy(false)
-      setSent(true)
-    }
+    setRefId(await submitLead(payload))
+    setBusy(false)
+    setSent(true)
   }
 
   return createPortal(
@@ -135,9 +123,11 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
                 className="h-14 w-14 shrink-0 rounded-2xl object-cover"
               />
               <div className="min-w-0">
-                <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-[11.5px] font-bold tracking-wide text-brand">
-                  <BadgeCheck className="h-3.5 w-3.5" /> VERIFIED
-                </span>
+                {property.verified && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-[11.5px] font-bold tracking-wide text-brand">
+                    <BadgeCheck className="h-3.5 w-3.5" /> VERIFIED
+                  </span>
+                )}
                 <p className="mt-1.5 truncate text-[16px] font-bold text-navy-800">
                   {property.title}, {shortLoc}
                 </p>
@@ -319,7 +309,7 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
             {/* Footer */}
             <div className="mt-3 flex items-center justify-center gap-2 bg-slate-50 px-6 py-4 text-center text-[12.5px] text-slate-600">
               <BadgeCheck className="h-4 w-4 shrink-0 text-brand" />
-              Title &amp; RERA verified · Your number is shared only with the owner.
+              {property.rera ? 'Title & RERA verified · ' : ''}Your number is shared only with the owner.
             </div>
           </div>
         )}

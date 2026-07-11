@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Send, BadgeCheck } from 'lucide-react'
 import SuccessCard from '@/components/SuccessCard'
+import { submitLead } from '@/lib/leads'
 
 export default function ExpertConnectModal({ open, onClose, expert }) {
   const [sent, setSent] = useState(false)
@@ -36,25 +37,13 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
       name: fd.get('name'),
       phone: fd.get('phone'),
       email: fd.get('email') || '',
+      budget: fd.get('budget') || undefined,
       message: fd.get('message') || undefined,
     }
     setBusy(true)
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed')
-      setRefId(data.refId)
-    } catch {
-      const year = new Date().getFullYear()
-      setRefId(`MWC-${year}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}`)
-    } finally {
-      setBusy(false)
-      setSent(true)
-    }
+    setRefId(await submitLead(payload))
+    setBusy(false)
+    setSent(true)
   }
 
   return createPortal(
@@ -125,6 +114,10 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
 
                 <Field label="Email address" optional>
                   <input name="email" type="email" placeholder="rahul@example.com" className={inputCls} />
+                </Field>
+
+                <Field label="Budget range" optional>
+                  <input name="budget" type="text" placeholder="e.g. ₹15,000 – ₹25,000" className={inputCls} />
                 </Field>
 
                 <Field label="Your message">

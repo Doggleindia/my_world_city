@@ -2,7 +2,7 @@ import { dbConnect } from '@/lib/db'
 import Property from '@/lib/models/Property'
 import Payment from '@/lib/models/Payment'
 import { PLANS } from '@/lib/plans'
-import { handler, ok, requireUser, ApiError } from '@/lib/api'
+import { handler, ok, requireUser, ApiError, assertObjectId } from '@/lib/api'
 
 // POST /api/payments/create-order { plan, propertyId }
 export const POST = handler(async (req) => {
@@ -10,6 +10,7 @@ export const POST = handler(async (req) => {
   const { plan, propertyId } = await req.json().catch(() => ({}))
   const planDef = PLANS[plan]
   if (!planDef) throw new ApiError('Unknown plan', 400)
+  assertObjectId(propertyId, 'Property')
   await dbConnect()
 
   const property = await Property.findById(propertyId)
@@ -28,7 +29,11 @@ export const POST = handler(async (req) => {
   })
 
   // No Razorpay configured — return a dev order the client can settle instantly.
+  // This bypasses real payment, so it is only ever allowed outside production.
   if (!keyId || !keySecret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ApiError('Payments are not configured', 500)
+    }
     return ok({ dev: true, paymentId: String(payment._id), amount: planDef.amount })
   }
 

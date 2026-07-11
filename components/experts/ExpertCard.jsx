@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import ExpertConnectButton from './ExpertConnectButton'
 
-export default function ExpertCard({ initials, tag, name, role, specialty, slug }) {
+export default function ExpertCard({ id, initials, tag, name, role, specialty, slug }) {
   const href = slug ? `/experts/${slug}` : '#'
   return (
     <article className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-card">
@@ -27,7 +27,7 @@ export default function ExpertCard({ initials, tag, name, role, specialty, slug 
       <p className="text-[13.5px] text-slate-600">{specialty}</p>
 
       <ExpertConnectButton
-        expert={{ initials, tag, name, specialty }}
+        expert={{ id, initials, tag, name, specialty }}
         className="mt-5 w-full rounded-lg bg-brand py-2.5 text-center text-[13.5px] font-semibold text-white transition hover:bg-brand-700"
       >
         Connect Now

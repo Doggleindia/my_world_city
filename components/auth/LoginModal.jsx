@@ -1,25 +1,21 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Phone, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { X, Lock, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react'
 
-const EMPTY = { phone: '', code: '', name: '' }
+const EMPTY = { phone: '', password: '' }
 
 export default function LoginModal({ open, onClose, onAuthed }) {
-  const [step, setStep] = useState('phone') // 'phone' | 'otp'
   const [form, setForm] = useState(EMPTY)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-  const [devCode, setDevCode] = useState('')
-  const firstField = useRef(null)
 
   useEffect(() => {
     if (open) {
-      setStep('phone')
       setForm(EMPTY)
       setError('')
-      setDevCode('')
     }
   }, [open])
 
@@ -36,39 +32,18 @@ export default function LoginModal({ open, onClose, onAuthed }) {
 
   if (!open || typeof document === 'undefined') return null
 
-  const sendOtp = async (e) => {
+  const login = async (e) => {
     e?.preventDefault()
     setError('')
     setBusy(true)
     try {
-      const res = await fetch('/api/auth/otp/send', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: form.phone }),
+        body: JSON.stringify({ phone: form.phone, password: form.password }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Could not send code')
-      if (data.devCode) setDevCode(data.devCode)
-      setStep('otp')
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const verifyOtp = async (e) => {
-    e?.preventDefault()
-    setError('')
-    setBusy(true)
-    try {
-      const res = await fetch('/api/auth/otp/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: form.phone, code: form.code, name: form.name || undefined }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Verification failed')
+      if (!res.ok) throw new Error(data.error || 'Login failed')
       onAuthed(data.user)
     } catch (err) {
       setError(err.message)
@@ -96,15 +71,11 @@ export default function LoginModal({ open, onClose, onAuthed }) {
           </button>
 
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-brand">
-            <Phone className="h-6 w-6" />
+            <Lock className="h-6 w-6" />
           </span>
-          <h2 className="mt-4 text-[22px] font-extrabold text-navy-800">
-            {step === 'phone' ? 'Login or sign up' : 'Verify your number'}
-          </h2>
+          <h2 className="mt-4 text-[22px] font-extrabold text-navy-800">Owner login</h2>
           <p className="mt-1.5 text-[13.5px] leading-relaxed text-slate-500">
-            {step === 'phone'
-              ? 'Enter your mobile number — we’ll send a one-time code.'
-              : `Enter the 6-digit code sent to +91 ${form.phone}.`}
+            Enter the mobile number and password you received when you listed your property.
           </p>
 
           {error && (
@@ -113,83 +84,54 @@ export default function LoginModal({ open, onClose, onAuthed }) {
             </p>
           )}
 
-          {step === 'phone' ? (
-            <form onSubmit={sendOtp} className="mt-5">
-              <div className="flex items-center overflow-hidden rounded-xl border border-slate-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
-                <span className="border-r border-slate-200 px-3.5 py-3 text-[14px] font-semibold text-slate-700">
-                  +91
-                </span>
-                <input
-                  ref={firstField}
-                  autoFocus
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={10}
-                  required
-                  value={form.phone}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, phone: e.target.value.replace(/\D/g, '') }))
-                  }
-                  placeholder="10-digit mobile number"
-                  className="w-full px-3.5 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={busy || form.phone.length !== 10}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-50"
-              >
-                {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Send code <ArrowRight className="h-[18px] w-[18px]" /></>}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={verifyOtp} className="mt-5 space-y-4">
-              {devCode && (
-                <p className="rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] font-medium text-amber-700">
-                  Dev mode — your code is <span className="font-bold">{devCode}</span>
-                </p>
-              )}
+          <form onSubmit={login} className="mt-5 space-y-3.5">
+            <div className="flex items-center overflow-hidden rounded-xl border border-slate-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
+              <span className="border-r border-slate-200 px-3.5 py-3 text-[14px] font-semibold text-slate-700">
+                +91
+              </span>
               <input
                 autoFocus
-                type="text"
+                type="tel"
                 inputMode="numeric"
-                maxLength={6}
+                maxLength={10}
                 required
-                value={form.code}
-                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.replace(/\D/g, '') }))}
-                placeholder="6-digit code"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-center text-[20px] font-bold tracking-[0.4em] text-slate-800 placeholder:tracking-normal placeholder:text-[14px] placeholder:font-normal placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                value={form.phone}
+                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value.replace(/\D/g, '') }))}
+                placeholder="10-digit mobile number"
+                className="w-full px-3.5 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none"
               />
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Your name (optional)"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-              />
-              <button
-                type="submit"
-                disabled={busy || form.code.length !== 6}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-[15px] font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"
-              >
-                {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Verify & continue'}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('phone')
-                  setForm((f) => ({ ...f, code: '' }))
-                  setError('')
-                }}
-                className="w-full text-center text-[13px] font-medium text-slate-500 hover:text-navy-800"
-              >
-                ← Change number
-              </button>
-            </form>
-          )}
+            </div>
+            <input
+              type="password"
+              required
+              value={form.password}
+              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+              placeholder="Password"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            />
+            <button
+              type="submit"
+              disabled={busy || form.phone.length !== 10 || !form.password}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-50"
+            >
+              {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Log in <ArrowRight className="h-[18px] w-[18px]" /></>}
+            </button>
+          </form>
 
-          <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-[12px] text-slate-400">
-            <ShieldCheck className="h-3.5 w-3.5" /> Your number stays private and is never shared.
+          <p className="mt-5 text-center text-[13px] text-slate-500">
+            New here?{' '}
+            <Link
+              href="/list-property"
+              onClick={onClose}
+              className="font-semibold text-brand hover:underline"
+            >
+              List a property
+            </Link>{' '}
+            to create your account.
+          </p>
+
+          <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12px] text-slate-400">
+            <ShieldCheck className="h-3.5 w-3.5" /> Your details stay private and are never shared.
           </p>
         </div>
       </div>

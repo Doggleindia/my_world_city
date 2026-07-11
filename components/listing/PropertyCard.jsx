@@ -9,7 +9,7 @@ export default function PropertyCard({
   title,
   loc,
   img,
-  href = '/property',
+  href = '/find-property',
   priceLabel,
   className = 'w-[300px] shrink-0',
 }) {

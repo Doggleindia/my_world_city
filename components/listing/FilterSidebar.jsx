@@ -5,8 +5,7 @@ import { MapPin, ChevronDown, Check } from 'lucide-react'
 
 const localities = ['Sitapura', 'RIICO', 'Jagatpura', 'Mansarovar', 'C-Scheme']
 const propertyTypes = ['Residential', 'Commercial', 'Industrial', 'Farm & Agri']
-const timelines = ['Immediately', '1–3 month', '3–6 month', 'Not Sure']
-const budgetRanges = ['40L - 60L', '60L - 80L', '80L - 1Cr', '1Cr - 1.5Cr', '1.5Cr+']
+const budgetRanges = ['Any budget', '40L - 60L', '60L - 80L', '80L - 1Cr', '1Cr - 1.5Cr', '1.5Cr+']
 
 function SectionLabel({ children }) {
   return (
@@ -35,6 +34,7 @@ function Switch({ on, onClick }) {
 }
 
 const BUDGET_BOUNDS = {
+  'Any budget': [undefined, undefined],
   '40L - 60L': [4_000_000, 6_000_000],
   '60L - 80L': [6_000_000, 8_000_000],
   '80L - 1Cr': [8_000_000, 10_000_000],
@@ -44,11 +44,11 @@ const BUDGET_BOUNDS = {
 
 export default function FilterSidebar({ onApply }) {
   const [checked, setChecked] = useState([])
-  const [ptype, setPtype] = useState('Residential')
-  const [timeline, setTimeline] = useState('Immediately')
+  const [locText, setLocText] = useState('')
+  const [ptype, setPtype] = useState('')
   const [verified, setVerified] = useState(false)
   const [rera, setRera] = useState(false)
-  const [budget, setBudget] = useState(budgetRanges[0])
+  const [budget, setBudget] = useState(budgetRanges[0]) // 'Any budget'
 
   const toggleLocality = (l) =>
     setChecked((prev) => (prev.includes(l) ? prev.filter((x) => x !== l) : [...prev, l]))
@@ -57,7 +57,9 @@ export default function FilterSidebar({ onApply }) {
     const [minPrice, maxPrice] = BUDGET_BOUNDS[budget] || []
     onApply?.({
       category: ptype || undefined,
-      locality: checked[0] || undefined, // API filters by a single locality
+      // Free-text location takes precedence; else the first ticked locality.
+      // The API filters by a single locality string.
+      locality: locText.trim() || checked[0] || undefined,
       verified: verified || undefined,
       rera: rera || undefined,
       minPrice,
@@ -67,8 +69,8 @@ export default function FilterSidebar({ onApply }) {
 
   const clearAll = () => {
     setChecked([])
+    setLocText('')
     setPtype('')
-    setTimeline('')
     setVerified(false)
     setRera(false)
     setBudget(budgetRanges[0])
@@ -94,6 +96,8 @@ export default function FilterSidebar({ onApply }) {
         <div className="relative mt-2.5">
           <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-rose-400" />
           <input
+            value={locText}
+            onChange={(e) => setLocText(e.target.value)}
             placeholder="Enter city, locality..."
             className="w-full rounded-lg border border-slate-200 py-2.5 pl-9 pr-3 text-[13.5px] text-slate-700 placeholder:text-slate-400 focus:border-brand focus:outline-none"
           />
@@ -125,10 +129,13 @@ export default function FilterSidebar({ onApply }) {
           {localities.map((l) => {
             const on = checked.includes(l)
             return (
-              <label
+              <button
                 key={l}
-                className="flex cursor-pointer items-center gap-2.5 text-[13.5px] text-slate-600"
+                type="button"
+                role="checkbox"
+                aria-checked={on}
                 onClick={() => toggleLocality(l)}
+                className="flex w-full cursor-pointer items-center gap-2.5 text-left text-[13.5px] text-slate-600"
               >
                 <span
                   className={`flex h-[18px] w-[18px] items-center justify-center rounded border transition ${
@@ -138,7 +145,7 @@ export default function FilterSidebar({ onApply }) {
                   {on && <Check className="h-3 w-3" strokeWidth={3.5} />}
                 </span>
                 {l}
-              </label>
+              </button>
             )
           })}
         </div>
@@ -154,26 +161,6 @@ export default function FilterSidebar({ onApply }) {
               onClick={() => setPtype(t)}
               className={`rounded-lg border px-3 py-2 text-[13px] font-medium transition ${
                 ptype === t
-                  ? 'border-brand bg-brand/5 text-brand'
-                  : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Timeline */}
-      <div className="mt-6">
-        <SectionLabel>Timeline</SectionLabel>
-        <div className="mt-3 grid grid-cols-2 gap-2.5">
-          {timelines.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTimeline(t)}
-              className={`rounded-lg border px-3 py-2 text-[13px] font-medium transition ${
-                timeline === t
                   ? 'border-brand bg-brand/5 text-brand'
                   : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300'
               }`}

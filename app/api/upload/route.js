@@ -3,6 +3,7 @@ import { handler, ok, requireUser, ApiError } from '@/lib/api'
 
 const MAX_BYTES = 8 * 1024 * 1024 // 8 MB hard cap
 const INLINE_LIMIT = 2 * 1024 * 1024 // store inline as data URL up to 2 MB (dev mode)
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'])
 
 // POST /api/upload (multipart: file) -> { url }
 // - With Cloudinary configured: uploads to the CDN and returns the secure URL.
@@ -15,6 +16,11 @@ export const POST = handler(async (req) => {
   const file = form.get('file')
   if (!file || typeof file === 'string') throw new ApiError('No file provided', 400)
   if (file.size > MAX_BYTES) throw new ApiError('Max file size is 8MB', 413)
+  // Only accept real image types — blocks e.g. a data:text/html payload being
+  // stored inline (dev mode) and later served as a stored-XSS vector.
+  if (!ALLOWED_TYPES.has(file.type)) {
+    throw new ApiError('Only JPEG, PNG, WebP, GIF or AVIF images are allowed', 415)
+  }
 
   const cloud = process.env.CLOUDINARY_CLOUD_NAME
   const apiKey = process.env.CLOUDINARY_API_KEY

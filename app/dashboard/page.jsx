@@ -7,7 +7,7 @@ import SiteFooter from '@/components/property/SiteFooter'
 import { useAuth } from '@/components/auth/AuthProvider'
 import PromoteButton from '@/components/dashboard/PromoteButton'
 import {
-  Loader2, LogIn, Plus, Eye, Trash2, Home, Inbox, Phone, Mail, BadgeCheck, Star,
+  Loader2, LogIn, Plus, Eye, Trash2, Home, BadgeCheck, Star, KeyRound, X, Check,
 } from 'lucide-react'
 
 const STATUS_STYLE = {
@@ -19,8 +19,7 @@ const STATUS_STYLE = {
 }
 
 export default function DashboardPage() {
-  const { user, loading, openLogin } = useAuth()
-  const [tab, setTab] = useState('listings')
+  const { user, loading, openLogin, refresh } = useAuth()
 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
@@ -35,7 +34,7 @@ export default function DashboardPage() {
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <div>
                 <h1 className="text-[28px] font-extrabold tracking-tight text-navy-900 sm:text-[32px]">
-                  Dashboard
+                  My properties
                 </h1>
                 <p className="mt-1 text-[14px] text-slate-500">
                   {user.name ? `Welcome, ${user.name.split(' ')[0]}` : `+91 ${user.phone}`}
@@ -49,23 +48,100 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            <div className="mt-7 flex gap-2.5">
-              <Tab active={tab === 'listings'} onClick={() => setTab('listings')} icon={Home}>
-                My listings
-              </Tab>
-              <Tab active={tab === 'leads'} onClick={() => setTab('leads')} icon={Inbox}>
-                Leads
-              </Tab>
-            </div>
+            {user.mustChangePassword && <ChangePasswordCard onDone={refresh} />}
 
             <div className="mt-6">
-              {tab === 'listings' ? <Listings /> : <Leads />}
+              <Listings />
             </div>
           </>
         )}
       </div>
       <SiteFooter />
     </main>
+  )
+}
+
+function ChangePasswordCard({ onDone }) {
+  const [open, setOpen] = useState(false)
+  const [current, setCurrent] = useState('')
+  const [next, setNext] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [ok, setOk] = useState(false)
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setBusy(true)
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: current, newPassword: next }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Could not change password')
+      setOk(true)
+      await onDone?.()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (ok) return null
+
+  return (
+    <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+      <div className="flex items-start gap-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-amber-400/30 text-amber-700">
+          <KeyRound className="h-4.5 w-4.5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-[14px] font-bold text-amber-900">You’re using a temporary password</h3>
+          <p className="mt-0.5 text-[12.5px] text-amber-700">
+            Set your own password so you can log in securely next time.
+          </p>
+
+          {open && (
+            <form onSubmit={submit} className="mt-3 grid gap-2.5 sm:max-w-md">
+              {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-[12.5px] font-medium text-red-600">{error}</p>}
+              <input
+                type="password"
+                required
+                value={current}
+                onChange={(e) => setCurrent(e.target.value)}
+                placeholder="Temporary password"
+                className="rounded-lg border border-amber-200 bg-white px-3 py-2.5 text-[13.5px] focus:border-brand focus:outline-none"
+              />
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={next}
+                onChange={(e) => setNext(e.target.value)}
+                placeholder="New password (min 6 chars)"
+                className="rounded-lg border border-amber-200 bg-white px-3 py-2.5 text-[13.5px] focus:border-brand focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={busy}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-navy-800 px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-60"
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4" /> Save new password</>}
+              </button>
+            </form>
+          )}
+        </div>
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="shrink-0 rounded-lg px-3 py-1.5 text-[12.5px] font-semibold text-amber-800 transition hover:bg-amber-100"
+        >
+          {open ? <X className="h-4 w-4" /> : 'Change'}
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -142,72 +218,7 @@ function Listings() {
   )
 }
 
-function Leads() {
-  const [data, setData] = useState(null)
-  useEffect(() => {
-    fetch('/api/me/leads')
-      .then((r) => r.json())
-      .then((d) => setData(d.received ? d : { received: [], sent: [] }))
-      .catch(() => setData({ received: [], sent: [] }))
-  }, [])
-
-  if (!data) return <Center><Loader2 className="h-7 w-7 animate-spin text-slate-400" /></Center>
-
-  return (
-    <div className="space-y-8">
-      <LeadGroup title="Leads on your properties" leads={data.received} empty="No leads yet — leads from buyers appear here." />
-      <LeadGroup title="Your enquiries" leads={data.sent} empty="You haven’t sent any enquiries yet." />
-    </div>
-  )
-}
-
-function LeadGroup({ title, leads, empty }) {
-  return (
-    <div>
-      <h3 className="text-[15px] font-bold text-navy-800">{title}</h3>
-      {leads.length === 0 ? (
-        <p className="mt-3 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-[13.5px] text-slate-500">
-          {empty}
-        </p>
-      ) : (
-        <div className="mt-3 space-y-3">
-          {leads.map((l) => (
-            <div key={l.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-[14px] font-bold text-navy-800">{l.name}</span>
-                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand">
-                  {l.type}
-                </span>
-              </div>
-              <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-slate-500">
-                <span className="inline-flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> +91 {l.phone}</span>
-                {l.email && <span className="inline-flex items-center gap-1"><Mail className="h-3.5 w-3.5" /> {l.email}</span>}
-                {l.propertyTitle && <span>• {l.propertyTitle}</span>}
-                {l.serviceKey && <span>• {l.serviceKey}</span>}
-                {l.refId && <span className="font-semibold text-slate-400">{l.refId}</span>}
-              </div>
-              {l.message && <p className="mt-2 text-[13px] text-slate-600">{l.message}</p>}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
 /* ---- shared bits ---- */
-function Tab({ active, onClick, icon: Icon, children }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13.5px] font-semibold transition ${
-        active ? 'bg-navy-800 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:ring-slate-300'
-      }`}
-    >
-      <Icon className="h-4 w-4" /> {children}
-    </button>
-  )
-}
 function Center({ children }) {
   return <div className="flex justify-center py-24">{children}</div>
 }

@@ -1,124 +1,340 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import Navbar from '@/components/Navbar'
-import SiteFooter from '@/components/property/SiteFooter'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthProvider'
 import {
-  Loader2, ShieldAlert, Check, X, BadgeCheck, Star, Clock, Inbox, ListChecks,
+  ChevronRight, ChevronDown, Calendar,
+  Inbox, UserSearch, ClipboardCheck, MapPin, Layers, TrendingUp,
 } from 'lucide-react'
 
-const TABS = [
-  { key: 'pending', label: 'Pending', icon: Clock },
-  { key: 'all', label: 'All listings', icon: ListChecks },
-  { key: 'leads', label: 'Leads', icon: Inbox },
+const RANGES = [[1, 'Today'], [7, 'Last 7 days'], [30, 'Last 30 days']]
+const STATUS_COLOR = { new: '#d9532a', contacted: '#e2843a', site_visit: '#7c4a1e', qualified: '#1f7a4d', closed: '#12356b', cancelled: '#94a3b8' }
+const TYPE_LABEL = { enquiry: 'Enquiry', visit: 'Visit', callback: 'Callback', service: 'Service', expert: 'Expert' }
+
+const CAT_META = [
+  { key: 'property', label: 'Property', color: '#1f7a4d' },
+  { key: 'build', label: 'Build', color: '#12356b' },
+  { key: 'operate', label: 'Operate & manage', color: '#e2843a' },
+  { key: 'invest', label: 'Invest', color: '#7c4a1e' },
 ]
 
-export default function AdminPage() {
-  const { user, loading } = useAuth()
-  const [tab, setTab] = useState('pending')
-  const isAdmin = user?.roles?.includes('admin')
+export default function AdminDashboard() {
+  const { user } = useAuth()
+  const [days, setDays] = useState(1)
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    setLoading(true)
+    fetch(`/api/admin/stats?days=${days}`)
+      .then((r) => r.json())
+      .then((d) => { if (d.ok !== false) { setData(d); setError('') } else setError(d.error || 'Failed to load') })
+      .catch(() => setError('Could not load dashboard'))
+      .finally(() => setLoading(false))
+  }, [days])
+
+  const [greeting, setGreeting] = useState('Welcome')
+  useEffect(() => {
+    const h = new Date().getHours()
+    setGreeting(h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
+  }, [])
+
+  const firstName = user?.name?.split(' ')[0] || 'Admin'
+  const s = data?.stats
+  const rangeLabel = RANGES.find(([d]) => d === days)?.[1] || 'Today'
+  const enqLabel = days === 1 ? 'Enquiries today' : `Enquiries · ${rangeLabel.toLowerCase()}`
+  const delta = s?.rangeDelta
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-900">
-      <Navbar cta="brand" />
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        {loading ? (
-          <div className="flex justify-center py-24"><Loader2 className="h-8 w-8 animate-spin text-slate-400" /></div>
-        ) : !isAdmin ? (
-          <Forbidden />
-        ) : (
-          <>
-            <h1 className="text-[28px] font-extrabold tracking-tight text-navy-900 sm:text-[32px]">
-              Admin console
-            </h1>
-            <p className="mt-1 text-[14px] text-slate-500">Moderate listings and manage leads.</p>
+    <div className="mx-auto max-w-[1400px]">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-[26px] font-extrabold tracking-tight text-navy-900 sm:text-[30px]">
+            {greeting}, {firstName} <span className="align-middle">👋</span>
+          </h1>
+          <p className="mt-1 text-[14px] text-slate-500">
+            Here’s what’s happening across My World City projects.
+          </p>
+        </div>
+        <div className="relative inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy-800 shadow-sm">
+          <Calendar className="h-4 w-4 text-slate-400" />
+          {rangeLabel}
+          <ChevronDown className="h-4 w-4 text-slate-400" />
+          <select value={days} onChange={(e) => setDays(Number(e.target.value))} className="absolute inset-0 cursor-pointer opacity-0">
+            {RANGES.map(([d, l]) => <option key={d} value={d}>{l}</option>)}
+          </select>
+        </div>
+      </div>
 
-            <div className="mt-7 flex gap-2.5">
-              {TABS.map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => setTab(t.key)}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13.5px] font-semibold transition ${
-                    tab === t.key ? 'bg-navy-800 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:ring-slate-300'
-                  }`}
-                >
-                  <t.icon className="h-4 w-4" /> {t.label}
-                </button>
+      {error && (
+        <p className="mt-6 rounded-xl bg-red-50 px-4 py-3 text-[13.5px] font-medium text-red-600">{error}</p>
+      )}
+
+      {/* KPI row */}
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+        <StatCard
+          accent="#1f7a4d"
+          label={enqLabel}
+          value={s?.rangeCount}
+          loading={loading}
+          sub={delta != null ? `${delta >= 0 ? '+' : ''}${delta}%` : undefined}
+          subColor={delta >= 0 ? 'text-emerald-600' : 'text-red-500'}
+        />
+        <StatCard
+          accent="#d9532a"
+          label="Unassigned"
+          value={s?.unassigned}
+          loading={loading}
+          sub={s?.unassigned > 0 ? 'Needs attention' : 'All assigned'}
+          subColor={s?.unassigned > 0 ? 'text-ember' : 'text-emerald-600'}
+        />
+        <StatCard accent="#1f5fbf" label="Live properties" value={s?.liveProperties} loading={loading} />
+        <StatCard
+          accent="#e2843a"
+          label="Experts onboarded"
+          value={s?.expertsOnboarded}
+          loading={loading}
+          sub={s?.expertsPending > 0 ? `${s.expertsPending} pending` : undefined}
+          subColor="text-amber-600"
+        />
+        <StatCard accent="#1f7a4d" label="Avg response time" value={s?.avgResponse || '—'} loading={loading} sub={s?.avgResponse ? 'first response' : 'no data yet'} subColor="text-slate-400" />
+      </div>
+
+      {/* Chart + Recent activity */}
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-[17px] font-bold text-navy-800">Enquiries by types</h2>
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+              {CAT_META.map((c) => (
+                <span key={c.key} className="inline-flex items-center gap-1.5 text-[12px] text-slate-500">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: c.color }} /> {c.label}
+                </span>
               ))}
             </div>
+          </div>
+          <EnquiriesChart days={data?.enquiriesByDay} loading={loading} />
+        </Card>
 
-            <div className="mt-6">
-              {tab === 'leads' ? <AdminLeads /> : <AdminProperties scope={tab} />}
-            </div>
-          </>
-        )}
+        <Card>
+          <h2 className="text-[17px] font-bold text-navy-800">Recent Activity</h2>
+          <RecentActivity items={data?.recentActivity} loading={loading} />
+        </Card>
       </div>
-      <SiteFooter />
-    </main>
+
+      {/* Three action cards */}
+      <div className="mt-5 grid gap-5 lg:grid-cols-3">
+        <Card>
+          <CardHead title="Unassigned Enquiries" count={s?.unassigned} tone="ember" />
+          <div className="mt-4 space-y-2">
+            <PreviewList
+              loading={loading}
+              items={data?.unassignedEnquiries}
+              empty="No unassigned enquiries."
+              render={(l) => (
+                <Link key={l.id} href="/admin/enquiries" className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-3.5 py-3 transition hover:border-slate-200">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-bold text-navy-800">{l.name}</p>
+                    <p className="mt-0.5 text-[12.5px] capitalize text-slate-500">{l.type} • {l.locality}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-300" />
+                </Link>
+              )}
+            />
+          </div>
+          <CardButton href="/admin/enquiries">Go to Enquiries</CardButton>
+        </Card>
+
+        <Card>
+          <CardHead title="Expert Requests" count={s?.expertsPending} tone="emerald" />
+          <div className="mt-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/60 py-8 text-center">
+            <UserSearch className="h-7 w-7 text-slate-300" />
+            <p className="mt-2 text-[13.5px] font-semibold text-navy-800">
+              {s?.expertsPending > 0 ? `${s.expertsPending} experts pending` : 'No open requests'}
+            </p>
+            <p className="mt-0.5 px-6 text-[12px] text-slate-500">Assign specialists to enquiries that need them.</p>
+          </div>
+          <CardButton href="/admin/experts">Assign Experts</CardButton>
+        </Card>
+
+        <Card>
+          <CardHead title="Pending Approval" count={s?.pendingProperties} tone="amber" />
+          <div className="mt-4 flex-1">
+            {loading ? (
+              <SkeletonRows n={1} />
+            ) : data?.pendingApprovals?.length ? (
+              <>
+                <div className="flex gap-2">
+                  {data.pendingApprovals.slice(0, 3).map((p) => (
+                    <img key={p.id} src={p.img} alt={p.title} className="h-16 w-1/3 rounded-lg object-cover" />
+                  ))}
+                </div>
+                <p className="mt-3 text-[14px] font-bold text-navy-800">New: {data.pendingApprovals[0].title}</p>
+                <p className="mt-0.5 text-[12.5px] text-slate-500">
+                  Submitted by {data.pendingApprovals[0].submittedBy} • {data.pendingApprovals[0].when}
+                </p>
+              </>
+            ) : (
+              <EmptyBox icon={ClipboardCheck} text="Nothing awaiting review 🎉" />
+            )}
+          </div>
+          <CardButton href="/admin/properties">Review Queue</CardButton>
+        </Card>
+      </div>
+
+      {/* Top localities */}
+      <div className="mt-5 grid gap-5 lg:grid-cols-3">
+        <Card className="lg:col-span-1">
+          <h2 className="text-[17px] font-bold text-navy-800">Top Localities</h2>
+          <TopLocalities items={data?.topLocalities} metric={data?.localityMetric} loading={loading} />
+        </Card>
+
+        <Card className="lg:col-span-1">
+          <h2 className="text-[17px] font-bold text-navy-800">Enquiries by Stage</h2>
+          <BreakdownBars items={data?.statusBreakdown} loading={loading} colorFor={(k) => STATUS_COLOR[k] || '#94a3b8'} labelKey="label" icon={Layers} />
+        </Card>
+        <Card className="lg:col-span-1">
+          <h2 className="text-[17px] font-bold text-navy-800">Enquiries by Type</h2>
+          <BreakdownBars items={data?.typeBreakdown} loading={loading} colorFor={() => '#1f5fbf'} labelKey="key" mapLabel={(k) => TYPE_LABEL[k] || k} icon={TrendingUp} />
+        </Card>
+      </div>
+    </div>
   )
 }
 
-function AdminProperties({ scope }) {
-  const [items, setItems] = useState(null)
-  const load = useCallback(async () => {
-    setItems(null)
-    const res = await fetch(`/api/admin/properties?status=${scope}`)
-    const data = await res.json()
-    setItems(res.ok ? data.items : [])
-  }, [scope])
-  useEffect(() => { load() }, [load])
+/* ---------------- pieces ---------------- */
 
-  const patch = async (id, body) => {
-    await fetch(`/api/admin/properties/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    load()
-  }
+function Card({ children, className = '' }) {
+  return (
+    <div className={`flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm ${className}`}>
+      {children}
+    </div>
+  )
+}
 
-  if (!items) return <Center />
-  if (items.length === 0)
-    return <Empty text={scope === 'pending' ? 'No listings awaiting review 🎉' : 'No listings yet.'} />
+function StatCard({ accent, label, value, sub, subColor = 'text-emerald-600', loading }) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="h-1" style={{ background: accent }} />
+      <div className="p-4">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">{label}</p>
+        <div className="mt-2 flex items-end gap-2">
+          {loading ? (
+            <span className="mt-1 h-7 w-16 animate-pulse rounded bg-slate-100" />
+          ) : (
+            <span className="text-[26px] font-extrabold leading-none text-navy-900">
+              {value ?? '—'}
+            </span>
+          )}
+          {sub && !loading && <span className={`pb-0.5 text-[12px] font-semibold ${subColor}`}>{sub}</span>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CardHead({ title, count, tone }) {
+  const toneCls = {
+    ember: 'bg-ember/10 text-ember',
+    emerald: 'bg-emerald-100 text-emerald-700',
+    amber: 'bg-amber-100 text-amber-700',
+  }[tone]
+  return (
+    <div className="flex items-center justify-between">
+      <h2 className="text-[17px] font-bold text-navy-800">{title}</h2>
+      {count > 0 && (
+        <span className={`grid h-6 min-w-[24px] place-items-center rounded-lg px-2 text-[12px] font-bold ${toneCls}`}>
+          {count}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function CardButton({ href, children }) {
+  return (
+    <Link
+      href={href}
+      className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy-800 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-navy-700"
+    >
+      {children}
+    </Link>
+  )
+}
+
+function PreviewList({ loading, items, empty, render }) {
+  if (loading) return <SkeletonRows n={3} />
+  if (!items?.length) return <EmptyBox icon={Inbox} text={empty} />
+  return items.map(render)
+}
+
+function EnquiriesChart({ days, loading }) {
+  if (loading) return <div className="mt-6 h-56 animate-pulse rounded-xl bg-slate-100" />
+  const data = days || []
+  const max = Math.max(1, ...data.map((d) => d.property + d.build + d.operate + d.invest))
+  const hasData = data.some((d) => d.property + d.build + d.operate + d.invest > 0)
 
   return (
-    <div className="space-y-4">
-      {items.map((p) => (
-        <div key={p.id} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
-          <img src={p.img} alt={p.title} className="h-24 w-full rounded-xl object-cover sm:w-36" />
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-[16px] font-bold text-navy-800">{p.title}</h3>
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-slate-600">
-                {p.status}
-              </span>
-              {p.verified && <BadgeCheck className="h-4 w-4 text-emerald-500" />}
-              {p.featured && <Star className="h-4 w-4 fill-amber-400 text-amber-400" />}
+    <div className="mt-6">
+      <div className="flex h-56 items-end justify-between gap-3">
+        {data.map((d, i) => {
+          const total = d.property + d.build + d.operate + d.invest
+          return (
+            <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
+              <div className="flex w-full max-w-[64px] flex-col-reverse overflow-hidden rounded-lg" style={{ height: `${(total / max) * 100}%`, minHeight: total ? 6 : 0 }}>
+                {CAT_META.map((c) => {
+                  const v = d[c.key]
+                  if (!v) return null
+                  return <div key={c.key} style={{ height: `${(v / total) * 100}%`, background: c.color }} />
+                })}
+              </div>
+              <span className="text-[12px] font-medium text-slate-400">{d.day}</span>
             </div>
-            <p className="mt-0.5 text-[13px] text-slate-500">
-              {p.category} • {p.locality} {p.priceLabel ? `• ${p.priceLabel}` : ''}
-            </p>
+          )
+        })}
+      </div>
+      {!hasData && (
+        <p className="mt-3 text-center text-[12.5px] text-slate-400">No enquiries recorded in the last 6 days yet.</p>
+      )}
+    </div>
+  )
+}
+
+function RecentActivity({ items, loading }) {
+  if (loading) return <div className="mt-4"><SkeletonRows n={4} /></div>
+  if (!items?.length) return <div className="mt-4"><EmptyBox icon={Inbox} text="No recent activity." /></div>
+  return (
+    <ul className="mt-4 space-y-4">
+      {items.map((a, i) => (
+        <li key={i} className="flex gap-3">
+          <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500" />
+          <div className="min-w-0">
+            <p className="text-[13.5px] font-bold text-navy-800">{a.title}</p>
+            <p className="mt-0.5 text-[12.5px] text-slate-500">{a.subtitle}</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {p.status !== 'active' && (
-              <button onClick={() => patch(p.id, { status: 'active' })} className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-2 text-[13px] font-semibold text-white hover:bg-emerald-600">
-                <Check className="h-4 w-4" /> Approve
-              </button>
-            )}
-            {p.status !== 'rejected' && (
-              <button
-                onClick={() => {
-                  const reason = prompt('Rejection reason (optional):') ?? ''
-                  patch(p.id, { status: 'rejected', rejectionReason: reason })
-                }}
-                className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-[13px] font-semibold text-red-600 hover:bg-red-50"
-              >
-                <X className="h-4 w-4" /> Reject
-              </button>
-            )}
-            <Toggle on={p.verified} onClick={() => patch(p.id, { verified: !p.verified })}>Verified</Toggle>
-            <Toggle on={p.featured} onClick={() => patch(p.id, { featured: !p.featured })}>Featured</Toggle>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function TopLocalities({ items, metric = 'Enquiries', loading }) {
+  if (loading) return <div className="mt-5"><SkeletonRows n={4} /></div>
+  if (!items?.length) return <div className="mt-5"><EmptyBox icon={MapPin} text="No locality data yet." /></div>
+  const max = Math.max(1, ...items.map((l) => l.count))
+  return (
+    <div className="mt-5 space-y-4">
+      {items.map((l) => (
+        <div key={l.locality}>
+          <div className="flex items-center justify-between">
+            <span className="text-[13.5px] font-bold text-navy-800">{l.locality}</span>
+            <span className="text-[12.5px] text-slate-500">{l.count} {metric}</span>
+          </div>
+          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-brand" style={{ width: `${(l.count / max) * 100}%` }} />
           </div>
         </div>
       ))}
@@ -126,94 +342,45 @@ function AdminProperties({ scope }) {
   )
 }
 
-function AdminLeads() {
-  const [items, setItems] = useState(null)
-  const load = useCallback(async () => {
-    const res = await fetch('/api/admin/leads')
-    const data = await res.json()
-    setItems(res.ok ? data.items : [])
-  }, [])
-  useEffect(() => { load() }, [load])
-
-  const setStatus = async (id, status) => {
-    setItems((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)))
-    await fetch(`/api/admin/leads/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    })
-  }
-
-  if (!items) return <Center />
-  if (items.length === 0) return <Empty text="No leads yet." />
-
+function BreakdownBars({ items, loading, colorFor, labelKey, mapLabel, icon: Icon }) {
+  if (loading) return <div className="mt-5"><SkeletonRows n={4} /></div>
+  if (!items?.length) return <div className="mt-5"><EmptyBox icon={Icon} text="No enquiries yet." /></div>
+  const max = Math.max(1, ...items.map((i) => i.count))
   return (
-    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <table className="w-full text-left text-[13px]">
-        <thead className="border-b border-slate-100 text-[11px] uppercase tracking-wide text-slate-400">
-          <tr>
-            <th className="px-4 py-3">Ref</th>
-            <th className="px-4 py-3">Type</th>
-            <th className="px-4 py-3">Contact</th>
-            <th className="px-4 py-3">Status</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-50">
-          {items.map((l) => (
-            <tr key={l.id} className="hover:bg-slate-50/60">
-              <td className="px-4 py-3 font-mono text-[12px] text-slate-500">{l.refId}</td>
-              <td className="px-4 py-3">
-                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-bold uppercase text-brand">{l.type}</span>
-              </td>
-              <td className="px-4 py-3">
-                <div className="font-semibold text-navy-800">{l.name}</div>
-                <div className="text-[12px] text-slate-500">+91 {l.phone}{l.email ? ` · ${l.email}` : ''}</div>
-              </td>
-              <td className="px-4 py-3">
-                <select
-                  value={l.status}
-                  onChange={(e) => setStatus(l.id, e.target.value)}
-                  className="rounded-lg border border-slate-200 px-2 py-1 text-[12.5px] font-semibold text-slate-700 focus:border-brand focus:outline-none"
-                >
-                  <option value="new">New</option>
-                  <option value="contacted">Contacted</option>
-                  <option value="closed">Closed</option>
-                </select>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="mt-5 space-y-3.5">
+      {items.map((i) => {
+        const label = mapLabel ? mapLabel(i[labelKey]) : i[labelKey]
+        return (
+          <div key={String(i.key ?? label)}>
+            <div className="flex items-center justify-between">
+              <span className="text-[13.5px] font-semibold capitalize text-navy-800">{label}</span>
+              <span className="text-[12.5px] text-slate-500">{i.count}</span>
+            </div>
+            <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full" style={{ width: `${(i.count / max) * 100}%`, background: colorFor(i.key) }} />
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
 
-function Toggle({ on, onClick, children }) {
+function EmptyBox({ icon: Icon, text }) {
   return (
-    <button
-      onClick={onClick}
-      className={`rounded-lg border px-3 py-2 text-[12.5px] font-semibold transition ${
-        on ? 'border-brand bg-brand/5 text-brand' : 'border-slate-200 text-slate-500 hover:border-slate-300'
-      }`}
-    >
-      {children}
-    </button>
+    <div className="flex flex-col items-center rounded-xl border border-dashed border-slate-200 bg-slate-50/60 py-8 text-center">
+      <Icon className="h-6 w-6 text-slate-300" />
+      <p className="mt-2 px-4 text-[13px] font-medium text-slate-500">{text}</p>
+    </div>
   )
 }
-function Center() {
-  return <div className="flex justify-center py-20"><Loader2 className="h-7 w-7 animate-spin text-slate-400" /></div>
-}
-function Empty({ text }) {
-  return <p className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-16 text-center text-[14px] text-slate-500">{text}</p>
-}
-function Forbidden() {
+
+function SkeletonRows({ n }) {
   return (
-    <div className="mt-10 flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center">
-      <ShieldAlert className="h-9 w-9 text-slate-300" />
-      <h2 className="mt-3 text-[18px] font-bold text-navy-800">Admins only</h2>
-      <p className="mt-1.5 max-w-xs text-[14px] text-slate-500">
-        You need an admin account to view this page.
-      </p>
+    <div className="space-y-2.5">
+      {Array.from({ length: n }).map((_, i) => (
+        <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-100" />
+      ))}
     </div>
   )
 }

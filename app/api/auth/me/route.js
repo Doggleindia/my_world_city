@@ -19,6 +19,7 @@ export const GET = handler(async () => {
       email: user.email ?? null,
       avatar: user.avatar ?? null,
       roles: user.roles,
+      mustChangePassword: !!user.mustChangePassword,
     },
   })
 })

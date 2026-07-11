@@ -6,13 +6,15 @@ import ExpertCard from './ExpertCard'
 import ExpertFilters from './ExpertFilters'
 import { expertList, expertCategories } from '@/data'
 
-export default function ExpertDirectory() {
+export default function ExpertDirectory({ experts, categories }) {
+  const source = experts?.length ? experts : expertList
+  const cats = categories?.length ? categories : expertCategories
   const [query, setQuery] = useState('')
   const [cat, setCat] = useState('All')
   const [domains, setDomains] = useState([]) // applied from sidebar
 
   const q = query.trim().toLowerCase()
-  const filtered = expertList.filter((e) => {
+  const filtered = source.filter((e) => {
     const matchesChip = cat === 'All' || e.cat === cat
     const matchesDomain = domains.length === 0 || domains.includes(e.cat)
     const matchesQuery =
@@ -39,7 +41,7 @@ export default function ExpertDirectory() {
 
       {/* Category chips */}
       <div className="mt-5 flex flex-wrap gap-2.5">
-        {expertCategories.map((c) => (
+        {cats.map((c) => (
           <button
             key={c}
             onClick={() => setCat(c)}
@@ -62,7 +64,7 @@ export default function ExpertDirectory() {
           {filtered.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {filtered.map((e) => (
-                <ExpertCard key={e.name} {...e} />
+                <ExpertCard key={e.id || e.slug || e.name} {...e} />
               ))}
             </div>
           ) : (

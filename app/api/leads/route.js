@@ -3,7 +3,7 @@ import { dbConnect } from '@/lib/db'
 import Lead from '@/lib/models/Lead'
 import { leadSchema } from '@/lib/validation'
 import { getSession } from '@/lib/auth/session'
-import { handler, parseBody, ok, ApiError } from '@/lib/api'
+import { handler, parseBody, ok, ApiError, isObjectId } from '@/lib/api'
 import { rateLimit, clientIp } from '@/lib/rateLimit'
 
 function makeRefId() {
@@ -25,6 +25,10 @@ export const POST = handler(async (req) => {
 
   await Lead.create({
     ...data,
+    // Only attach id references that are real ObjectIds — a slug or junk string
+    // would otherwise throw a Mongoose CastError (500) on create.
+    propertyId: isObjectId(data.propertyId) ? data.propertyId : undefined,
+    expertId: isObjectId(data.expertId) ? data.expertId : undefined,
     email: data.email || undefined,
     userId: session?.uid,
     refId,

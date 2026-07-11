@@ -151,31 +151,6 @@ export const insights = [
   },
 ]
 
-// ---- Property listing page ----
-export const activeChips = [
-  'Buy',
-  'Residential',
-  'Plot',
-  'Jaipur',
-  '₹40L – ₹1.2Cr',
-  '1000–2500 sq.yd',
-]
-
-const listingImgs = [
-  img('1500382017468-9049fed747ef'), // farm / land
-  img('1586023492125-27b2c045efd7'), // living room interior
-  img('1564013799919-ab600027ffc6'), // white villa
-  img('1497366216548-37526070297c'), // dark commercial building
-]
-
-export const listings = Array.from({ length: 8 }, (_, i) => ({
-  id: i,
-  tag: 'INDUSTRIAL',
-  title: 'Industrial Land',
-  loc: 'Sitapura — 4.5 acres',
-  img: listingImgs[i % listingImgs.length],
-}))
-
 // ---- Property detail page ----
 export const property = {
   category: 'RESIDENTIAL',
@@ -782,17 +757,6 @@ export const reliability = [
     title: 'Absolute Transparency',
     desc: 'Live budget tracking and construction updates via your dashboard. No hidden costs, ever.',
     bg: 'bg-red-600',
-  },
-]
-
-// ---- Saved properties page ----
-export const savedProperties = [
-  {
-    id: 1,
-    tag: 'INDUSTRIAL',
-    title: 'Industrial Land',
-    loc: 'Sitapura — 4.5 acres',
-    img: img('1564013799919-ab600027ffc6'),
   },
 ]
 

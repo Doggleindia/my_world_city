@@ -22,7 +22,13 @@ export default function ProfileHero({ p }) {
         <div className="mt-6 grid gap-8 md:grid-cols-[300px_1fr]">
           {/* Photo */}
           <div className="overflow-hidden rounded-2xl">
-            <img src={p.photo} alt={p.name} className="h-[320px] w-full object-cover md:h-[340px]" />
+            {p.photo ? (
+              <img src={p.photo} alt={p.name} className="h-[320px] w-full object-cover md:h-[340px]" />
+            ) : (
+              <div className="grid h-[320px] w-full place-items-center bg-brand/10 text-[56px] font-extrabold text-brand md:h-[340px]">
+                {p.initials}
+              </div>
+            )}
           </div>
 
           {/* Info */}
@@ -34,16 +40,16 @@ export default function ProfileHero({ p }) {
             <p className="mt-1 text-[14px] text-slate-500">{p.role}</p>
 
             <div className="mt-4 flex flex-wrap gap-2.5">
-              <MetaPill icon={MapPin}>{p.location}</MetaPill>
-              <MetaPill icon={Clock}>{p.experience}</MetaPill>
-              <MetaPill icon={Languages}>{p.languages}</MetaPill>
+              {p.location && <MetaPill icon={MapPin}>{p.location}</MetaPill>}
+              {p.experience && <MetaPill icon={Clock}>{p.experience}</MetaPill>}
+              {p.languages && <MetaPill icon={Languages}>{p.languages}</MetaPill>}
             </div>
 
-            <p className="mt-5 max-w-2xl text-[14px] leading-relaxed text-slate-600">{p.intro}</p>
+            {p.intro && <p className="mt-5 max-w-2xl text-[14px] leading-relaxed text-slate-600">{p.intro}</p>}
 
             <div className="mt-6 flex flex-wrap gap-3">
               <ExpertConnectButton
-                expert={{ initials: p.initials, tag: p.tag, name: p.name, specialty: p.specialty }}
+                expert={{ id: p.id, initials: p.initials, tag: p.tag, name: p.name, specialty: p.specialty }}
                 className="inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 text-[14px] font-semibold text-white transition hover:bg-brand-700"
               >
                 Connect Now <ArrowRight className="h-4 w-4" />
@@ -57,7 +63,7 @@ export default function ProfileHero({ p }) {
             </div>
 
             <div className="mt-7 grid max-w-2xl grid-cols-2 gap-6 border-t border-slate-100 pt-6 sm:grid-cols-4">
-              {p.stats.map((s) => (
+              {(p.stats || []).map((s) => (
                 <div key={s.label}>
                   <p className="text-[22px] font-extrabold text-navy-800">{s.value}</p>
                   <p className="mt-0.5 text-[12.5px] text-slate-500">{s.label}</p>

@@ -10,8 +10,11 @@ import SiteFooter from '@/components/property/SiteFooter'
 import { ownershipSteps, property as staticProperty } from '@/data'
 import { dbConnect } from '@/lib/db'
 import Property from '@/lib/models/Property'
+import User from '@/lib/models/User' // registered for populate
 import { serialize } from '@/lib/serialize'
+import { getSession } from '@/lib/auth/session'
 
+void User
 export const dynamic = 'force-dynamic'
 
 const DEFAULT_AGENT = {
@@ -21,38 +24,100 @@ const DEFAULT_AGENT = {
   avatar: 'https://i.pravatar.cc/120?img=12',
 }
 
+// Build the "Key details" grid rows from the admin details subdoc (real data),
+// falling back to basic top-level facts — never the static demo property.
+function buildKeyDetails(doc) {
+  const d = doc.details || {}
+  const list = []
+  const push = (l, v) => { if (v !== undefined && v !== null && v !== '') list.push({ l, v: String(v) }) }
+  push('Type', doc.listingType === 'rent' ? 'For Rent' : 'For Sale')
+  push('Bedrooms', d.bedrooms)
+  push('Bathrooms', d.bathrooms)
+  push('Balconies', d.balconies)
+  push('Carpet Area', d.carpetArea)
+  push('Built-up Area', d.builtUpArea)
+  push('Super Area', d.superArea)
+  if (d.floorNumber || d.totalFloors) push('Floor', `${d.floorNumber ?? '—'}${d.totalFloors ? ` of ${d.totalFloors}` : ''}`)
+  push('Facing', d.facing)
+  push('Furnishing', d.furnishing)
+  push('Age', d.age)
+  push('Possession', d.possession)
+  push('Ownership', d.ownership)
+  push('Parking', d.parking)
+  if (d.priceSqft) push('Price / sq.ft', `₹${Number(d.priceSqft).toLocaleString('en-IN')}`)
+  if (d.booking) push('Booking', `₹${Number(d.booking).toLocaleString('en-IN')}`)
+  if (d.maintenance) push('Maintenance', `₹${Number(d.maintenance).toLocaleString('en-IN')}/mo`)
+  if (d.negotiable !== undefined && d.negotiable !== null) push('Negotiable', d.negotiable ? 'Yes' : 'No')
+
+  // Fall back to basics if the owner never filled the spec sheet.
+  if (list.length <= 1) {
+    if (doc.category) list.push({ l: 'Category', v: doc.category })
+    if (doc.area) list.push({ l: 'Area', v: doc.area })
+    if (doc.priceLabel) list.push({ l: 'Price', v: doc.priceLabel })
+    if (doc.location?.locality) list.push({ l: 'Locality', v: doc.location.locality })
+    if (doc.pincode) list.push({ l: 'Pincode', v: doc.pincode })
+  }
+
+  const rows = []
+  for (let i = 0; i < list.length; i += 2) rows.push([list[i], list[i + 1] || { l: '', v: '' }])
+  return rows
+}
+
 // Map a DB property document to the shape the detail components expect.
 function toDetail(doc) {
   const locality = doc.location?.locality || ''
   const city = doc.location?.city || 'Jaipur'
+  const owner = doc.ownerId && typeof doc.ownerId === 'object' ? doc.ownerId : null
+  const agent = owner
+    ? {
+        name: owner.name || 'Owner',
+        role: 'OWNER',
+        avatar: owner.avatar || null,
+        initials: (owner.name || 'O').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase(),
+        phone: owner.phone || null,
+        email: owner.email || null,
+        responds: null,
+      }
+    : DEFAULT_AGENT
+
   return {
     id: doc.id || doc._id,
     category: doc.category,
+    subType: doc.subType || null,
     title: doc.title,
-    area: doc.area || '',
-    location: [locality, city].filter(Boolean).join(', '),
+    area: [doc.subType, doc.area].filter(Boolean).join(' · ') || doc.area || '',
+    location: [doc.address, locality, city].filter(Boolean).join(', '),
     verified: !!doc.verified,
+    rera: !!doc.rera,
     photoCount: doc.photoCount || (doc.gallery?.thumbs?.length || 0) + 1,
     breadcrumb: ['Home', doc.category, locality || city, doc.title],
     badges: doc.badges || [],
-    gallery: {
-      main: doc.gallery?.main,
-      thumbs: doc.gallery?.thumbs?.length ? doc.gallery.thumbs : staticProperty.gallery.thumbs,
-    },
-    keyDetails: doc.keyDetails?.length ? doc.keyDetails : staticProperty.keyDetails,
-    amenities: doc.amenities?.length ? doc.amenities : staticProperty.amenities,
-    about: doc.description || '',
-    distances: doc.distances?.length ? doc.distances : staticProperty.distances,
+    gallery: { main: doc.gallery?.main, thumbs: doc.gallery?.thumbs || [] },
+    keyDetails: buildKeyDetails(doc),
+    amenities: doc.amenities || [],
+    about: doc.description || `${doc.title} in ${locality || city}.`,
+    distances: doc.distances || [],
     priceLabel: doc.priceLabel || null,
-    agent: DEFAULT_AGENT,
+    negotiable: !!doc.details?.negotiable,
+    agent,
   }
 }
 
 async function getProperty(slug) {
   try {
     await dbConnect()
-    const doc = await Property.findOne({ slug }).lean()
-    if (doc) return toDetail(serialize(doc))
+    const doc = await Property.findOne({ slug }).populate('ownerId', 'name phone email avatar').lean()
+    if (doc) {
+      // Non-active listings are only visible to their owner or an admin.
+      if (doc.status !== 'active') {
+        const session = await getSession()
+        const ownerId = String(doc.ownerId?._id || doc.ownerId || '')
+        const isOwner = session && ownerId === session.uid
+        const isAdmin = session && (session.roles || []).includes('admin')
+        if (!isOwner && !isAdmin) return null
+      }
+      return toDetail(serialize(doc))
+    }
   } catch {
     // DB not configured — fall back to the static showcase for the demo slug.
   }

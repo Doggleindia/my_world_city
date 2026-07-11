@@ -2,6 +2,8 @@ import Navbar from '@/components/Navbar'
 import ExpertStepper from '@/components/experts/ExpertStepper'
 import ExpertDirectory from '@/components/experts/ExpertDirectory'
 import SiteFooter from '@/components/property/SiteFooter'
+import { getPublicExperts } from '@/lib/experts'
+import { expertCategories } from '@/data'
 
 export const metadata = {
   title: 'Connect with our Experts — My World City',
@@ -9,7 +11,10 @@ export const metadata = {
     'Trusted professionals for every step of buying, building and owning property in the Pink City.',
 }
 
-export default function ExpertsPage() {
+export const revalidate = 60
+
+export default async function ExpertsPage() {
+  const experts = await getPublicExperts()
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
       <Navbar cta="brand" />
@@ -24,7 +29,7 @@ export default function ExpertsPage() {
         </p>
 
         <ExpertStepper />
-        <ExpertDirectory />
+        <ExpertDirectory experts={experts} categories={expertCategories} />
       </div>
 
       <SiteFooter />

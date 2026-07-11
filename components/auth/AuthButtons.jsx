@@ -7,7 +7,7 @@ import { useAuth } from './AuthProvider'
 import { User, Heart, LayoutDashboard, Shield, LogOut, ChevronDown } from 'lucide-react'
 
 export default function AuthButtons({ cta = 'navy' }) {
-  const { user, loading, openLogin, requireAuth, logout } = useAuth()
+  const { user, loading, openLogin, logout } = useAuth()
   const router = useRouter()
   const [menu, setMenu] = useState(false)
   const ref = useRef(null)
@@ -77,7 +77,7 @@ export default function AuthButtons({ cta = 'navy' }) {
       )}
 
       <button
-        onClick={() => requireAuth(() => router.push('/list-property'))}
+        onClick={() => router.push('/list-property')}
         className={`whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold text-white transition sm:px-4 ${ctaClass}`}
       >
         <span className="sm:hidden">List Free</span>

@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react'
 import SuccessCard from '@/components/SuccessCard'
+import { submitLead } from '@/lib/leads'
 
 const iconMap = { Scale, Ruler, PencilRuler, Wrench, Landmark, Home, Sun, Lightbulb }
 const TIMES = ['Morning', 'Afternoon', 'Evening', 'Anytime']
@@ -58,27 +59,15 @@ export default function ServiceRequestModal({ open, service, onClose }) {
       name: fd.get('name'),
       phone: fd.get('phone'),
       email: fd.get('email') || '',
+      budget: fd.get('budget') || undefined,
       message:
         (fd.get('message') || '') + (related ? `\nRelated property: ${related}` : ''),
       preferredTime: time,
     }
     setBusy(true)
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed')
-      setRefId(data.refId)
-    } catch {
-      const year = new Date().getFullYear()
-      setRefId(`MWC-${year}-${String(Math.floor(Math.random() * 100000)).padStart(5, '0')}`)
-    } finally {
-      setBusy(false)
-      setSent(true)
-    }
+    setRefId(await submitLead(payload))
+    setBusy(false)
+    setSent(true)
   }
 
   return createPortal(
@@ -150,6 +139,10 @@ export default function ServiceRequestModal({ open, service, onClose }) {
 
               <Field label="Email address (optional)">
                 <input name="email" type="email" placeholder="rahul.sharma@example.com" className={inputCls} />
+              </Field>
+
+              <Field label="Budget range (optional)">
+                <input name="budget" type="text" placeholder="e.g. ₹15,000 – ₹25,000" className={inputCls} />
               </Field>
 
               <Field label="What do you need help with?">
