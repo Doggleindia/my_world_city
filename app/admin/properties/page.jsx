@@ -233,13 +233,13 @@ export default function AdminProperties() {
 function Chip({ active, onClick, children }) {
   return <button onClick={onClick} className={`rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold transition ${active ? 'bg-navy-800 text-white' : 'border border-slate-200 text-slate-600 hover:border-slate-300'}`}>{children}</button>
 }
-function Select({ value, onChange, options, plain, disabledHint }) {
+function Select({ value, onChange, options, plain }) {
   const current = options.find(([v]) => v === value)?.[1] ?? options[0][1]
   return (
-    <div className={`relative inline-flex items-center rounded-full pr-8 text-[13px] font-semibold text-navy-800 ${plain ? '' : 'border border-slate-200 py-2.5 pl-4'} ${disabledHint ? 'text-slate-400' : ''}`}>
+    <div className={`relative inline-flex items-center rounded-full pr-8 text-[13px] font-semibold text-navy-800 ${plain ? '' : 'border border-slate-200 py-2.5 pl-4'}`}>
       <span>{current}</span>
       <ChevronDown className="pointer-events-none absolute right-3 h-4 w-4 text-slate-400" />
-      {!disabledHint && <select value={value} onChange={(e) => onChange(e.target.value)} className="absolute inset-0 cursor-pointer opacity-0">{options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>}
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="absolute inset-0 cursor-pointer opacity-0">{options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
     </div>
   )
 }

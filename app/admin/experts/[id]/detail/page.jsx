@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Loader2, ArrowRight, MessageSquare, Phone, Mail, MapPin, Globe, Calendar,
-  AlertCircle, Star, Check, Clock, ExternalLink, Hammer,
+  AlertCircle, Star, Clock, ExternalLink, Hammer,
 } from 'lucide-react'
 
 const TABS = ['Overview', 'Communication Log', 'Property Context', 'Admin Notes', 'Activity Log']

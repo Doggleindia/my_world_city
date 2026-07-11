@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, Loader2, Check } from 'lucide-react'
+import { Star, Loader2 } from 'lucide-react'
 
 function loadRazorpay() {
   return new Promise((resolve) => {

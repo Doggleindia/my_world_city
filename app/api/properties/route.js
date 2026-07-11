@@ -1,20 +1,8 @@
 import { dbConnect } from '@/lib/db'
 import Property from '@/lib/models/Property'
-import { propertyQuerySchema, propertyCreateSchema } from '@/lib/validation'
-import { handler, parseQuery, parseBody, ok, requireUser } from '@/lib/api'
+import { propertyQuerySchema } from '@/lib/validation'
+import { handler, parseQuery, ok } from '@/lib/api'
 import { toPropertyCard } from '@/lib/serialize'
-
-function slugify(s) {
-  return (
-    s
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
-      .slice(0, 60) +
-    '-' +
-    Math.random().toString(36).slice(2, 7)
-  )
-}
 
 // GET /api/properties?category=&listingType=&locality=&q=&min/maxPrice=&verified=&rera=&featured=&sort=&page=&limit=
 export const GET = handler(async (req) => {
@@ -57,21 +45,4 @@ export const GET = handler(async (req) => {
     total,
     hasMore: skip + docs.length < total,
   })
-})
-
-// POST /api/properties — create a listing (owner). Starts as `pending` for moderation.
-export const POST = handler(async (req) => {
-  const session = await requireUser()
-  const data = await parseBody(req, propertyCreateSchema)
-  await dbConnect()
-
-  const doc = await Property.create({
-    ...data,
-    ownerId: session.uid,
-    slug: slugify(data.title),
-    photoCount: 1 + (data.gallery?.thumbs?.length || 0),
-    status: 'pending',
-  })
-
-  return ok({ property: toPropertyCard(doc.toObject()), id: String(doc._id) }, { status: 201 })
 })

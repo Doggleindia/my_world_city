@@ -3,8 +3,8 @@
 import { Suspense, useEffect, useMemo, useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
-  Loader2, ChevronDown, ChevronRight, ChevronLeft, Calendar, UserPlus,
-  Globe, AlertCircle, Inbox,
+  Loader2, ChevronDown, ChevronRight, ChevronLeft, Calendar,
+  AlertCircle, Inbox,
 } from 'lucide-react'
 import { useAdminStats } from '../layout'
 
@@ -286,14 +286,6 @@ function Dropdown({ label, value, onChange, options, icon: Icon }) {
         {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
       </select>
     </div>
-  )
-}
-
-function FakePill({ icon: Icon, label }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 py-2 pl-3.5 pr-3 text-[13px] font-semibold text-slate-400" title="Not tracked yet">
-      {Icon && <Icon className="h-3.5 w-3.5" />} {label}
-    </span>
   )
 }
 

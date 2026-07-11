@@ -1,6 +1,6 @@
 'use client'
 
-import { X, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 
 const SORTS = {
   recent: 'Newest',

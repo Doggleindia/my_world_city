@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { compressImage } from '@/lib/image'
 import {
-  Loader2, ChevronRight, MapPin, Upload, X, Phone, Mail, Clock, Check,
+  Loader2, ChevronRight, MapPin, Upload, Phone, Mail, Clock, Check,
 } from 'lucide-react'
 import { useAdminStats } from '../../layout'
 

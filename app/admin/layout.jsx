@@ -7,7 +7,7 @@ import { useAuth } from '@/components/auth/AuthProvider'
 import {
   LayoutDashboard, Inbox, Lightbulb, Building2, Wrench, MessageSquare,
   UserSearch, BookUser, Map, Search, Bell, HelpCircle, ShieldAlert, Loader2,
-  Menu, X, ClipboardCheck, AlertCircle, ChevronRight,
+  Menu, X, ClipboardCheck, ChevronRight,
 } from 'lucide-react'
 
 function roleLabel(user) {
