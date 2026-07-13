@@ -54,13 +54,22 @@ export function useAdminStats() {
 }
 
 export default function AdminLayout({ children }) {
-  const { user, loading } = useAuth()
+  const { user, loading, logout } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
   const isAdmin = user?.roles?.includes('admin')
 
   const [data, setData] = useState(null)
   const [statsLoading, setStatsLoading] = useState(true)
   const [statsError, setStatsError] = useState('')
   const [drawer, setDrawer] = useState(false)
+
+  // Not signed in → send to login and return to this exact admin page after.
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace(`/login?next=${encodeURIComponent(pathname || '/admin')}`)
+    }
+  }, [loading, user, pathname, router])
 
   const refresh = useCallback(async () => {
     setStatsLoading(true)
@@ -81,7 +90,8 @@ export default function AdminLayout({ children }) {
     if (isAdmin) refresh()
   }, [isAdmin, refresh])
 
-  if (loading) {
+  // While loading, or while redirecting an unauthenticated visitor to login.
+  if (loading || !user) {
     return (
       <div className="grid min-h-screen place-items-center bg-[#f4f6fb]">
         <Loader2 className="h-8 w-8 animate-spin text-brand" />
@@ -89,6 +99,7 @@ export default function AdminLayout({ children }) {
     )
   }
 
+  // Signed in but without the admin role.
   if (!isAdmin) {
     return (
       <div className="grid min-h-screen place-items-center bg-[#f4f6fb] px-6">
@@ -96,11 +107,19 @@ export default function AdminLayout({ children }) {
           <ShieldAlert className="h-10 w-10 text-slate-300" />
           <h2 className="mt-4 text-[18px] font-bold text-navy-800">Admins only</h2>
           <p className="mt-1.5 px-8 text-[14px] text-slate-500">
-            You need an admin account to open the console.
+            You’re signed in as {user.name || `+91 ${user.phone}`}, which isn’t an admin account.
           </p>
-          <Link href="/" className="mt-6 rounded-full bg-brand px-6 py-3 text-[14px] font-semibold text-white hover:bg-brand-700">
-            Back to site
-          </Link>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <button
+              onClick={async () => { await logout(); router.replace('/login?next=/admin') }}
+              className="rounded-full bg-brand px-6 py-3 text-[14px] font-semibold text-white hover:bg-brand-700"
+            >
+              Log in as admin
+            </button>
+            <Link href="/" className="rounded-full border border-slate-300 px-6 py-3 text-[14px] font-semibold text-navy-800 hover:border-slate-400">
+              Back to site
+            </Link>
+          </div>
         </div>
       </div>
     )

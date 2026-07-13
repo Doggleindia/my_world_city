@@ -21,6 +21,7 @@ function LoginInner() {
   const router = useRouter()
   const params = useSearchParams()
   const next = params.get('next') || '/dashboard'
+  const isAdminLogin = next.startsWith('/admin')
 
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
@@ -60,9 +61,11 @@ function LoginInner() {
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-brand">
             <Lock className="h-6 w-6" />
           </span>
-          <h1 className="mt-4 text-[26px] font-extrabold tracking-tight text-navy-900">Owner login</h1>
+          <h1 className="mt-4 text-[26px] font-extrabold tracking-tight text-navy-900">{isAdminLogin ? 'Admin login' : 'Owner login'}</h1>
           <p className="mt-1.5 text-[14px] text-slate-500">
-            Use the mobile number and password you received when you listed your property.
+            {isAdminLogin
+              ? 'Sign in with your admin mobile number and password to open the console.'
+              : 'Use the mobile number and password you received when you listed your property.'}
           </p>
 
           {error && (
@@ -105,12 +108,14 @@ function LoginInner() {
             </button>
           </form>
 
-          <p className="mt-5 text-center text-[13.5px] text-slate-500">
-            Don’t have an account?{' '}
-            <Link href="/list-property" className="font-semibold text-brand hover:underline">
-              List a property
-            </Link>
-          </p>
+          {!isAdminLogin && (
+            <p className="mt-5 text-center text-[13.5px] text-slate-500">
+              Don’t have an account?{' '}
+              <Link href="/list-property" className="font-semibold text-brand hover:underline">
+                List a property
+              </Link>
+            </p>
+          )}
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12px] text-slate-400">
             <ShieldCheck className="h-3.5 w-3.5" /> Your details stay private and are never shared.
           </p>
