@@ -21,7 +21,7 @@ yarn-error.log*
 
 # env
 .env*.local
-
+.env
 # editor
 .vscode/*
 !.vscode/extensions.json
