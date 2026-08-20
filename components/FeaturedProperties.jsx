@@ -29,64 +29,81 @@ async function getFeatured() {
 export default async function FeaturedProperties() {
   const featured = await getFeatured()
   return (
-    <section className="bg-slate-50">
+    <section className="bg-[#f5f6f8]">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-extrabold text-navy-800 sm:text-3xl">Featured Properties</h2>
-            <p className="mt-2 text-[14px] text-slate-500">
+            <h2 className="text-[30px] font-extrabold tracking-tight text-navy-900 sm:text-[34px]">
+              Featured Properties
+            </h2>
+            <p className="mt-1.5 text-[14.5px] text-slate-500">
               Curated premium listings with verified details and direct owner contact.
             </p>
           </div>
           <Link
             href="/find-property"
-            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-300 bg-white px-4 py-2 text-[13px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+            className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-slate-200 bg-white px-5 py-2.5 text-[14px] font-semibold text-brand shadow-sm transition hover:border-brand"
           >
             View all <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((p, i) => (
+        {/* four across on desktop keeps each card ~290px wide */}
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {featured.slice(0, 4).map((p, i) => (
             <article
               key={i}
-              className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:shadow-card"
+              className="group flex flex-col rounded-2xl bg-white p-3 shadow-[0_4px_18px_-6px_rgba(8,26,51,0.14)] transition hover:shadow-card"
             >
-              <Link href={p.href} className="block h-44 w-full overflow-hidden">
+              {/* image is inset in the card, not bled to the edges */}
+              <Link href={p.href} className="block overflow-hidden rounded-xl">
                 <img
                   src={p.img}
                   alt={p.title}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105"
                 />
               </Link>
-              <div className="p-4">
-                <span className="text-[10.5px] font-bold tracking-wide text-brand">{p.tag}</span>
-                <Link href={p.href} className="mt-1 block">
-                  <h3 className="text-[16px] font-bold text-navy-800 transition hover:text-brand">{p.title}</h3>
+
+              <div className="flex flex-1 flex-col px-2 pb-1 pt-4">
+                <span className="self-start rounded-md bg-brand/10 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-brand">
+                  {p.tag}
+                </span>
+                <Link href={p.href} className="mt-2.5 block">
+                  <h3 className="text-[17px] font-bold text-navy-900 transition group-hover:text-brand">
+                    {p.title}
+                  </h3>
                 </Link>
-                <p className="mt-1 flex items-center gap-1 text-[12.5px] text-slate-500">
-                  <MapPin className="h-3.5 w-3.5" /> {p.loc}
+                <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-slate-500">
+                  <MapPin className="h-4 w-4 shrink-0" /> {p.loc}
                 </p>
 
-                <div className="mt-4 flex items-center gap-2">
+                <div className="mt-5 flex items-center gap-2.5">
                   {p.id ? (
-                    <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200">
-                      <SaveButton id={p.id} size={16} />
-                    </span>
+                    <SaveButton
+                      id={p.id}
+                      size={17}
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-slate-100 hover:bg-slate-200"
+                    />
                   ) : (
-                    <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-ember hover:text-ember">
-                      <Heart className="h-4 w-4" />
+                    <button
+                      aria-label="Save"
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-400 transition hover:bg-slate-200 hover:text-ember"
+                    >
+                      <Heart className="h-[17px] w-[17px]" />
                     </button>
                   )}
                   <Link
                     href={p.href}
-                    className="flex-1 rounded-lg bg-navy-800 py-2 text-center text-[13px] font-semibold text-white transition hover:bg-navy-700"
+                    className="flex-1 rounded-full bg-brand-800 py-2.5 text-center text-[13.5px] font-semibold text-white transition hover:bg-navy-700"
                   >
                     Details
                   </Link>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-brand hover:text-brand">
-                    <ShareButton url={p.href} title={p.title} size={16} />
-                  </span>
+                  <ShareButton
+                    url={p.href}
+                    title={p.title}
+                    size={17}
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-brand"
+                  />
                 </div>
               </div>
             </article>

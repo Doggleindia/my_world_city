@@ -6,11 +6,12 @@ import ExpertCard from './ExpertCard'
 import ExpertFilters from './ExpertFilters'
 import { expertList, expertCategories } from '@/data'
 
-export default function ExpertDirectory({ experts, categories }) {
+// AFTER
+export default function ExpertDirectory({ experts, categories, initialCat = 'All' }) {
   const source = experts?.length ? experts : expertList
   const cats = categories?.length ? categories : expertCategories
   const [query, setQuery] = useState('')
-  const [cat, setCat] = useState('All')
+  const [cat, setCat] = useState(initialCat)
   const [domains, setDomains] = useState([]) // applied from sidebar
 
   const q = query.trim().toLowerCase()

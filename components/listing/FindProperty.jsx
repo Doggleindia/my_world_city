@@ -65,7 +65,7 @@ export default function FindProperty() {
       <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
         <button
           onClick={() => setShowFilters((v) => !v)}
-          className="mb-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-[14px] font-semibold text-navy-800 transition hover:border-slate-400 lg:hidden"
+          className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-[14px] font-semibold text-navy-800 transition hover:border-slate-400 lg:hidden"
         >
           <SlidersHorizontal className="h-4 w-4" /> {showFilters ? 'Hide filters' : 'Filters'}
         </button>

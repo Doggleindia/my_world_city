@@ -1,21 +1,24 @@
 import { gallery } from '../data'
 
-export default function Gallery({ bg = 'bg-white' }) {
+export default function Gallery({ bg = 'bg-[#f5f6f8]' }) {
   return (
     <section className={bg}>
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="text-center">
-          <h2 className="text-2xl font-extrabold text-navy-800 sm:text-3xl">Gallery</h2>
-          <p className="mt-2 text-[14px] text-slate-500">
+          <h2 className="text-[34px] font-extrabold tracking-tight text-navy-900 sm:text-[40px]">
+            Gallery
+          </h2>
+          <p className="mx-auto mt-3 text-[17px] leading-relaxed text-slate-500">
             Snapshots from our latest live campaigns
           </p>
         </div>
 
-        <div className="no-scrollbar mt-8 flex gap-4 overflow-x-auto pb-2">
+        {/* tall portrait strip that scrolls sideways, with a visible slim scrollbar */}
+        <div className="mwc-scrollbar mt-10 flex gap-4 overflow-x-auto pb-4">
           {gallery.map((src, i) => (
             <div
               key={i}
-              className="h-52 min-w-[260px] flex-1 overflow-hidden rounded-2xl"
+              className="h-[420px] w-[250px] shrink-0 overflow-hidden rounded-xl sm:h-[460px] sm:w-[268px]"
             >
               <img
                 src={src}

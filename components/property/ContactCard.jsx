@@ -1,44 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { BadgeCheck, MessageCircle, Mail, Link2, Share2, Download, Phone } from 'lucide-react'
+import { BadgeCheck, Download, Phone } from 'lucide-react'
 import EnquiryModal from './EnquiryModal'
+import ShareCard from './ShareCard'
 
 export default function ContactCard({ property }) {
   const { agent } = property
   const [modalTab, setModalTab] = useState(null) // null = closed, else active tab
-  const [copied, setCopied] = useState(false)
 
   const openWith = (tab) => setModalTab(tab)
   const close = () => setModalTab(null)
 
-  const pageUrl = () => (typeof window !== 'undefined' ? window.location.href : '')
-  const shareText = `${property.title} — ${property.location}`
-  const onWhatsApp = () =>
-    window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${pageUrl()}`)}`, '_blank')
-  const onEmail = () => {
-    window.location.href = `mailto:?subject=${encodeURIComponent(property.title)}&body=${encodeURIComponent(`${shareText}\n${pageUrl()}`)}`
-  }
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(pageUrl())
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1800)
-    } catch {
-      /* ignore */
-    }
-  }
-  const onShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: property.title, text: shareText, url: pageUrl() })
-        return
-      }
-    } catch {
-      return
-    }
-    onCopy()
-  }
   const onDownload = () => window.print()
 
   return (
@@ -99,24 +72,10 @@ export default function ContactCard({ property }) {
         >
           Request callback
         </button>
-
-        {/* Share */}
-        <p className="mt-6 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-          Share this property
-        </p>
-        <button
-          onClick={onWhatsApp}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-emerald-600"
-        >
-          <MessageCircle className="h-[18px] w-[18px]" /> WhatsApp
-        </button>
-
-        <div className="mt-2.5 space-y-2.5">
-          <ShareRow icon={Mail} label="Email" onClick={onEmail} />
-          <ShareRow icon={Link2} label={copied ? 'Link copied!' : 'Copy link'} onClick={onCopy} />
-          <ShareRow icon={Share2} label="Share" onClick={onShare} />
-        </div>
       </div>
+
+      {/* Sharing lives in its own card now */}
+      <ShareCard property={property} />
 
       <button
         onClick={onDownload}
@@ -133,16 +92,5 @@ export default function ContactCard({ property }) {
         property={property}
       />
     </div>
-  )
-}
-
-function ShareRow({ icon: Icon, label, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand/[0.07] py-2.5 text-[13.5px] font-semibold text-slate-600 transition hover:bg-brand/10"
-    >
-      <Icon className="h-[17px] w-[17px] text-slate-500" /> {label}
-    </button>
   )
 }
