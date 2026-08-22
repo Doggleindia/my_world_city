@@ -43,7 +43,7 @@ export default function PropertyCard({
 
           <Link
             href={href}
-            className="flex-1 rounded-lg bg-brand py-2 text-center text-[13px] font-semibold text-white transition hover:bg-brand-700"
+            className="flex-1 rounded-full bg-brand py-2 text-center text-[13px] font-semibold text-white transition hover:bg-brand-700"
           >
             Details
           </Link>

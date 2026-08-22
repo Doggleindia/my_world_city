@@ -3,64 +3,102 @@ const img = (id, w = 900) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`
 
 // Shared primary navigation (used by Navbar across every page).
-export const navLinks = [
-  { label: 'Find Property', href: '/find-property' },
-  { label: 'Build Property', href: '/develop' },
-  { label: 'Services', href: '/services' },
-  { label: 'Premium', href: '/find-property' },
+// export const navLinks = [
+//   { label: 'Find Property', href: '/find-property' },
+//   { label: 'Build Property', href: '/develop' },
+//   { label: 'Services', href: '/services' },
+//   { label: 'Premium', href: '/find-property' },
+// ]
+
+// Tail of the hero headline — cycles through the four things the site does.
+// The first entry keeps the original sentence intact on first paint.
+export const heroRotatingWords = [
+  'a Modern Jaipur',
+  'Operate & Manage',
+  'Invest',
+  'Develop & Build',
 ]
 
 export const hero = {
+  // `bg` doubles as the video poster: it holds the frame while the clip loads
+  // and stays put if the browser blocks autoplay.
   bg: img('1503387762-592deb58ef4e', 1600),
+  video: '/videos/home-hero.mp4',
 }
 
+// `color` tints the icon and the sub-line; `bar` is the two-tone rule that sits
+// between them (left half → right half).
 export const actionCards = [
   {
     key: 'buy',
-    icon: 'Home',
+    icon: 'buy',
     title: 'Buy a Property',
     desc: 'I want to buy or lease a verified property',
-    color: 'text-emerald-600',
-    bar: 'bg-emerald-500',
+    color: '#17838c',
+    bar: ['#6ecf97', '#178089'],
   },
   {
     key: 'build',
-    icon: 'Building2',
+    icon: 'build',
     title: 'Build',
     desc: 'I want to build on my land , handled',
-    color: 'text-blue-600',
-    bar: 'bg-blue-500',
+    color: '#2b5fc9',
+    bar: ['#3f6fd8', '#22307d'],
   },
   {
     key: 'manage',
-    icon: 'Users',
+    icon: 'manage',
     title: 'Operate & Manage',
     desc: 'I own a property and need it leased and maintained',
-    color: 'text-ember',
-    bar: 'bg-ember',
+    color: '#c0392b',
+    bar: ['#c0392b', '#7a1c0d'],
   },
   {
     key: 'invest',
-    icon: 'TrendingUp',
+    icon: 'invest',
     title: 'Invest',
     desc: 'I want pre-leased, yield-focused property',
-    color: 'text-amber-500',
-    bar: 'bg-amber-500',
+    color: '#ef8f2a',
+    bar: ['#ef9024', '#e2542a'],
   },
 ]
 
+
 export const stats = [
-  { value: '1,800+', label: 'VERIFIED PROPERTIES' },
-  { value: '₹4,200 Cr+', label: 'LISTED VALUE' },
-  { value: '240+', label: 'TRUSTED PARTNERS' },
-  { value: '12 yrs', label: 'ON-GROUND EXPERTISE' },
+  { value: '1,800+', label: 'VERIFIED PROPERTIES', color: 'text-teal-600' },
+  { value: '₹4,200 Cr+', label: 'LISTED VALUE', color: 'text-brand' },
+  { value: '240+', label: 'TRUSTED PARTNERS', color: 'text-ember' },
+  { value: '12 yrs', label: 'ON-GROUND EXPERTISE', color: 'text-amber-500' },
 ]
 
+
+// `tint` is the colour wash laid over each photo: [top, bottom]. The photo shows
+// through the middle of the card and the bottom colour carries the label.
 export const categories = [
-  { title: 'Industrial', listings: '120+ Listings', img: img('1581094794329-c8112a89af12') },
-  { title: 'Residential', listings: '450+ Listings', img: img('1564013799919-ab600027ffc6') },
-  { title: 'Commercial', listings: '85+ Listings', img: img('1486406146926-c627a92ad1ab') },
-  { title: 'Farm & Agri', listings: '140+ Listings', img: img('1500382017468-9049fed747ef') },
+  {
+    title: 'Industrial',
+    listings: '120+ Listings',
+    img: img('1758789667762-56175fe4601c'),
+    tint: ['rgba(46,63,140,0.86)', 'rgba(96,131,214,0.94)'],
+  },
+  {
+    title: 'Residential',
+    listings: '450+ Listings',
+    img: img('1580587771525-78b9dba3b914'),
+    tint: ['rgba(58,112,172,0.55)', 'rgba(196,90,50,0.94)'],
+  },
+  {
+    title: 'Commercial',
+    listings: '85+ Listings',
+    img: img('1486406146926-c627a92ad1ab'),
+    tint: ['rgba(28,70,96,0.78)', 'rgba(52,180,128,0.92)'],
+  },
+  {
+    title: 'Farm & Agri',
+    listings: '140+ Listings',
+    img: img('1500382017468-9049fed747ef'),
+    tint: ['rgba(40,110,180,0.6)', 'rgba(228,150,25,0.94)'],
+  },
 ]
 
 export const featured = [
@@ -72,15 +110,104 @@ export const featured = [
   { tag: 'RESIDENTIAL', title: 'Luxury Apartment', loc: 'Vaishali Nagar — 3.2 acres', img: img('1502672260266-1c1ef2d93688') },
 ]
 
+// ---- "Find Solution" wizard (home hero) ----
+// Three steps: purpose → category → type. `short` is the label that appears in
+// the breadcrumb pill once the step is answered.
+export const solutionPurposes = [
+  {
+    key: 'buy',
+    short: 'Buy / Lease',
+    title: 'Buy or Lease Property',
+    desc: 'Find a home, plot or space to own or lease.',
+    img: img('1580587771525-78b9dba3b914'),
+  },
+  {
+    key: 'manage',
+    short: 'Manage',
+    title: 'Operate & Manage',
+    desc: 'Managed or income-generating assets for business.',
+    img: img('1644079446600-219068676743'),
+  },
+  {
+    key: 'develop',
+    short: 'Develop',
+    title: 'Develop or Build',
+    desc: 'Land & plots ready to develop and construct.',
+    img: img('1664662566501-73a7e41d8c19'),
+  },
+  {
+    key: 'invest',
+    short: 'Invest',
+    title: 'Invest',
+    desc: 'Opportunities for returns & long-term appreciation.',
+    img: img('1626178793926-22b28830aa30'),
+  },
+]
+
+export const solutionCategories = [
+  {
+    key: 'Residential',
+    title: 'Residential',
+    desc: 'Villas, apartments, plots, homes',
+    img: img('1580587771525-78b9dba3b914'),
+  },
+  {
+    key: 'Industrial',
+    title: 'Industrial',
+    desc: 'Factories, warehouses, industrial land',
+    img: img('1758789667762-56175fe4601c'),
+  },
+  {
+    key: 'Commercial',
+    title: 'Commercial',
+    desc: 'Offices, retail, co-working spaces',
+    img: img('1486406146926-c627a92ad1ab'),
+  },
+  {
+    key: 'Farm & Agri',
+    title: 'Farm & Agri',
+    desc: 'Farmland, farmhouses, plantations',
+    img: img('1500382017468-9049fed747ef'),
+  },
+]
+
+export const solutionTypes = {
+  Residential: [
+    { title: 'Villa', desc: 'Independent houses with private land', img: img('1512917774080-9991f1c4c750') },
+    { title: 'Apartment', desc: 'Flats in gated and high-rise projects', img: img('1545324418-cc1a3fa10c00') },
+    { title: 'Plot', desc: 'Residential land ready to build on', img: img('1620352332363-4261655a086d') },
+    { title: 'Builder floor', desc: 'Full-floor units in low-rise buildings', img: img('1605146769289-440113cc3d00') },
+  ],
+  Industrial: [
+    { title: 'Factory', desc: 'Production units with power and access', img: img('1496247749665-49cf5b1022e9') },
+    { title: 'Warehouse', desc: 'Storage and distribution sheds', img: img('1644079446600-219068676743') },
+    { title: 'Industrial land', desc: 'RIICO and approved industrial plots', img: img('1620352332363-4261655a086d') },
+    { title: 'Cold storage', desc: 'Temperature-controlled facilities', img: img('1606824722920-4c652a70f348') },
+  ],
+  Commercial: [
+    { title: 'Office', desc: 'Fitted and bare-shell office floors', img: img('1560264280-88b68371db39') },
+    { title: 'Retail shop', desc: 'High-street and mall storefronts', img: img('1563899911-1cd41c199d2a') },
+    { title: 'Co-working', desc: 'Ready desks and managed suites', img: img('1531973576160-7125cd663d86') },
+    { title: 'Showroom', desc: 'Large-frontage display spaces', img: img('1734576861113-8dcab61bc59d') },
+  ],
+  'Farm & Agri': [
+    { title: 'Farmland', desc: 'Cultivable land with water access', img: img('1500382017468-9049fed747ef') },
+    { title: 'Farmhouse', desc: 'Country homes on private acreage', img: img('1612192356527-6a02eef94eeb') },
+    { title: 'Orchard', desc: 'Planted groves and fruit farms', img: img('1598722818387-cbdaa0dc58d2') },
+    { title: 'Plantation', desc: 'Large-scale planted estates', img: img('1620352332363-4261655a086d') },
+  ],
+}
+
+// `color` drives the card's left stripe, tag pill and icon tile.
 export const experts = [
-  { tag: 'Certified Experts', icon: 'Scale', title: 'Legal', desc: 'Paperwork, RERA agreements you can trust' },
-  { tag: 'On-Site Survey', icon: 'Ruler', title: 'Surveyor', desc: 'Site measurements and boundary verification' },
-  { tag: 'Design & Planning', icon: 'PencilRuler', title: 'Architect', desc: 'Plans, layout, structural design' },
-  { tag: 'Construction', icon: 'Wrench', title: 'Contractor', desc: 'Build crews, materials, on-site execution' },
-  { tag: 'Compliance', icon: 'Stamp', title: 'Govt Liaison', desc: 'Approvals, permits, NOC documentation' },
-  { tag: 'Supply Chain', icon: 'Truck', title: 'Building Material', desc: 'Cement, steel, fittings, sanitary supply' },
-  { tag: 'Finishing', icon: 'Sofa', title: 'Interior', desc: 'Layout, finishes, furniture & styling' },
-  { tag: 'Consulting', icon: 'Compass', title: 'Vastu', desc: 'Direction, energy flow, spatial balance' },
+  { tag: 'Certified Experts', icon: 'Scale', title: 'Legal', desc: 'Paperwork, RERA agreements you can trust', color: '#16a34a' },
+  { tag: 'On-Site Survey', icon: 'Ruler', title: 'Surveyor', desc: 'Site measurements and boundary verification', color: '#f59e0b' },
+  { tag: 'Design & Planning', icon: 'PencilRuler', title: 'Architect', desc: 'Plans, layout, structural design', color: '#ee6c5f' },
+  { tag: 'Construction', icon: 'Wrench', title: 'Contractor', desc: 'Build crews, materials, on-site execution', color: '#3b82f6' },
+  { tag: 'Compliance', icon: 'Stamp', title: 'Govt Liaison', desc: 'Approvals, permits, NOC documentation', color: '#8b5cf6' },
+  { tag: 'Supply Chain', icon: 'Truck', title: 'Building Material', desc: 'Cement, steel, fittings, sanitary supply', color: '#0d9488' },
+  { tag: 'Finishing', icon: 'Sofa', title: 'Interior', desc: 'Layout, finishes, furniture & styling', color: '#ec4899' },
+  { tag: 'Consulting', icon: 'Compass', title: 'Vastu', desc: 'Direction, energy flow, spatial balance', color: '#6366f1' },
 ]
 
 export const gallery = [
@@ -616,149 +743,149 @@ export const expertDomains = ['Architecture', 'Legal', 'Engineering', 'Construct
 export const expertExperience = ['Any', '5+ Years', '10+ Years', '15+ Years']
 export const expertLocations = ['C-Scheme', 'Malviya Nagar', 'Mansarovar']
 
-// ---- Develop / Build Property page ----
-export const developHeroImg = img('1571003123894-1f0594d2b5d9', 1600)
+// // ---- Develop / Build Property page ----
+// export const developHeroImg = img('1571003123894-1f0594d2b5d9', 1600)
 
-export const developFeatures = [
-  {
-    icon: 'Map',
-    title: 'Guided step-by-step',
-    desc: 'A crystal-clear roadmap from the first soil test to the final key handover. No guesswork, just progress.',
-    bg: 'bg-indigo-500',
-  },
-  {
-    icon: 'ShieldCheck',
-    title: 'Verified experts',
-    desc: 'Every architect, engineer, and contractor is vetted for quality, legal standing, and past performance.',
-    bg: 'bg-emerald-500',
-  },
-  {
-    icon: 'Sparkles',
-    title: 'One team',
-    desc: 'A unified dashboard where all your stakeholders collaborate. One vision, one point of truth.',
-    bg: 'bg-amber-500',
-  },
-]
+// export const developFeatures = [
+//   {
+//     icon: 'Map',
+//     title: 'Guided step-by-step',
+//     desc: 'A crystal-clear roadmap from the first soil test to the final key handover. No guesswork, just progress.',
+//     bg: 'bg-indigo-500',
+//   },
+//   {
+//     icon: 'ShieldCheck',
+//     title: 'Verified experts',
+//     desc: 'Every architect, engineer, and contractor is vetted for quality, legal standing, and past performance.',
+//     bg: 'bg-emerald-500',
+//   },
+//   {
+//     icon: 'Sparkles',
+//     title: 'One team',
+//     desc: 'A unified dashboard where all your stakeholders collaborate. One vision, one point of truth.',
+//     bg: 'bg-amber-500',
+//   },
+// ]
 
-export const developSteps = [
-  {
-    n: 1,
-    title: 'Land & Legal',
-    desc: 'Securing the foundation. We verify land titles, conduct topographical surveys, and handle government liaisons.',
-    ring: 'bg-emerald-500',
-    img: img('1500382017468-9049fed747ef', 1000),
-    faqs: [
-      {
-        q: 'What happens in this step',
-        a: 'We run a full title search, check encumbrances and ownership history, conduct a topographical and boundary survey, and confirm the land is legally clear to build on.',
-      },
-      { q: 'Who is involved', a: 'Title lawyers, licensed surveyors, and our government liaison team.' },
-      { q: 'How long does it take', a: 'Typically 2–4 weeks, depending on record availability.' },
-      { q: 'What do I receive at the end', a: 'A verified title report, survey map, and a clear-to-proceed certificate.' },
-    ],
-  },
-  {
-    n: 2,
-    title: 'Design & Planning',
-    desc: "Visualizing perfection. Our architects and structural engineers work to blend Jaipur's heritage with modern luxury.",
-    ring: 'bg-red-600',
-    img: img('1497366811353-6870744d04b2', 1000),
-    faqs: [
-      {
-        q: 'What happens in this step',
-        a: 'Architects translate your brief into concept designs, floor plans, 3D renders, and structural drawings ready for sanction.',
-      },
-      { q: 'Who is involved', a: 'Architects, structural engineers, and interior planners.' },
-      { q: 'How long does it take', a: '4–8 weeks across concept, revisions, and final drawings.' },
-      { q: 'What do I receive at the end', a: 'Approved architectural drawings, 3D visualizations, and a structural plan.' },
-    ],
-  },
-  {
-    n: 3,
-    title: 'Approvals & Permits',
-    desc: 'Navigating bureaucracy with ease. We secure all municipal clearances, utility connections, and environment permits.',
-    ring: 'bg-brand',
-    img: img('1451187580459-43490279c0fa', 1000),
-    faqs: [
-      {
-        q: 'What happens in this step',
-        a: 'This is where your design becomes legally allowed to be built. We compile your full submission package — site plans, structural drawings, ownership documents — and file it with the relevant authority (JDA for most of Jaipur, RIICO for industrial plots). Alongside the building plan sanction, we secure the NOCs you need: fire, environment, water, and electricity, depending on the project. Our liaison team follows up with the authorities, answers their queries, and pushes the file through. By the end of this step, you have an approved plan and clear permission to break ground.',
-      },
-      { q: 'Who is involved', a: 'Our liaison team, JDA/RIICO officials, and the relevant NOC departments.' },
-      { q: 'How long does it take', a: '6–12 weeks, depending on authority workload and project type.' },
-      { q: 'What do I receive at the end', a: 'A sanctioned building plan and all required NOCs.' },
-    ],
-  },
-  {
-    n: 4,
-    title: 'Construction',
-    desc: 'The transformation begins. Civil contractors and project managers ensure quality control and timeline adherence at every stage.',
-    ring: 'bg-amber-500',
-    img: img('1581094794329-c8112a89af12', 1000),
-    faqs: [
-      {
-        q: 'What happens in this step',
-        a: 'Foundation, structure, and finishing work are executed in phases with on-site supervision, material quality checks, and milestone tracking.',
-      },
-      { q: 'Who is involved', a: 'Civil contractors, site engineers, and your dedicated project manager.' },
-      { q: 'How long does it take', a: '6–18 months based on size and specification.' },
-      { q: 'What do I receive at the end', a: 'A completed structure built to approved drawings and quality standards.' },
-    ],
-  },
-  {
-    n: 5,
-    title: 'Utilities & Systems',
-    desc: 'Powering your future. Integration of smart electrical grids, premium plumbing, and sustainable solar solutions.',
-    ring: 'bg-emerald-500',
-    img: img('1518780664697-55e3ad937233', 1000),
-    faqs: [
-      {
-        q: 'What happens in this step',
-        a: 'Electrical wiring, plumbing, water systems, and optional solar and smart-home integrations are installed and tested.',
-      },
-      { q: 'Who is involved', a: 'MEP engineers, electricians, plumbers, and solar specialists.' },
-      { q: 'How long does it take', a: '3–6 weeks, often overlapping with finishing.' },
-      { q: 'What do I receive at the end', a: 'Fully functional, tested utility systems with compliance certificates.' },
-    ],
-  },
-  {
-    n: 6,
-    title: 'Finishing & Handover',
-    desc: 'The final flourish. Interior designers and Vastu consultants ensure your space is harmonious, beautiful, and ready for you.',
-    ring: 'bg-brand',
-    img: img('1586023492125-27b2c045efd7', 1000),
-    faqs: [
-      {
-        q: 'What happens in this step',
-        a: 'Interior finishes, fittings, painting, and Vastu alignment are completed, followed by a final snag check and handover.',
-      },
-      { q: 'Who is involved', a: 'Interior designers, Vastu consultants, and the handover team.' },
-      { q: 'How long does it take', a: '4–8 weeks for finishing and final inspection.' },
-      { q: 'What do I receive at the end', a: 'Keys, a completion certificate, warranties, and your finished home.' },
-    ],
-  },
-]
+// export const developSteps = [
+//   {
+//     n: 1,
+//     title: 'Land & Legal',
+//     desc: 'Securing the foundation. We verify land titles, conduct topographical surveys, and handle government liaisons.',
+//     ring: 'bg-emerald-500',
+//     img: img('1500382017468-9049fed747ef', 1000),
+//     faqs: [
+//       {
+//         q: 'What happens in this step',
+//         a: 'We run a full title search, check encumbrances and ownership history, conduct a topographical and boundary survey, and confirm the land is legally clear to build on.',
+//       },
+//       { q: 'Who is involved', a: 'Title lawyers, licensed surveyors, and our government liaison team.' },
+//       { q: 'How long does it take', a: 'Typically 2–4 weeks, depending on record availability.' },
+//       { q: 'What do I receive at the end', a: 'A verified title report, survey map, and a clear-to-proceed certificate.' },
+//     ],
+//   },
+//   {
+//     n: 2,
+//     title: 'Design & Planning',
+//     desc: "Visualizing perfection. Our architects and structural engineers work to blend Jaipur's heritage with modern luxury.",
+//     ring: 'bg-red-600',
+//     img: img('1497366811353-6870744d04b2', 1000),
+//     faqs: [
+//       {
+//         q: 'What happens in this step',
+//         a: 'Architects translate your brief into concept designs, floor plans, 3D renders, and structural drawings ready for sanction.',
+//       },
+//       { q: 'Who is involved', a: 'Architects, structural engineers, and interior planners.' },
+//       { q: 'How long does it take', a: '4–8 weeks across concept, revisions, and final drawings.' },
+//       { q: 'What do I receive at the end', a: 'Approved architectural drawings, 3D visualizations, and a structural plan.' },
+//     ],
+//   },
+//   {
+//     n: 3,
+//     title: 'Approvals & Permits',
+//     desc: 'Navigating bureaucracy with ease. We secure all municipal clearances, utility connections, and environment permits.',
+//     ring: 'bg-brand',
+//     img: img('1451187580459-43490279c0fa', 1000),
+//     faqs: [
+//       {
+//         q: 'What happens in this step',
+//         a: 'This is where your design becomes legally allowed to be built. We compile your full submission package — site plans, structural drawings, ownership documents — and file it with the relevant authority (JDA for most of Jaipur, RIICO for industrial plots). Alongside the building plan sanction, we secure the NOCs you need: fire, environment, water, and electricity, depending on the project. Our liaison team follows up with the authorities, answers their queries, and pushes the file through. By the end of this step, you have an approved plan and clear permission to break ground.',
+//       },
+//       { q: 'Who is involved', a: 'Our liaison team, JDA/RIICO officials, and the relevant NOC departments.' },
+//       { q: 'How long does it take', a: '6–12 weeks, depending on authority workload and project type.' },
+//       { q: 'What do I receive at the end', a: 'A sanctioned building plan and all required NOCs.' },
+//     ],
+//   },
+//   {
+//     n: 4,
+//     title: 'Construction',
+//     desc: 'The transformation begins. Civil contractors and project managers ensure quality control and timeline adherence at every stage.',
+//     ring: 'bg-amber-500',
+//     img: img('1581094794329-c8112a89af12', 1000),
+//     faqs: [
+//       {
+//         q: 'What happens in this step',
+//         a: 'Foundation, structure, and finishing work are executed in phases with on-site supervision, material quality checks, and milestone tracking.',
+//       },
+//       { q: 'Who is involved', a: 'Civil contractors, site engineers, and your dedicated project manager.' },
+//       { q: 'How long does it take', a: '6–18 months based on size and specification.' },
+//       { q: 'What do I receive at the end', a: 'A completed structure built to approved drawings and quality standards.' },
+//     ],
+//   },
+//   {
+//     n: 5,
+//     title: 'Utilities & Systems',
+//     desc: 'Powering your future. Integration of smart electrical grids, premium plumbing, and sustainable solar solutions.',
+//     ring: 'bg-emerald-500',
+//     img: img('1518780664697-55e3ad937233', 1000),
+//     faqs: [
+//       {
+//         q: 'What happens in this step',
+//         a: 'Electrical wiring, plumbing, water systems, and optional solar and smart-home integrations are installed and tested.',
+//       },
+//       { q: 'Who is involved', a: 'MEP engineers, electricians, plumbers, and solar specialists.' },
+//       { q: 'How long does it take', a: '3–6 weeks, often overlapping with finishing.' },
+//       { q: 'What do I receive at the end', a: 'Fully functional, tested utility systems with compliance certificates.' },
+//     ],
+//   },
+//   {
+//     n: 6,
+//     title: 'Finishing & Handover',
+//     desc: 'The final flourish. Interior designers and Vastu consultants ensure your space is harmonious, beautiful, and ready for you.',
+//     ring: 'bg-brand',
+//     img: img('1586023492125-27b2c045efd7', 1000),
+//     faqs: [
+//       {
+//         q: 'What happens in this step',
+//         a: 'Interior finishes, fittings, painting, and Vastu alignment are completed, followed by a final snag check and handover.',
+//       },
+//       { q: 'Who is involved', a: 'Interior designers, Vastu consultants, and the handover team.' },
+//       { q: 'How long does it take', a: '4–8 weeks for finishing and final inspection.' },
+//       { q: 'What do I receive at the end', a: 'Keys, a completion certificate, warranties, and your finished home.' },
+//     ],
+//   },
+// ]
 
-export const reliability = [
-  {
-    icon: 'BadgeCheck',
-    title: 'All experts verified',
-    desc: 'Background checks, past projects, and performance audits for every single partner on our platform.',
-    bg: 'bg-amber-500',
-  },
-  {
-    icon: 'UserCheck',
-    title: 'One point of contact',
-    desc: "A dedicated Project Success Manager who coordinates all stakeholders so you don't have to.",
-    bg: 'bg-brand',
-  },
-  {
-    icon: 'Eye',
-    title: 'Absolute Transparency',
-    desc: 'Live budget tracking and construction updates via your dashboard. No hidden costs, ever.',
-    bg: 'bg-red-600',
-  },
-]
+// export const reliability = [
+//   {
+//     icon: 'BadgeCheck',
+//     title: 'All experts verified',
+//     desc: 'Background checks, past projects, and performance audits for every single partner on our platform.',
+//     bg: 'bg-amber-500',
+//   },
+//   {
+//     icon: 'UserCheck',
+//     title: 'One point of contact',
+//     desc: "A dedicated Project Success Manager who coordinates all stakeholders so you don't have to.",
+//     bg: 'bg-brand',
+//   },
+//   {
+//     icon: 'Eye',
+//     title: 'Absolute Transparency',
+//     desc: 'Live budget tracking and construction updates via your dashboard. No hidden costs, ever.',
+//     bg: 'bg-red-600',
+//   },
+// ]
 
 // ---- Services page ----
 export const serviceSteps = [
@@ -840,4 +967,118 @@ export const services = [
     partners: 14,
     bg: 'bg-amber-500',
   },
+]
+
+
+
+
+
+
+
+
+
+
+
+
+// ---- DEVELOP PAGE DATA ----
+export const developHeroImg = img('1571003123894-1f0594d2b5d9', 1600)
+
+// Hero background video (self-hosted in /public/videos). The image above is the
+// poster: it shows while the video buffers and stays put if the browser blocks
+// autoplay or the visitor prefers reduced motion.
+export const developHeroVideo = '/videos/develop-hero.mp4'
+
+export const developFeatures = [
+  { icon: 'Map',         title: 'Guided step-by-step', bg: 'bg-indigo-500',
+    desc: 'A crystal-clear roadmap from the first soil test to the final key handover. No guesswork, just progress.' },
+  { icon: 'ShieldCheck', title: 'Verified experts',    bg: 'bg-emerald-500',
+    desc: 'Every architect, engineer, and contractor is vetted for quality, legal standing, and past performance.' },
+  { icon: 'Sparkles',    title: 'One team',            bg: 'bg-amber-500',
+    desc: 'A unified dashboard where all your stakeholders collaborate. One vision, one point of truth.' },
+]
+
+export const developSteps = [
+  {
+    n: 1, title: 'Land & Legal', ring: 'bg-green-600', color: '#16a34a',
+    img: img('1500382017468-9049fed747ef', 1000),
+    desc: 'Securing the foundation. We verify land titles, conduct topographical surveys, and handle government liaisons.',
+    faqs: [
+      { q: 'What happens in this step', a: 'We run a full title search, check encumbrances and ownership history, conduct a topographical and boundary survey, and confirm the land is legally clear to build on.' },
+      { q: 'Who is involved', a: 'Title lawyers, licensed surveyors, and our government liaison team.' },
+      { q: 'How long does it take', a: 'Typically 2–4 weeks, depending on record availability.' },
+      { q: 'What do I receive at the end', a: 'A verified title report, survey map, and a clear-to-proceed certificate.' },
+    ],
+  },
+  {
+    n: 2, title: 'Design & Planning', ring: 'bg-blue-600', color: '#2563eb',
+    img: img('1497366811353-6870744d04b2', 1000),
+    desc: "Visualizing perfection. Our architects and structural engineers work to blend Jaipur's heritage with modern luxury.",
+    faqs: [
+      { q: 'What happens in this step', a: 'Architects translate your brief into concept designs, floor plans, 3D renders, and structural drawings ready for sanction.' },
+      { q: 'Who is involved', a: 'Architects, structural engineers, and interior planners.' },
+      { q: 'How long does it take', a: '4–8 weeks across concept, revisions, and final drawings.' },
+      { q: 'What do I receive at the end', a: 'Approved architectural drawings, 3D visualizations, and a structural plan.' },
+    ],
+  },
+  {
+    n: 3, title: 'Approvals & Permits', ring: 'bg-red-600', color: '#dc2626',
+    img: img('1451187580459-43490279c0fa', 1000),
+    desc: 'Navigating bureaucracy with ease. We secure all municipal clearances, utility connections, and environment permits.',
+    faqs: [
+      { q: 'What happens in this step', a: 'This is where your design becomes legally allowed to be built. We compile your full submission package — site plans, structural drawings, ownership documents — and file it with the relevant authority (JDA for most of Jaipur, RIICO for industrial plots). Alongside the building plan sanction, we secure the NOCs you need: fire, environment, water, and electricity, depending on the project. By the end of this step, you have an approved plan and clear permission to break ground.' },
+      { q: 'Who is involved', a: 'Our liaison team, JDA/RIICO officials, and the relevant NOC departments.' },
+      { q: 'How long does it take', a: '6–12 weeks, depending on authority workload and project type.' },
+      { q: 'What do I receive at the end', a: 'A sanctioned building plan and all required NOCs.' },
+    ],
+  },
+  {
+    n: 4, title: 'Construction', ring: 'bg-amber-500', color: '#f59e0b',
+    img: img('1581094794329-c8112a89af12', 1000),
+    desc: 'The transformation begins. Civil contractors and project managers ensure quality control and timeline adherence at every stage.',
+    faqs: [
+      { q: 'What happens in this step', a: 'Foundation, structure, and finishing work are executed in phases with on-site supervision, material quality checks, and milestone tracking.' },
+      { q: 'Who is involved', a: 'Civil contractors, site engineers, and your dedicated project manager.' },
+      { q: 'How long does it take', a: '6–18 months based on size and specification.' },
+      { q: 'What do I receive at the end', a: 'A completed structure built to approved drawings and quality standards.' },
+    ],
+  },
+  {
+    n: 5, title: 'Utilities & Systems', ring: 'bg-pink-500', color: '#ec4899',
+    img: img('1518780664697-55e3ad937233', 1000),
+    desc: 'Powering your future. Integration of smart electrical grids, premium plumbing, and sustainable solar solutions.',
+    faqs: [
+      { q: 'What happens in this step', a: 'Electrical wiring, plumbing, water systems, and optional solar and smart-home integrations are installed and tested.' },
+      { q: 'Who is involved', a: 'MEP engineers, electricians, plumbers, and solar specialists.' },
+      { q: 'How long does it take', a: '3–6 weeks, often overlapping with finishing.' },
+      { q: 'What do I receive at the end', a: 'Fully functional, tested utility systems with compliance certificates.' },
+    ],
+  },
+  {
+    n: 6, title: 'Finishing & Handover', ring: 'bg-navy-800', color: '#0b2547',
+    img: img('1586023492125-27b2c045efd7', 1000),
+    desc: 'The final flourish. Interior designers and Vastu consultants ensure your space is harmonious, beautiful, and ready for you.',
+    faqs: [
+      { q: 'What happens in this step', a: 'Interior finishes, fittings, painting, and Vastu alignment are completed, followed by a final snag check and handover.' },
+      { q: 'Who is involved', a: 'Interior designers, Vastu consultants, and the handover team.' },
+      { q: 'How long does it take', a: '4–8 weeks for finishing and final inspection.' },
+      { q: 'What do I receive at the end', a: 'Keys, a completion certificate, warranties, and your finished home.' },
+    ],
+  },
+]
+
+export const reliability = [
+  { icon: 'BadgeCheck', title: 'All experts verified',   bg: 'bg-amber-500',
+    desc: 'Background checks, past projects, and performance audits for every single partner on our platform.' },
+  { icon: 'UserCheck',  title: 'One point of contact',   bg: 'bg-brand',
+    desc: "A dedicated Project Success Manager who coordinates all stakeholders so you don't have to." },
+  { icon: 'Eye',        title: 'Absolute Transparency',  bg: 'bg-red-600',
+    desc: 'Live budget tracking and construction updates via your dashboard. No hidden costs, ever.' },
+]
+
+
+export const navLinks = [
+  { label: 'Find Property',  href: '/find-property' },
+  { label: 'Build Property', href: '/develop' },
+  { label: 'Experts',        href: '/experts' },
+  { label: 'Services',       href: '/services' },
 ]

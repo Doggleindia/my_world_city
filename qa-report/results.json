@@ -1,0 +1,455 @@
+{
+  "base": "http://localhost:3500",
+  "when": "2026-08-07T11:55:59.839Z",
+  "qaPhone": "7000000001",
+  "qaTitle": "QA TEST Listing - delete me",
+  "results": [
+    {
+      "id": "TC-01",
+      "area": "Browsing",
+      "name": "Homepage loads with hero and navigation",
+      "expected": "Hero heading and nav render",
+      "status": "PASS",
+      "actual": "Hero and navigation rendered correctly",
+      "evidence": "screenshots/01-homepage.png"
+    },
+    {
+      "id": "TC-02",
+      "area": "Browsing",
+      "name": "Property listing page returns database results",
+      "expected": "Cards render and count matches API total",
+      "status": "PASS",
+      "actual": "7 property cards rendered; page reports 7 properties found",
+      "evidence": "screenshots/02-find-property.png"
+    },
+    {
+      "id": "TC-03",
+      "area": "Browsing",
+      "name": "Property detail page opens from a listing card",
+      "expected": "Detail page shows title, price and enquiry actions",
+      "status": "PASS",
+      "actual": "Detail page for \"/property/corporate-plaza-c-scheme-2\" rendered with enquiry actions",
+      "evidence": "screenshots/03-property-detail.png"
+    },
+    {
+      "id": "TC-04",
+      "area": "Browsing",
+      "name": "Category tab filters the listing grid",
+      "expected": "Selecting Commercial re-queries the API",
+      "status": "PASS",
+      "actual": "Category tab correctly re-queried the API with category=Commercial",
+      "evidence": ""
+    },
+    {
+      "id": "TC-05",
+      "area": "Filters",
+      "name": "Locality filter applies every ticked locality",
+      "expected": "All selected localities reach the API",
+      "status": "FAIL",
+      "actual": "Ticked 3 localities (Sitapura, Jagatpura, Mansarovar) but the API request contained only locality=\"Sitapura\". The remaining selections are discarded with no message to the user.",
+      "evidence": "screenshots/05-locality-filter.png"
+    },
+    {
+      "id": "TC-06",
+      "area": "Filters",
+      "name": "Expert Experience filter narrows results",
+      "expected": "Selecting 15+ Years changes the expert grid",
+      "status": "FAIL",
+      "actual": "With the Domain filter held constant, selecting \"15+ Years\" left the grid unchanged at 1 experts (baseline 1). The control is inert.",
+      "evidence": "screenshots/06-expert-filters.png"
+    },
+    {
+      "id": "TC-07",
+      "area": "Filters",
+      "name": "Expert Location filter narrows results",
+      "expected": "Ticking a location changes the expert grid",
+      "status": "FAIL",
+      "actual": "Ticking \"Mansarovar\" left the grid unchanged at 1 experts (baseline 1). The control is inert.",
+      "evidence": ""
+    },
+    {
+      "id": "TC-08",
+      "area": "Validation",
+      "name": "Login rejects a short phone number",
+      "expected": "Submit stays disabled until 10 digits are entered",
+      "status": "PASS",
+      "actual": "Submit correctly disabled for a 3-digit number",
+      "evidence": ""
+    },
+    {
+      "id": "TC-09",
+      "area": "Validation",
+      "name": "Lead API rejects malformed payloads",
+      "expected": "POST /api/leads returns 422 for bad data",
+      "status": "PASS",
+      "actual": "HTTP 422 - {\"ok\":false,\"error\":\"Validation failed\",\"issues\":{\"name\":[\"Name is required\"],\"phone\":[\"Enter a valid 10-digit Indian mobile number\"]}}",
+      "evidence": ""
+    },
+    {
+      "id": "TC-10",
+      "area": "Authentication",
+      "name": "Login screen offers the documented OTP flow",
+      "expected": "OTP entry exists as described in the transfer document",
+      "status": "FAIL",
+      "actual": "No OTP exists on the login screen; it asks for phone + password. The transfer document describes an OTP flow that is not present in this build.",
+      "evidence": "screenshots/10-login-page.png"
+    },
+    {
+      "id": "TC-11",
+      "area": "Authentication",
+      "name": "Documented admin number 9990001111 can log in",
+      "expected": "Admin credentials from the transfer document work",
+      "status": "FAIL",
+      "actual": "Rejected with \"Invalid phone number or password\". This account has no stored password (created under the removed OTP flow), so no password can ever authenticate it.",
+      "evidence": "screenshots/11-login-rejected.png"
+    },
+    {
+      "id": "TC-12",
+      "area": "Authentication",
+      "name": "Password recovery is available",
+      "expected": "A forgot-password option exists",
+      "status": "FAIL",
+      "actual": "No forgot/reset password option. The one-time temporary password is never re-sent, so losing it locks the account out permanently.",
+      "evidence": ""
+    },
+    {
+      "id": "TC-13",
+      "area": "Enquiry journey",
+      "name": "Guest can submit a property enquiry end to end",
+      "expected": "Enquiry submits and returns a reference number",
+      "status": "PASS",
+      "actual": "Enquiry accepted, reference MWC-2026-10820 issued and shown to the user",
+      "evidence": "screenshots/13-enquiry-success.png"
+    },
+    {
+      "id": "TC-14",
+      "area": "Listing journey",
+      "name": "Guest can submit a property listing end to end",
+      "expected": "Wizard completes and issues account credentials",
+      "status": "FAIL",
+      "actual": "BLOCKER: a guest cannot complete the listing wizard. Step 2 requires a photo before \"Continue\" becomes active (Continue disabled: true), but POST /api/upload returns 401 because it calls requireUser(). The page shows \"Authentication required\". Since /list-property is the only route that creates an account, no new user can register through the website at all.",
+      "evidence": "screenshots/14-upload-blocked.png"
+    },
+    {
+      "id": "TC-15",
+      "area": "Listing journey",
+      "name": "New listing is withheld from public search until approved",
+      "expected": "Pending listing does not appear in public results",
+      "status": "PASS",
+      "actual": "Pending listing correctly hidden from public search until an admin approves it",
+      "evidence": ""
+    },
+    {
+      "id": "TC-16",
+      "area": "Dashboard",
+      "name": "Owner dashboard shows the new listing with pending status",
+      "expected": "Listing appears with a Pending badge",
+      "status": "PASS",
+      "actual": "Listing visible on the dashboard with status pending: true",
+      "evidence": "screenshots/16-dashboard.png"
+    },
+    {
+      "id": "TC-17",
+      "area": "Dashboard",
+      "name": "Temporary-password warning is shown to the owner",
+      "expected": "Dashboard prompts the user to set a real password",
+      "status": "PASS",
+      "actual": "Dashboard displays the temporary-password notice with a change form",
+      "evidence": ""
+    },
+    {
+      "id": "TC-18",
+      "area": "Saved",
+      "name": "Logged-in user can save a property and see it in Saved",
+      "expected": "Heart toggle persists to the Saved page",
+      "status": "PASS",
+      "actual": "Saved page reports 1 saved property/properties after the heart toggle",
+      "evidence": "screenshots/18-saved.png"
+    },
+    {
+      "id": "TC-19",
+      "area": "Access control",
+      "name": "Non-admin owner is blocked from the admin console",
+      "expected": "Owner session cannot open /admin",
+      "status": "PASS",
+      "actual": "Owner session correctly refused access to the admin console",
+      "evidence": "screenshots/19-admin-denied.png"
+    },
+    {
+      "id": "TC-20",
+      "area": "Authentication",
+      "name": "Owner can log out and log back in with the issued password",
+      "expected": "Round-trip login works",
+      "status": "PASS",
+      "actual": "Logged out and back in successfully with the issued temporary password; landed on /dashboard",
+      "evidence": "screenshots/20-relogin.png"
+    },
+    {
+      "id": "TC-21",
+      "area": "SEO",
+      "name": "Every public page has a unique title and meta description",
+      "expected": "Distinct title + description per page",
+      "status": "PASS",
+      "actual": "All 7 pages have unique titles and descriptions",
+      "evidence": ""
+    },
+    {
+      "id": "TC-22",
+      "area": "SEO",
+      "name": "robots.txt and sitemap.xml are served",
+      "expected": "Both reachable with valid content",
+      "status": "PASS",
+      "actual": "robots.txt HTTP 200 (has Disallow rules: true), sitemap.xml HTTP 200 with 22 URLs",
+      "evidence": ""
+    },
+    {
+      "id": "TC-23",
+      "area": "Performance",
+      "name": "Images are optimized",
+      "expected": "Images served through next/image with lazy loading",
+      "status": "FAIL",
+      "actual": "13 images on the page; 0 optimized via next/image and 0 lazy-loaded. All use raw <img> tags pointing at full-size originals, so no resizing, WebP conversion or lazy loading is applied.",
+      "evidence": ""
+    },
+    {
+      "id": "TC-24",
+      "area": "Accessibility",
+      "name": "Images have alt text and pages have one H1",
+      "expected": "No empty alt attributes; exactly one H1 per page",
+      "status": "FAIL",
+      "actual": "/: 4/19 images missing alt; /find-property: 0 H1 headings",
+      "evidence": ""
+    },
+    {
+      "id": "TC-25",
+      "area": "Responsive",
+      "name": "No horizontal overflow on a 390px mobile viewport",
+      "expected": "Pages fit the viewport width",
+      "status": "PASS",
+      "actual": "No horizontal overflow on any page tested",
+      "evidence": "screenshots/25-mobile.png"
+    },
+    {
+      "id": "TC-26",
+      "area": "Stability",
+      "name": "No unexpected console or network errors",
+      "expected": "Clean console across the session",
+      "status": "FAIL",
+      "actual": "Unexpected failing requests: 404 /favicon.ico, 401 /api/upload",
+      "evidence": ""
+    }
+  ],
+  "consoleErrors": [
+    {
+      "page": "/",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "page": "/login",
+      "text": "Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"
+    },
+    {
+      "page": "/login",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "page": "/list-property",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    }
+  ],
+  "failedRequests": [
+    {
+      "status": 404,
+      "url": "/favicon.ico"
+    },
+    {
+      "status": 422,
+      "url": "/api/leads"
+    },
+    {
+      "status": 401,
+      "url": "/api/auth/login"
+    },
+    {
+      "status": 401,
+      "url": "/api/upload"
+    }
+  ],
+  "perf": [
+    {
+      "url": "/",
+      "ms": 3218,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 912,
+      "status": 200
+    },
+    {
+      "url": "/property/corporate-plaza-c-scheme-2",
+      "ms": 1729,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 1727,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 1500,
+      "status": 200
+    },
+    {
+      "url": "/experts",
+      "ms": 1182,
+      "status": 200
+    },
+    {
+      "url": "/experts",
+      "ms": 1281,
+      "status": 200
+    },
+    {
+      "url": "/login",
+      "ms": 1143,
+      "status": 200
+    },
+    {
+      "url": "/login",
+      "ms": 1103,
+      "status": 200
+    },
+    {
+      "url": "/login",
+      "ms": 1124,
+      "status": 200
+    },
+    {
+      "url": "/property/corporate-plaza-c-scheme-2",
+      "ms": 1666,
+      "status": 200
+    },
+    {
+      "url": "/list-property",
+      "ms": 1479,
+      "status": 200
+    },
+    {
+      "url": "/dashboard",
+      "ms": 1803,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 1991,
+      "status": 200
+    },
+    {
+      "url": "/saved",
+      "ms": 1422,
+      "status": 200
+    },
+    {
+      "url": "/admin",
+      "ms": 1112,
+      "status": 200
+    },
+    {
+      "url": "/login",
+      "ms": 1131,
+      "status": 200
+    },
+    {
+      "url": "/",
+      "ms": 1404,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 1691,
+      "status": 200
+    },
+    {
+      "url": "/experts",
+      "ms": 1340,
+      "status": 200
+    },
+    {
+      "url": "/services",
+      "ms": 1502,
+      "status": 200
+    },
+    {
+      "url": "/develop",
+      "ms": 1746,
+      "status": 200
+    },
+    {
+      "url": "/about",
+      "ms": 1151,
+      "status": 200
+    },
+    {
+      "url": "/contact",
+      "ms": 1180,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 1694,
+      "status": 200
+    },
+    {
+      "url": "/",
+      "ms": 1419,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 1742,
+      "status": 200
+    },
+    {
+      "url": "/experts",
+      "ms": 1483,
+      "status": 200
+    },
+    {
+      "url": "/services",
+      "ms": 1321,
+      "status": 200
+    },
+    {
+      "url": "/",
+      "ms": 1718,
+      "status": 200
+    },
+    {
+      "url": "/find-property",
+      "ms": 1930,
+      "status": 200
+    },
+    {
+      "url": "/experts",
+      "ms": 1603,
+      "status": 200
+    },
+    {
+      "url": "/services",
+      "ms": 1884,
+      "status": 200
+    },
+    {
+      "url": "/develop",
+      "ms": 1731,
+      "status": 200
+    }
+  ],
+  "artifacts": {
+    "tempPassword": "JQVXXGG5",
+    "propertySlug": "corporate-plaza-c-scheme-2",
+    "provisionStatus": 201
+  }
+}

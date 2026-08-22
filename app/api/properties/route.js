@@ -13,6 +13,10 @@ export const GET = handler(async (req) => {
   if (qp.category && qp.category !== 'All') filter.category = qp.category
   if (qp.listingType) filter.listingType = qp.listingType
   if (qp.locality) filter['location.locality'] = qp.locality
+  if (qp.bedrooms) {
+    const n = parseInt(qp.bedrooms, 10)
+    filter['details.bedrooms'] = qp.bedrooms.endsWith('+') ? { $gte: n } : n
+  }
   if (qp.verified) filter.verified = true
   if (qp.rera) filter.rera = true
   if (qp.featured) filter.featured = true

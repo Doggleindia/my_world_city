@@ -11,6 +11,20 @@ body {
   background: #ffffff;
 }
 
+/* slim visible scrollbar for the gallery strip */
+.mwc-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #d5d9e0 transparent;
+}
+.mwc-scrollbar::-webkit-scrollbar { height: 8px; }
+.mwc-scrollbar::-webkit-scrollbar-button { display: none; }
+.mwc-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.mwc-scrollbar::-webkit-scrollbar-thumb {
+  background: #d5d9e0;
+  border-radius: 999px;
+}
+.mwc-scrollbar::-webkit-scrollbar-thumb:hover { background: #b9c0cb; }
+
 /* hide scrollbars on horizontal carousels */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -18,4 +32,76 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+
+
+/* ── Develop timeline: animated "loader" rail + step highlights ── */
+@keyframes mwcLoaderFill { from { width: 0%; } to { width: 100%; } }
+@keyframes mwcRailShimmer { 0% { transform: translateY(-100%); } 100% { transform: translateY(220%); } }
+/* --mwc-pulse-rgb lets each timeline step pulse in its own colour */
+@keyframes mwcPulse {
+  0%   { box-shadow: 0 0 0 0  rgb(var(--mwc-pulse-rgb, 93 92 246) / 0.45); }
+  70%  { box-shadow: 0 0 0 12px rgb(var(--mwc-pulse-rgb, 93 92 246) / 0); }
+  100% { box-shadow: 0 0 0 0  rgb(var(--mwc-pulse-rgb, 93 92 246) / 0); }
+}
+/* ── Home hero headline: soft blue-to-white gradient with a slow sheen ── */
+.mwc-hero-gradient {
+  background-image: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #dbeeff 18%,
+    #8fcbff 34%,
+    #ffffff 50%,
+    #b9dcff 68%,
+    #ffffff 86%,
+    #dbeeff 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mwcHeroSheen 11s ease-in-out infinite;
+}
+@keyframes mwcHeroSheen {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* rotating tail of the hero headline */
+.mwc-rotate {
+  transition: opacity 380ms ease, transform 380ms ease;
+}
+.mwc-rotate[data-shown='false'] {
+  opacity: 0;
+  transform: translateY(-0.22em);
+}
+.mwc-rotate[data-shown='true'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* dropdown / popover entrance */
+@keyframes mwcPop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.mwc-pop { animation: mwcPop 150ms ease-out; transform-origin: top center; }
+
+.mwc-loader-line { animation: mwcLoaderFill var(--mwc-dur, 900ms) linear forwards; }
+.mwc-rail-fill::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.7), transparent);
+  animation: mwcRailShimmer 1.6s linear infinite;
+}
+.mwc-pulse { animation: mwcPulse 2.1s ease-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mwc-pop { animation: none; }
+  .mwc-hero-gradient { animation: none; }
+  .mwc-rotate { transition: opacity 200ms linear; transform: none !important; }
+  .mwc-loader-line { animation: none; width: 100%; }
+  .mwc-rail-fill::after { animation: none; }
+  .mwc-pulse { animation: none; }
 }

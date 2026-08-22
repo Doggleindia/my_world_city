@@ -6,12 +6,47 @@ import { MapPin, ChevronDown, Check } from 'lucide-react'
 const localities = ['Sitapura', 'RIICO', 'Jagatpura', 'Mansarovar', 'C-Scheme']
 const propertyTypes = ['Residential', 'Commercial', 'Industrial', 'Farm & Agri']
 const budgetRanges = ['Any budget', '40L - 60L', '60L - 80L', '80L - 1Cr', '1Cr - 1.5Cr', '1.5Cr+']
+const listingTypes = [
+  { label: 'Buy', value: 'buy' },
+  { label: 'Rent', value: 'rent' },
+]
+const bedroomOptions = ['1 BHK', '2 BHK', '3 BHK', '4+ BHK']
+const timelines = ['Immediately', '1-3 month', '3-6 month', 'Not Sure']
 
 function SectionLabel({ children }) {
   return (
     <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
       {children}
     </h3>
+  )
+}
+
+// Chip grid shared by Listing Type, Property Type, Bedrooms and Timeline.
+// Clicking the active chip clears it.
+function ChipGroup({ options, value, onChange }) {
+  return (
+    <div className="mt-3 grid grid-cols-2 gap-2.5">
+      {options.map((o) => {
+        const label = typeof o === 'string' ? o : o.label
+        const val = typeof o === 'string' ? o : o.value
+        const on = value === val
+        return (
+          <button
+            key={val}
+            type="button"
+            aria-pressed={on}
+            onClick={() => onChange(on ? '' : val)}
+            className={`rounded-full border px-3 py-2 text-[13px] font-medium transition ${
+              on
+                ? 'border-brand bg-brand/5 text-brand'
+                : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300'
+            }`}
+          >
+            {label}
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -46,6 +81,9 @@ export default function FilterSidebar({ onApply }) {
   const [checked, setChecked] = useState([])
   const [locText, setLocText] = useState('')
   const [ptype, setPtype] = useState('')
+  const [listing, setListing] = useState('')
+  const [beds, setBeds] = useState('')
+  const [timeline, setTimeline] = useState('')
   const [verified, setVerified] = useState(false)
   const [rera, setRera] = useState(false)
   const [budget, setBudget] = useState(budgetRanges[0]) // 'Any budget'
@@ -57,6 +95,9 @@ export default function FilterSidebar({ onApply }) {
     const [minPrice, maxPrice] = BUDGET_BOUNDS[budget] || []
     onApply?.({
       category: ptype || undefined,
+      listingType: listing || undefined,
+      // '1 BHK' → '1', '4+ BHK' → '4+' (the API reads the + as "or more").
+      bedrooms: beds ? beds.replace(' BHK', '') : undefined,
       // Free-text location takes precedence; else the first ticked locality.
       // The API filters by a single locality string.
       locality: locText.trim() || checked[0] || undefined,
@@ -71,6 +112,9 @@ export default function FilterSidebar({ onApply }) {
     setChecked([])
     setLocText('')
     setPtype('')
+    setListing('')
+    setBeds('')
+    setTimeline('')
     setVerified(false)
     setRera(false)
     setBudget(budgetRanges[0])
@@ -88,6 +132,12 @@ export default function FilterSidebar({ onApply }) {
         >
           Clear all
         </button>
+      </div>
+
+      {/* Listing type */}
+      <div className="mt-6">
+        <SectionLabel>Listing Type</SectionLabel>
+        <ChipGroup options={listingTypes} value={listing} onChange={setListing} />
       </div>
 
       {/* Location */}
@@ -154,21 +204,19 @@ export default function FilterSidebar({ onApply }) {
       {/* Property type */}
       <div className="mt-6">
         <SectionLabel>Property Type</SectionLabel>
-        <div className="mt-3 grid grid-cols-2 gap-2.5">
-          {propertyTypes.map((t) => (
-            <button
-              key={t}
-              onClick={() => setPtype(t)}
-              className={`rounded-lg border px-3 py-2 text-[13px] font-medium transition ${
-                ptype === t
-                  ? 'border-brand bg-brand/5 text-brand'
-                  : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+        <ChipGroup options={propertyTypes} value={ptype} onChange={setPtype} />
+      </div>
+
+      {/* Bedrooms */}
+      <div className="mt-6">
+        <SectionLabel>Bedrooms</SectionLabel>
+        <ChipGroup options={bedroomOptions} value={beds} onChange={setBeds} />
+      </div>
+
+      {/* Timeline */}
+      <div className="mt-6">
+        <SectionLabel>Timeline</SectionLabel>
+        <ChipGroup options={timelines} value={timeline} onChange={setTimeline} />
       </div>
 
       <div className="my-6 border-t border-slate-100" />
@@ -187,7 +235,7 @@ export default function FilterSidebar({ onApply }) {
 
       <button
         onClick={apply}
-        className="mt-6 w-full rounded-lg bg-navy-800 py-3 text-[14px] font-semibold text-white transition hover:bg-navy-700"
+        className="mt-6 w-full rounded-full bg-navy-800 py-3 text-[14px] font-semibold text-white transition hover:bg-navy-700"
       >
         Apply Filters
       </button>

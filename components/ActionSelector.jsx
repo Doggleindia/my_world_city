@@ -1,8 +1,7 @@
 import Link from 'next/link'
-import { Home, Building2, Users, TrendingUp } from 'lucide-react'
+import { actionIcons } from './icons/ActionIcons'
 import { actionCards } from '../data'
 
-const icons = { Home, Building2, Users, TrendingUp }
 const hrefs = {
   buy: '/find-property',
   build: '/develop',
@@ -14,20 +13,29 @@ export default function ActionSelector() {
   return (
     <section className="relative z-10">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        {/* Four action cards */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-10 lg:grid-cols-4">
           {actionCards.map((c) => {
-            const Icon = icons[c.icon]
+            const Icon = actionIcons[c.icon]
             return (
-              <Link
-                key={c.key}
-                href={hrefs[c.key] || '/find-property'}
-                className="group flex flex-col items-center rounded-xl border border-slate-100 bg-white px-4 py-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-card"
-              >
-                <Icon className={`h-8 w-8 ${c.color}`} strokeWidth={1.75} />
-                <span className={`mt-3 h-0.5 w-8 rounded-full ${c.bar}`} />
-                <h3 className="mt-3 text-[15px] font-bold text-navy-800">{c.title}</h3>
-                <p className={`mt-1.5 text-[12.5px] leading-snug ${c.color}`}>{c.desc}</p>
+              <Link key={c.key} href={hrefs[c.key] || '/find-property'} className="group text-center">
+                <Icon
+                  className="mx-auto h-16 w-16 transition-transform duration-300 group-hover:-translate-y-1"
+                  style={{ color: c.color }}
+                />
+                {/* two-tone rule spanning the column */}
+                <span
+                  className="mt-8 block h-[5px] w-full rounded-full"
+                  style={{
+                    backgroundImage: `linear-gradient(90deg, ${c.bar[0]} 0%, ${c.bar[0]} 45%, ${c.bar[1]} 55%, ${c.bar[1]} 100%)`,
+                  }}
+                />
+                <h3 className="mt-3.5 text-[17px] font-bold text-navy-900">{c.title}</h3>
+                <p
+                  className="mx-auto mt-2 max-w-[13.5rem] text-[15px] leading-snug"
+                  style={{ color: c.color }}
+                >
+                  {c.desc}
+                </p>
               </Link>
             )
           })}
