@@ -7,7 +7,7 @@ import { useAuth } from './AuthProvider'
 import { User, Heart, LayoutDashboard, Shield, LogOut, ChevronDown } from 'lucide-react'
 
 export default function AuthButtons({ cta = 'navy' }) {
-  const { user, loading, openLogin, logout } = useAuth()
+  const { user, loading, openLogin, openSignup, logout } = useAuth()
   const router = useRouter()
   const [menu, setMenu] = useState(false)
   const ref = useRef(null)
@@ -68,12 +68,20 @@ export default function AuthButtons({ cta = 'navy' }) {
           )}
         </div>
       ) : (
-        <button
-          onClick={openLogin}
-          className="hidden text-[14px] font-medium text-slate-600 transition hover:text-navy-800 sm:block"
-        >
-          Login
-        </button>
+        <>
+          <button
+            onClick={() => openLogin()}
+            className="hidden text-[14px] font-medium text-slate-600 transition hover:text-navy-800 sm:block"
+          >
+            Login
+          </button>
+          <button
+            onClick={openSignup}
+            className="whitespace-nowrap rounded-full border border-slate-300 px-3.5 py-2 text-[13px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+          >
+            Sign up
+          </button>
+        </>
       )}
 
       <button

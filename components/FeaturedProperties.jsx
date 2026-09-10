@@ -1,11 +1,12 @@
 import Link from 'next/link'
-import { Heart, MapPin, ArrowRight } from 'lucide-react'
+import { Heart, MapPin, ArrowRight, Eye, MessageSquare } from 'lucide-react'
 import SaveButton from '@/components/SaveButton'
 import ShareButton from '@/components/ShareButton'
 import { featured as staticFeatured } from '../data'
 import { dbConnect } from '@/lib/db'
 import Property from '@/lib/models/Property'
 import { toPropertyCard } from '@/lib/serialize'
+import { enquiryCountsFor } from '@/lib/enquiryCounts'
 
 async function getFeatured() {
   try {
@@ -15,9 +16,13 @@ async function getFeatured() {
       .limit(6)
       .lean()
     if (docs.length) {
+      const counts = await enquiryCountsFor(docs.map((d) => d._id))
       return docs.map((d) => {
         const c = toPropertyCard(d)
-        return { id: c.id, tag: c.tag, title: c.title, loc: c.loc, img: c.img, href: c.href }
+        return {
+          id: c.id, tag: c.tag, title: c.title, loc: c.loc, img: c.img, href: c.href,
+          views: c.views, enquiries: counts[c.id] || 0,
+        }
       })
     }
   } catch {
@@ -76,6 +81,20 @@ export default async function FeaturedProperties() {
                 <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-slate-500">
                   <MapPin className="h-4 w-4 shrink-0" /> {p.loc}
                 </p>
+
+                {/* Real figures from the database — shown only when there is something
+                    to show, so a brand-new listing isn't stamped with zeros. */}
+                {(p.views > 0 || p.enquiries > 0) && (
+                  <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] font-semibold text-slate-500">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Eye className="h-3.5 w-3.5 text-brand" /> {p.views.toLocaleString('en-IN')} views
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <MessageSquare className="h-3.5 w-3.5 text-emerald-600" /> {p.enquiries}{' '}
+                      {p.enquiries === 1 ? 'enquiry' : 'enquiries'}
+                    </span>
+                  </p>
+                )}
 
                 <div className="mt-5 flex items-center gap-2.5">
                   {p.id ? (

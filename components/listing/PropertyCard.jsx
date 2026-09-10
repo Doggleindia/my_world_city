@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MapPin } from 'lucide-react'
+import { MapPin, Eye, MessageSquare } from 'lucide-react'
 import SaveButton from '@/components/SaveButton'
 import ShareButton from '@/components/ShareButton'
 
@@ -9,6 +9,8 @@ export default function PropertyCard({
   title,
   loc,
   img,
+  views = 0,
+  enquiries = 0,
   href = '/find-property',
   priceLabel,
   className = 'w-[300px] shrink-0',
@@ -37,6 +39,20 @@ export default function PropertyCard({
         <p className="mt-1 flex items-center gap-1 text-[12.5px] text-slate-500">
           <MapPin className="h-3.5 w-3.5" /> {loc}
         </p>
+
+        {/* Live counts, so two listings can be compared at a glance. Hidden
+            until there is something real to report. */}
+        {(views > 0 || enquiries > 0) && (
+          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-semibold text-slate-500">
+            <span className="inline-flex items-center gap-1">
+              <Eye className="h-3.5 w-3.5 text-brand" /> {views.toLocaleString('en-IN')} views
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <MessageSquare className="h-3.5 w-3.5 text-emerald-600" /> {enquiries}{' '}
+              {enquiries === 1 ? 'enquiry' : 'enquiries'}
+            </span>
+          </p>
+        )}
 
         <div className="mt-4 flex items-center gap-3">
           <ShareButton url={href} title={title} className="text-slate-400 hover:text-brand" />

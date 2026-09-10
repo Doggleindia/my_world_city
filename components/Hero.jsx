@@ -23,7 +23,7 @@ export default function Hero() {
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6">
           <div className="max-w-3xl">
             {/* pb-1 so bg-clip-text doesn't shave the descenders */}
-            <h1 className="mwc-hero-gradient pb-1 text-4xl font-extrabold leading-tight drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)] sm:text-5xl">
+            <h1 className="mwc-hero-gradient font-display pb-1 text-4xl font-extrabold leading-[1.12] tracking-[-0.02em] drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)] sm:text-5xl">
               Space and investment
               <br /> solutions for <RotatingWords items={heroRotatingWords} />
             </h1>

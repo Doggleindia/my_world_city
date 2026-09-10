@@ -15,6 +15,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loginOpen, setLoginOpen] = useState(false)
+  const [loginMode, setLoginMode] = useState('login')
   const pendingRef = useRef(null) // action to run after a successful login
 
   const refresh = useCallback(async () => {
@@ -46,7 +47,12 @@ export function AuthProvider({ children }) {
     [user],
   )
 
-  const openLogin = useCallback(() => setLoginOpen(true), [])
+  // mode: 'login' (default) or 'signup' — the navbar opens the right tab.
+  const openLogin = useCallback((mode = 'login') => {
+    setLoginMode(mode === 'signup' ? 'signup' : 'login')
+    setLoginOpen(true)
+  }, [])
+  const openSignup = useCallback(() => openLogin('signup'), [openLogin])
 
   const onAuthed = useCallback((u) => {
     setUser(u)
@@ -62,7 +68,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthCtx.Provider value={{ user, loading, openLogin, requireAuth, logout, refresh }}>
+    <AuthCtx.Provider value={{ user, loading, openLogin, openSignup, requireAuth, logout, refresh }}>
       {children}
       <LoginModal
         open={loginOpen}
@@ -71,6 +77,7 @@ export function AuthProvider({ children }) {
           pendingRef.current = null
         }}
         onAuthed={onAuthed}
+        initialMode={loginMode}
       />
     </AuthCtx.Provider>
   )

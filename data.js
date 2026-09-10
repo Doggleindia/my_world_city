@@ -902,6 +902,7 @@ export const services = [
     tagline: 'Title checks, registration & agreements',
     need: 'I need help with property title verification and registration.',
     partners: 14,
+    color: '#f59e0b',
     bg: 'bg-amber-500',
   },
   {
@@ -910,7 +911,8 @@ export const services = [
     desc: 'Accurate land & property measurement.',
     tagline: 'Land measurement & boundary surveys',
     need: 'I need a site survey and boundary verification for my plot.',
-    partners: 14,
+    partners: 9,
+    color: '#10b981',
     bg: 'bg-emerald-500',
   },
   {
@@ -919,7 +921,8 @@ export const services = [
     desc: 'Award-winning designs for Jaipur homes.',
     tagline: 'Design, layout & structural plans',
     need: 'I need design and layout plans for my home.',
-    partners: 14,
+    partners: 11,
+    color: '#e11d48',
     bg: 'bg-red-600',
   },
   {
@@ -928,7 +931,8 @@ export const services = [
     desc: 'Reliable construction & civil work.',
     tagline: 'Construction, civil work & execution',
     need: 'I need a contractor for construction and civil work.',
-    partners: 14,
+    partners: 18,
+    color: '#1f5fbf',
     bg: 'bg-brand',
   },
   {
@@ -937,7 +941,8 @@ export const services = [
     desc: 'Smooth approvals & license handling.',
     tagline: 'Approvals, permits & NOC handling',
     need: 'I need help with approvals, permits and NOC documentation.',
-    partners: 14,
+    partners: 7,
+    color: '#7c3aed',
     bg: 'bg-emerald-500',
   },
   {
@@ -946,7 +951,8 @@ export const services = [
     desc: 'Wholesale rates for premium supplies.',
     tagline: 'Cement, steel, fittings & supplies',
     need: 'I need a quote for building materials and supplies.',
-    partners: 14,
+    partners: 22,
+    color: '#d9532a',
     bg: 'bg-red-600',
   },
   {
@@ -955,7 +961,8 @@ export const services = [
     desc: 'Clean energy for sustainable living.',
     tagline: 'Panels, inverters & clean energy setup',
     need: 'I want to install a rooftop solar setup for my home.',
-    partners: 14,
+    partners: 12,
+    color: '#0891b2',
     bg: 'bg-brand',
   },
   {
@@ -964,7 +971,8 @@ export const services = [
     desc: 'Vastu & project management expertise.',
     tagline: 'Vastu & end-to-end project management',
     need: 'I need Vastu consultation and project management support.',
-    partners: 14,
+    partners: 8,
+    color: '#db2777',
     bg: 'bg-amber-500',
   },
 ]
@@ -1067,11 +1075,11 @@ export const developSteps = [
 ]
 
 export const reliability = [
-  { icon: 'BadgeCheck', title: 'All experts verified',   bg: 'bg-amber-500',
+  { icon: 'BadgeCheck', title: 'All experts verified',   bg: 'bg-amber-500', color: '#f59e0b',
     desc: 'Background checks, past projects, and performance audits for every single partner on our platform.' },
-  { icon: 'UserCheck',  title: 'One point of contact',   bg: 'bg-brand',
+  { icon: 'UserCheck',  title: 'One point of contact',   bg: 'bg-brand', color: '#1f5fbf',
     desc: "A dedicated Project Success Manager who coordinates all stakeholders so you don't have to." },
-  { icon: 'Eye',        title: 'Absolute Transparency',  bg: 'bg-red-600',
+  { icon: 'Eye',        title: 'Absolute Transparency',  bg: 'bg-red-600', color: '#dc2626',
     desc: 'Live budget tracking and construction updates via your dashboard. No hidden costs, ever.' },
 ]
 

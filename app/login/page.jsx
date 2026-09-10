@@ -3,9 +3,10 @@
 import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Lock, ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import SiteFooter from '@/components/property/SiteFooter'
+import OtpAuth from '@/components/auth/OtpAuth'
 import { useAuth } from '@/components/auth/AuthProvider'
 
 export default function LoginPage() {
@@ -21,18 +22,21 @@ function LoginInner() {
   const router = useRouter()
   const params = useSearchParams()
   const next = params.get('next') || '/dashboard'
+  // ?signup=1 opens straight on the create-account form.
+  const [mode, setMode] = useState(params.get('signup') ? 'signup' : 'login')
+  // Owners issued a temporary password can still sign in the old way.
+  const [usePassword, setUsePassword] = useState(false)
 
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  // Already logged in — skip the form.
   useEffect(() => {
     if (!loading && user) router.replace(next)
   }, [loading, user, next, router])
 
-  const submit = async (e) => {
+  const submitPassword = async (e) => {
     e.preventDefault()
     setError('')
     setBusy(true)
@@ -55,66 +59,82 @@ function LoginInner() {
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
       <Navbar cta="brand" />
-      <div className="mx-auto flex max-w-md flex-col px-4 py-16 sm:px-6">
+      <div className="mx-auto flex max-w-md flex-col px-4 py-14 sm:px-6">
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-card sm:p-8">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-brand">
-            <Lock className="h-6 w-6" />
-          </span>
-          <h1 className="mt-4 text-[26px] font-extrabold tracking-tight text-navy-900">Owner login</h1>
-          <p className="mt-1.5 text-[14px] text-slate-500">
-            Use the mobile number and password you received when you listed your property.
-          </p>
+          {usePassword ? (
+            <>
+              <h1 className="text-[24px] font-extrabold tracking-tight text-navy-900">
+                Log in with a <span className="text-brand">password</span>
+              </h1>
+              <p className="mt-1.5 text-[14px] text-slate-500">
+                For owner accounts issued a password when the property was listed.
+              </p>
 
-          {error && (
-            <p className="mt-5 rounded-lg bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">
-              {error}
-            </p>
+              {error && (
+                <p className="mt-5 rounded-lg bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">{error}</p>
+              )}
+
+              <form onSubmit={submitPassword} className="mt-5 space-y-3.5">
+                <div className="flex items-center overflow-hidden rounded-xl border border-slate-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
+                  <span className="border-r border-slate-200 px-3.5 py-3 text-[14px] font-semibold text-slate-700">+91</span>
+                  <input
+                    autoFocus type="tel" inputMode="numeric" maxLength={10} required
+                    value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                    placeholder="10-digit mobile number"
+                    className="w-full px-3.5 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                  />
+                </div>
+                <input
+                  type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                />
+                <button
+                  type="submit" disabled={busy || phone.length !== 10 || !password}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-50"
+                >
+                  {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Log in <ArrowRight className="h-[18px] w-[18px]" /></>}
+                </button>
+              </form>
+
+              <button
+                type="button" onClick={() => { setUsePassword(false); setError('') }}
+                className="mt-5 w-full text-center text-[13.5px] font-semibold text-brand hover:underline"
+              >
+                Use a one-time code instead
+              </button>
+            </>
+          ) : (
+            <>
+              <OtpAuth
+                mode={mode}
+                onSwitchMode={() => setMode((m) => (m === 'signup' ? 'login' : 'signup'))}
+                onDone={async () => {
+                  await refresh()
+                  router.replace(next)
+                }}
+                footer={false}
+              />
+              <button
+                type="button" onClick={() => setUsePassword(true)}
+                className="mt-5 w-full text-center text-[13px] font-semibold text-slate-500 transition hover:text-navy-800"
+              >
+                Owner with a password? Log in here
+              </button>
+            </>
           )}
 
-          <form onSubmit={submit} className="mt-5 space-y-3.5">
-            <div className="flex items-center overflow-hidden rounded-xl border border-slate-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
-              <span className="border-r border-slate-200 px-3.5 py-3 text-[14px] font-semibold text-slate-700">
-                +91
-              </span>
-              <input
-                autoFocus
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                placeholder="10-digit mobile number"
-                className="w-full px-3.5 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none"
-              />
-            </div>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-            />
-            <button
-              type="submit"
-              disabled={busy || phone.length !== 10 || !password}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-50"
-            >
-              {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Log in <ArrowRight className="h-[18px] w-[18px]" /></>}
-            </button>
-          </form>
-
-          <p className="mt-5 text-center text-[13.5px] text-slate-500">
-            Don’t have an account?{' '}
-            <Link href="/list-property" className="font-semibold text-brand hover:underline">
-              List a property
-            </Link>
-          </p>
-          <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12px] text-slate-400">
+          <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-[12px] text-slate-400">
             <ShieldCheck className="h-3.5 w-3.5" /> Your details stay private and are never shared.
           </p>
         </div>
+
+        <p className="mt-5 text-center text-[13.5px] text-slate-500">
+          Want to list a property?{' '}
+          <Link href="/list-property" className="font-semibold text-brand hover:underline">
+            List it free
+          </Link>
+        </p>
       </div>
       <SiteFooter />
     </main>
