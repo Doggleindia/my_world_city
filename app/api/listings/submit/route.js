@@ -35,8 +35,33 @@ async function createListing(ownerId, data) {
     description: data.description,
     ownerId,
     slug: slugify(data.title),
-    photoCount: 1 + (data.gallery?.thumbs?.length || 0),
+    photoCount: (data.photos?.length || 0) || 1 + (data.gallery?.thumbs?.length || 0),
     status: 'pending',
+    // --- richer detail captured by the 7-step wizard ---
+    subType: data.propertyType,
+    address: data.address,
+    pincode: data.pincode || undefined,
+    details: {
+      bathrooms: data.bathrooms,
+      possession: data.possession,
+      negotiable: data.negotiable,
+      builtUpArea: data.area,
+    },
+    // Fields without a first-class column ride along in meta, which the admin
+    // property editor already reads.
+    meta: {
+      profession: data.profession,
+      propertyType: data.propertyType,
+      configuration: data.configuration,
+      possessionDate: data.possessionDate,
+      landmark: data.landmark,
+      state: data.state,
+      country: data.country,
+      photos: data.photos,
+      nearby: data.nearby,
+      leadGoal: data.leadGoal,
+      leadSources: data.leadSources,
+    },
   })
   return doc
 }
@@ -54,6 +79,14 @@ export const POST = handler(async (req) => {
 
   // --- Logged-in owner: just add another pending listing. ---
   if (session) {
+    // Listing a property makes you an owner; keep the profession in step too.
+    await User.updateOne(
+      { _id: session.uid },
+      {
+        $addToSet: { roles: 'owner' },
+        ...(data.profession ? { $set: { profession: data.profession } } : {}),
+      },
+    )
     const doc = await createListing(session.uid, data)
     return ok(
       { property: toPropertyCard(doc.toObject()), id: String(doc._id), status: 'pending' },
@@ -95,6 +128,7 @@ export const POST = handler(async (req) => {
       passwordHash,
       mustChangePassword: true,
       roles: ['owner'],
+      profession: data.profession,
       verified: false,
     })
   }

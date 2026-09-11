@@ -28,6 +28,20 @@ The app runs without any third-party keys — features degrade gracefully:
 
 See [.env.example](.env.example) for the full list (SMS, Cloudinary, Razorpay, admin).
 
+## SMS gateway (OTP login / signup)
+
+Set `SMS_PROVIDER` to one of `msg91`, `fast2sms` or `twilio` and add that provider's keys:
+
+| Provider | Variables | Notes |
+| --- | --- | --- |
+| `msg91` | `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `MSG91_SENDER_ID` (optional) | Recommended for India. Template must be DLT-approved and contain `##OTP##`. |
+| `fast2sms` | `FAST2SMS_API_KEY` | Uses the OTP route. |
+| `twilio` | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | International; `TWILIO_FROM` is your Twilio number in E.164. |
+
+Restart the server after changing these. Admins can check the configuration with
+`GET /api/admin/sms` and send themselves a test code with `POST /api/admin/sms { "phone": "98xxxxxxxx" }`.
+With `SMS_PROVIDER` blank, codes are printed to the server log (and shown on screen in `npm run dev`).
+
 ## Seeding demo data
 
 Seed sample properties + experts from `data.js`:

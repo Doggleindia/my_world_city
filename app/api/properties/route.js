@@ -3,6 +3,7 @@ import Property from '@/lib/models/Property'
 import { propertyQuerySchema } from '@/lib/validation'
 import { handler, parseQuery, ok } from '@/lib/api'
 import { toPropertyCard } from '@/lib/serialize'
+import { enquiryCountsFor } from '@/lib/enquiryCounts'
 
 // GET /api/properties?category=&listingType=&locality=&q=&min/maxPrice=&verified=&rera=&featured=&sort=&page=&limit=
 export const GET = handler(async (req) => {
@@ -42,8 +43,13 @@ export const GET = handler(async (req) => {
     Property.countDocuments(filter),
   ])
 
+  const counts = await enquiryCountsFor(docs.map((d) => d._id))
+
   return ok({
-    items: docs.map(toPropertyCard),
+    items: docs.map((d) => {
+      const c = toPropertyCard(d)
+      return { ...c, enquiries: counts[c.id] || 0 }
+    }),
     page: qp.page,
     limit: qp.limit,
     total,

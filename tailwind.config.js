@@ -15,6 +15,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'var(--font-inter)', 'ui-sans-serif', 'sans-serif'],
       },
       colors: {
         navy:  { 900: '#081a33', 800: '#0b2547', 700: '#103464' },

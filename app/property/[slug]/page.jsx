@@ -139,6 +139,12 @@ export default async function PropertyDetailPage({ params }) {
   const property = await getProperty(slug)
   if (!property) notFound()
 
+  // Count the visit once per render. getProperty() also runs inside
+  // generateMetadata(), so counting in there charged every visit twice.
+  if (property.id) {
+    Property.updateOne({ _id: property.id }, { $inc: { views: 1 } }).catch(() => {})
+  }
+
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <TopBar />

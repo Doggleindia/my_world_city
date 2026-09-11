@@ -23,6 +23,18 @@ const STEPS = [
 export default function FindSolutionWizard({ onClose }) {
   const router = useRouter()
   const [step, setStep] = useState(1)
+  // +1 when moving forward, -1 when going back — drives the slide direction.
+  const [dir, setDir] = useState(1)
+  const goTo = (n) => { setDir(n >= step ? 1 : -1); setStep(n) }
+  // The current set animates out before the next one animates in, so the two
+  // movements read as one continuous transition rather than a jump cut.
+  const [leaving, setLeaving] = useState(false)
+  const [picked, setPicked] = useState(null)
+  const advance = (n, chosen) => {
+    setPicked(chosen ?? null)
+    setLeaving(true)
+    setTimeout(() => { goTo(n); setLeaving(false); setPicked(null) }, 190)
+  }
   const [purpose, setPurpose] = useState(null)
   const [category, setCategory] = useState(null)
 
@@ -33,7 +45,7 @@ export default function FindSolutionWizard({ onClose }) {
   }, [onClose])
 
   // Step 1 has nowhere to go back to, so BACK closes the panel instead.
-  const back = () => (step === 1 ? onClose() : setStep(step - 1))
+  const back = () => (step === 1 ? onClose() : goTo(step - 1))
 
   // How far the user is allowed to jump — step 3 needs a category to list types.
   const reachable = 1 + (purpose ? 1 : 0) + (category ? 1 : 0)
@@ -48,10 +60,10 @@ export default function FindSolutionWizard({ onClose }) {
   const select = (item) => {
     if (step === 1) {
       setPurpose(item)
-      setStep(2)
+      advance(2, item.title)
     } else if (step === 2) {
       setCategory(item)
-      setStep(3)
+      advance(3, item.title)
     } else {
       const params = new URLSearchParams({ category: category.key, type: item.title })
       router.push(`/find-property?${params.toString()}`)
@@ -78,8 +90,8 @@ export default function FindSolutionWizard({ onClose }) {
         </span>
       </div>
 
-      {/* Heading */}
-      <div className="mt-4 text-center">
+      {/* Heading — re-keyed on step so the entrance animation replays */}
+      <div key={`head-${step}`} className="mwc-head-in mt-4 text-center">
         <h3 className="text-[24px] font-extrabold tracking-tight text-navy-900 sm:text-[28px]">
           {STEPS[step - 1].title}
         </h3>
@@ -93,17 +105,23 @@ export default function FindSolutionWizard({ onClose }) {
         purpose={purpose}
         category={category}
         reachable={reachable}
-        onGo={setStep}
+        onGo={goTo}
       />
 
-      {/* Option cards */}
-      <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
-        {cards.map((c) => (
+      {/* Option cards — staggered so the set visibly arrives */}
+      <div
+        key={`cards-${step}`}
+        className={`mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5 ${leaving ? 'mwc-step-out' : ''}`}
+      >
+        {cards.map((c, i) => (
           <article
             key={c.title}
-            className="flex flex-col overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-card"
+            style={{ animationDelay: leaving ? '0ms' : `${i * 70}ms` }}
+            className={`mwc-card flex flex-col overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-card ${
+              leaving ? (picked === c.title ? 'mwc-card-picked' : 'mwc-card-out') : dir > 0 ? 'mwc-step-next' : 'mwc-step-prev'
+            }`}
           >
-            <img src={c.img} alt="" className="aspect-[4/3] w-full object-cover" />
+            <img src={c.img} alt="" className="mwc-card-img aspect-[4/3] w-full object-cover" />
             <div className="flex flex-1 flex-col p-4">
               <h4 className="text-[15px] font-bold text-navy-900">{c.title}</h4>
               <p className="mt-1 flex-1 text-[12.5px] leading-snug text-slate-500">{c.desc}</p>
@@ -145,10 +163,14 @@ function StepNav({ step, purpose, category, reachable, onGo }) {
               <span
                 // spans from the previous column's centre to this one's
                 style={{ left: `calc(-50% - ${GAP})`, right: '50%' }}
-                className={`absolute top-1/2 mx-[18px] h-1.5 -translate-y-1/2 rounded-full transition-colors duration-300 ${
-                  step > c.n - 1 ? 'bg-emerald-500' : 'bg-slate-200'
-                }`}
-              />
+                className="absolute top-1/2 mx-[18px] h-1.5 -translate-y-1/2 overflow-hidden rounded-full bg-slate-200"
+              >
+                {/* grows out of the completed step towards this one */}
+                <span
+                  className="block h-full w-full origin-left rounded-full bg-emerald-500 transition-transform duration-500 ease-out"
+                  style={{ transform: `scaleX(${step > c.n - 1 ? 1 : 0})` }}
+                />
+              </span>
             )}
             <button
               type="button"
@@ -164,7 +186,11 @@ function StepNav({ step, purpose, category, reachable, onGo }) {
                     : 'bg-slate-200 text-slate-500'
               } ${canGo ? 'hover:scale-110' : 'cursor-default'}`}
             >
-              {c.n < step ? <Check className="h-5 w-5 text-amber-300" strokeWidth={3.5} /> : c.n}
+              {c.n < step ? (
+                <Check key={`chk-${c.n}-${step}`} className="mwc-check-pop h-5 w-5 text-amber-300" strokeWidth={3.5} />
+              ) : (
+                c.n
+              )}
             </button>
           </div>
         )
