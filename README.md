@@ -1,7 +1,7 @@
 # My World City
 
 A property marketplace for Jaipur — buy, build, manage and invest. Next.js 15 (App
-Router) frontend + API routes, MongoDB (Mongoose), phone-OTP auth, Cloudinary image
+Router) frontend + API routes, MongoDB (Mongoose), email-OTP auth, Cloudinary image
 uploads and Razorpay payments. Designed to deploy on Vercel.
 
 ## Quick start
@@ -17,7 +17,7 @@ The app runs without any third-party keys — features degrade gracefully:
 | Missing config | Behaviour |
 | --- | --- |
 | `MONGODB_URI` | Pages render with static fallback content; auth/save/leads need the DB |
-| `SMS_PROVIDER` | OTP is printed to the **server console** instead of sent by SMS |
+| SMTP settings | The login code is printed to the **server console** instead of emailed |
 | Cloudinary keys | Uploads return an Unsplash placeholder image |
 | Razorpay keys | "Promote" settles instantly in dev mode (no real charge) |
 
@@ -26,21 +26,37 @@ The app runs without any third-party keys — features degrade gracefully:
 - `MONGODB_URI` — MongoDB Atlas connection string
 - `SESSION_SECRET` — 32+ char random string (`openssl rand -base64 32`)
 
-See [.env.example](.env.example) for the full list (SMS, Cloudinary, Razorpay, admin).
+See [.env.example](.env.example) for the full list (SMTP, Cloudinary, Razorpay, admin).
 
-## SMS gateway (OTP login / signup)
+## Authentication
 
-Set `SMS_PROVIDER` to one of `msg91`, `fast2sms` or `twilio` and add that provider's keys:
+Accounts are identified by **email address**. There is no password for ordinary
+users: they type their email, we send a 6-digit code, they type it back. The same
+form handles sign-up and sign-in — an address we already know simply signs in.
 
-| Provider | Variables | Notes |
-| --- | --- | --- |
-| `msg91` | `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `MSG91_SENDER_ID` (optional) | Recommended for India. Template must be DLT-approved and contain `##OTP##`. |
-| `fast2sms` | `FAST2SMS_API_KEY` | Uses the OTP route. |
-| `twilio` | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | International; `TWILIO_FROM` is your Twilio number in E.164. |
+A phone number is still collected on the listing wizard and enquiry forms, but
+only as a contact detail. It is never used to log in.
 
-Restart the server after changing these. Admins can check the configuration with
-`GET /api/admin/sms` and send themselves a test code with `POST /api/admin/sms { "phone": "98xxxxxxxx" }`.
-With `SMS_PROVIDER` blank, codes are printed to the server log (and shown on screen in `npm run dev`).
+Owners issued a temporary password when a listing was filed can still sign in
+with email + password from the "Owner with a password?" link on `/login`.
+
+## Email (login codes)
+
+Codes go out over SMTP. Fill these in and restart:
+
+| Variable | Meaning |
+| --- | --- |
+| `SMTP_HOST` | Mail server hostname, e.g. `smtp.mailercloud.com` |
+| `SMTP_PORT` | `587` for STARTTLS (the default) |
+| `SMTP_USER` | SMTP username from the mail provider |
+| `SMTP_PASSWORD` | SMTP password / API key |
+| `MAIL_FROM` | The "from" address, on a domain verified with the provider |
+
+Admins can check the set-up with `GET /api/admin/email` and send themselves a
+test code with `POST /api/admin/email { "to": "you@example.com" }`.
+
+With these blank, codes are printed to the server log (and shown on screen in
+`npm run dev`) so the flow still works before the mail account exists.
 
 ## Seeding demo data
 
@@ -50,13 +66,26 @@ Seed sample properties + experts from `data.js`:
    ```bash
    curl -X POST http://localhost:3000/api/admin/seed -H "x-seed-secret: <your-secret>"
    ```
-2. Or log in with a phone listed in `ADMIN_PHONES` (auto-granted admin) and POST the
+2. Or log in with an email listed in `ADMIN_EMAILS` (auto-granted admin) and POST the
    same endpoint from the browser.
 
 ## Becoming an admin
 
-Add your 10-digit number to `ADMIN_PHONES` (comma-separated). On your next OTP login
-you'll get the `admin` role and the **Admin** console at `/admin`.
+Add your email to `ADMIN_EMAILS` (comma-separated). On your next login you'll get
+the `admin` role and the **Admin** console at `/admin`.
+
+## Migrating an existing database
+
+Accounts used to be keyed by phone. Run this once after deploying the email change:
+
+```bash
+node migrate-email-auth.cjs            # report only
+node migrate-email-auth.cjs --apply    # rebuild indexes, clear stale codes
+```
+
+It rebuilds the unique indexes as sparse (the old phone index rejects the second
+account created without a number) and lists any account that has no email address
+— those people cannot log in until one is added.
 
 ## Architecture
 

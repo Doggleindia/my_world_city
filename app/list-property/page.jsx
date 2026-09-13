@@ -26,8 +26,12 @@ const STEPS = [
   { title: 'Review & submit', heading: 'Review & submit', sub: 'Quick check before you send this to our team for approval.', icon: CheckCircle2 },
 ]
 
+// A signed-in account is identified by its email, so the wizard needs a valid
+// one before it can create or attach the listing.
+const EMAIL_OK = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim())
+
 const EMPTY = {
-  name: '', phone: '', email: '', profession: '',
+  name: '', email: '', profession: '',
   title: '', propertyType: 'apartment', configuration: [], area: '', bathrooms: '',
   priceLabel: '', negotiable: true, possession: 'ready', possessionDate: '', description: '',
   address: '', locality: '', landmark: '', pincode: '', city: 'Jaipur', state: 'Rajasthan', country: 'India',
@@ -55,14 +59,13 @@ export default function ListPropertyPage() {
     setForm((f) => ({
       ...f,
       name: f.name || user.name || '',
-      phone: f.phone || user.phone || '',
       email: f.email || user.email || '',
       profession: f.profession || user.profession || '',
     }))
   }, [user])
 
   const stepValid = useCallback(() => {
-    if (step === 0) return form.name.trim().length >= 2 && /^[6-9]\d{9}$/.test(form.phone) && !!form.profession
+    if (step === 0) return form.name.trim().length >= 2 && EMAIL_OK(form.email) && !!form.profession
     if (step === 1) return form.title.trim().length >= 3 && !!form.propertyType
     if (step === 2) {
       const pinOk = !form.pincode || /^[1-9][0-9]{5}$/.test(form.pincode)
@@ -75,7 +78,7 @@ export default function ListPropertyPage() {
   const next = async () => {
     setError('')
     if (!stepValid()) return setError(hint(step))
-    // A guest proves their number once, right after the About-you step. That
+    // A guest proves their email once, right after the About-you step. That
     // creates their account, so photo uploads and the submission work.
     if (step === 0 && !user) return setVerifying(true)
     setStep((s) => Math.min(s + 1, STEPS.length - 1))
@@ -123,7 +126,7 @@ export default function ListPropertyPage() {
           }),
         leadGoal: form.leadGoal,
         leadSources: form.leadSources,
-        ...(user ? {} : { name: form.name.trim(), phone: form.phone, email: form.email || undefined }),
+        ...(user ? {} : { name: form.name.trim(), email: form.email || undefined }),
       }
       const res = await fetch('/api/listings/submit', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
@@ -243,7 +246,7 @@ export default function ListPropertyPage() {
 
 function hint(step) {
   return [
-    'Add your name, a valid 10-digit mobile number, and tell us what you do.',
+    'Add your name, a valid email address, and tell us what you do.',
     'Give the property a name and pick its type.',
     'Add at least the area/street and city — and a 6-digit pincode if you enter one.',
     'Upload at least one photo.',
@@ -287,19 +290,13 @@ function AboutYou({ form, set, locked }) {
       <Field label="Full name">
         <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. Rahul Sharma" className={field} />
       </Field>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Contact number">
-          <div className="flex gap-2">
-            <span className="grid w-[58px] shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-[14px] font-semibold text-slate-600">+91</span>
-            <input
-              value={form.phone} disabled={locked} inputMode="numeric"
-              onChange={(e) => set('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
-              placeholder="98100 24680" className={`${field} disabled:bg-slate-50 disabled:text-slate-500`}
-            />
-          </div>
-        </Field>
+      <div>
         <Field label="Email address">
-          <input value={form.email} onChange={(e) => set('email', e.target.value)} type="email" placeholder="rahul@example.com" className={field} />
+          <input
+            value={form.email} disabled={locked} onChange={(e) => set('email', e.target.value)}
+            type="email" placeholder="rahul@example.com"
+            className={`${field} disabled:bg-slate-50 disabled:text-slate-500`}
+          />
         </Field>
       </div>
 
@@ -340,14 +337,14 @@ function VerifyGate({ form, onVerified, onCancel }) {
     try {
       const res = await fetch('/api/auth/otp/send', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: form.phone, name: form.name.trim(), email: form.email.trim() }),
+        body: JSON.stringify({ email: form.email.trim().toLowerCase(), name: form.name.trim() }),
       })
       const d = await res.json()
       if (!res.ok) throw new Error(d.error || 'Could not send the code')
       setDevCode(d.devCode || '')
       setLeft(30)
     } catch (e) { setError(e.message) }
-  }, [form.phone, form.name, form.email])
+  }, [form.email, form.name])
 
   useEffect(() => { if (!sent.current) { sent.current = true; send() } }, [send])
   useEffect(() => { if (left <= 0) return; const t = setTimeout(() => setLeft((s) => s - 1), 1000); return () => clearTimeout(t) }, [left])
@@ -358,7 +355,7 @@ function VerifyGate({ form, onVerified, onCancel }) {
     try {
       const res = await fetch('/api/auth/otp/verify', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: form.phone, code }),
+        body: JSON.stringify({ email: form.email.trim().toLowerCase(), code }),
       })
       const d = await res.json()
       if (!res.ok) throw new Error(d.error || 'Could not verify the code')
@@ -368,9 +365,10 @@ function VerifyGate({ form, onVerified, onCancel }) {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
-      <h2 className="text-[17px] font-bold text-navy-900">Verify your number</h2>
-      <p className="mt-1 text-[13.5px] text-slate-500">
-        We sent a 6-digit code to +91 {form.phone}. This creates your free account so you can manage the listing later.
+      <h2 className="text-[17px] font-bold text-navy-900">Verify your email</h2>
+      <p className="mt-1 break-words text-[13.5px] text-slate-500">
+        We sent a 6-digit code to <b className="text-navy-800">{form.email.trim()}</b>. This creates your free account so you can
+        manage the listing later.
       </p>
       <input
         value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -379,7 +377,7 @@ function VerifyGate({ form, onVerified, onCancel }) {
       />
       {devCode && (
         <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">
-          <b>Development mode:</b> no SMS gateway is connected, so your code is <b className="tracking-widest">{devCode}</b>.
+          <b>Development mode:</b> email sending isn’t configured, so your code is <b className="tracking-widest">{devCode}</b>.
         </p>
       )}
       {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">{error}</p>}
@@ -710,7 +708,6 @@ function Review({ form }) {
   const prof = PROFESSIONS.find((p) => p.key === form.profession)
   const rows = [
     ['Full name', form.name],
-    ['Phone number', form.phone ? `+91 ${form.phone}` : '—'],
     ['Email address', form.email || '—'],
     ['Role / Type', prof?.label || '—'],
     ['Property & type', `${form.title || '—'} · ${t.label}`],

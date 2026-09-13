@@ -37,7 +37,7 @@ export default function DashboardPage() {
                   My properties
                 </h1>
                 <p className="mt-1 text-[14px] text-slate-500">
-                  {user.name ? `Welcome, ${user.name.split(' ')[0]}` : `+91 ${user.phone}`}
+                  {user.name ? `Welcome, ${user.name.split(' ')[0]}` : user.email}
                 </p>
               </div>
               <Link

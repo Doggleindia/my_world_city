@@ -1,5 +1,21 @@
 import { sendTestEmail, getEmailStatus } from '@/lib/email'
 import { z } from 'zod'
+import { getSession } from '@/lib/auth/session'
+
+/**
+ * Sending mail costs money and can be abused for spam, so this endpoint is
+ * admin-only. Returns a Response to send back, or null when the caller is allowed.
+ */
+async function denyUnlessAdmin() {
+  const session = await getSession()
+  if (!session) {
+    return Response.json({ success: false, message: 'Authentication required' }, { status: 401 })
+  }
+  if (!(session.roles || []).includes('admin')) {
+    return Response.json({ success: false, message: 'Forbidden' }, { status: 403 })
+  }
+  return null
+}
 
 // Validation schema for test email request
 const testEmailSchema = z.object({
@@ -15,6 +31,9 @@ const testEmailSchema = z.object({
  */
 export async function POST(req) {
   try {
+    const denied = await denyUnlessAdmin()
+    if (denied) return denied
+
     // Check if email service is configured
     const emailStatus = getEmailStatus()
     if (!emailStatus.configured) {
@@ -91,6 +110,9 @@ export async function POST(req) {
  * Response: { "configured": true/false, "message": "...", "missing": [...] }
  */
 export async function GET() {
+  const denied = await denyUnlessAdmin()
+  if (denied) return denied
+
   const status = getEmailStatus()
   return Response.json({
     configured: status.configured,

@@ -3,10 +3,14 @@
  *
  *   node create-qa-users.cjs "<password>"
  *
- * Safe to re-run: it refuses to touch a phone number that already belongs to a
+ * Safe to re-run: it refuses to touch an email address that already belongs to a
  * non-QA account. Delete this file (and the accounts) when testing is done:
  *   node create-qa-users.cjs --remove
  */
+const dns = require('dns')
+// This machine's resolver cannot perform the SRV lookup that mongodb+srv://
+// needs, so point Node at public DNS (same workaround as lib/db.js).
+try { dns.setServers(['8.8.8.8', '1.1.1.1']) } catch {}
 const fs = require('fs')
 const crypto = require('crypto')
 const mongoose = require('mongoose')
@@ -27,8 +31,8 @@ const hash = (p) => {
   return salt + ':' + crypto.scryptSync(String(p), salt, 64).toString('hex')
 }
 
-// 90000000xx are unused in this database. Admin role is set directly, so no
-// change to ADMIN_PHONES is needed (syncAdminRole only ever adds, never strips).
+// These addresses are unused in this database. The admin role is set directly,
+// so no change to ADMIN_EMAILS is needed (syncAdminRole only adds, never strips).
 const ACCOUNTS = [
   { phone: '9000000001', name: 'QA Admin', email: 'qa.admin@myworldcity.test', roles: ['buyer', 'admin'] },
   { phone: '9000000002', name: 'QA Buyer', email: 'qa.buyer@myworldcity.test', roles: ['buyer'] },
@@ -40,33 +44,33 @@ async function main() {
   const users = mongoose.connection.db.collection('users')
 
   for (const a of ACCOUNTS) {
-    const existing = await users.findOne({ phone: a.phone })
+    const existing = await users.findOne({ email: a.email })
 
     if (existing && !/^QA /.test(existing.name || '')) {
-      console.log('SKIP    ' + a.phone + ' — belongs to "' + (existing.name || 'an existing user') + '", left untouched')
+      console.log('SKIP    ' + a.email + ' — belongs to "' + (existing.name || 'an existing user') + '", left untouched')
       continue
     }
 
     if (REMOVE) {
       if (existing) {
-        await users.deleteOne({ phone: a.phone })
-        console.log('REMOVED ' + a.phone + '  ' + a.name)
+        await users.deleteOne({ email: a.email })
+        console.log('REMOVED ' + a.email + '  ' + a.name)
       } else {
-        console.log('ABSENT  ' + a.phone)
+        console.log('ABSENT  ' + a.email)
       }
       continue
     }
 
     const now = new Date()
     await users.updateOne(
-      { phone: a.phone },
+      { email: a.email },
       {
         $set: { ...a, passwordHash: hash(PW), verified: true, mustChangePassword: false, updatedAt: now },
         $setOnInsert: { createdAt: now },
       },
       { upsert: true },
     )
-    console.log((existing ? 'UPDATED ' : 'CREATED ') + a.phone + '  ' + a.name + '  ' + JSON.stringify(a.roles))
+    console.log((existing ? 'UPDATED ' : 'CREATED ') + a.email + '  ' + a.name + '  ' + JSON.stringify(a.roles))
   }
 
   console.log('users in database: ' + (await users.countDocuments()))

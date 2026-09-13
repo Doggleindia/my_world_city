@@ -8,18 +8,18 @@ import { handler, parseBody, ok, ApiError } from '@/lib/api'
 import { rateLimit } from '@/lib/rateLimit'
 import { codeMatches, MAX_ATTEMPTS } from '@/lib/auth/otp'
 
-// POST /api/auth/otp/verify { phone, code }
+// POST /api/auth/otp/verify { email, code }
 // Checks the code, then either signs the person in or creates their account and
 // signs them in. Either way they land logged in — no password involved.
 export const POST = handler(async (req) => {
-  const { phone, code } = await parseBody(req, otpVerifySchema)
+  const { email, code } = await parseBody(req, otpVerifySchema)
 
-  const rl = rateLimit(`otp:verify:${phone}`, 12, 15 * 60 * 1000)
+  const rl = rateLimit(`otp:verify:${email}`, 12, 15 * 60 * 1000)
   if (!rl.ok) throw new ApiError('Too many attempts. Request a new code in a few minutes.', 429)
 
   await dbConnect()
 
-  const record = await Otp.findOne({ phone })
+  const record = await Otp.findOne({ email })
   if (!record || record.consumedAt) throw new ApiError('Request a new code to continue.', 400)
   if (record.expiresAt < new Date()) {
     await Otp.deleteOne({ _id: record._id })
@@ -44,23 +44,23 @@ export const POST = handler(async (req) => {
   record.consumedAt = new Date()
   await record.save()
 
-  let user = await User.findOne({ phone })
+  let user = await User.findOne({ email })
   const isNewUser = !user
 
   if (!user) {
     user = await User.create({
-      phone,
+      email,
       name: record.name || undefined,
-      email: record.email || undefined,
+      phone: record.phone || undefined,
       roles: ['buyer'],
-      verified: true, // the phone was just proven
+      verified: true, // the address was just proven
       mustChangePassword: false,
     })
   } else {
-    // Fill in anything the account was missing, and mark the number verified.
+    // Fill in anything the account was missing, and mark the address verified.
     let touched = false
     if (record.name && !user.name) { user.name = record.name; touched = true }
-    if (record.email && !user.email) { user.email = record.email; touched = true }
+    if (record.phone && !user.phone) { user.phone = record.phone; touched = true }
     if (!user.verified) { user.verified = true; touched = true }
     if (touched) await user.save()
   }
@@ -74,9 +74,9 @@ export const POST = handler(async (req) => {
       isNewUser,
       user: {
         id: String(user._id),
-        phone: user.phone,
+        email: user.email,
         name: user.name ?? null,
-        email: user.email ?? null,
+        phone: user.phone ?? null,
         roles: user.roles,
       },
     },
