@@ -21,7 +21,7 @@ export default function AuthButtons({ cta = 'navy' }) {
   const ctaClass =
     cta === 'brand' ? 'bg-brand hover:bg-brand-700' : 'bg-navy-800 hover:bg-navy-700'
 
-  const firstName = user?.name?.split(' ')[0] || `+91 ${user?.phone?.slice(-4)}`
+  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Account'
   const isAdmin = user?.roles?.includes('admin')
 
   return (

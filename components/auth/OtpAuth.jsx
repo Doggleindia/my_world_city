@@ -1,14 +1,15 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowRight, Check, Loader2, ShieldCheck, Smartphone } from 'lucide-react'
+import { ArrowRight, Check, Loader2, Mail, ShieldCheck } from 'lucide-react'
 
 const RESEND_SECONDS = 30
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
-// Two-step phone auth used for both signing up and signing in.
-//   signup  : name + email + mobile  ->  6-digit code
-//   login   : mobile                 ->  6-digit code
-// A returning number is detected by the server, so entering an existing number
+// Two-step email auth used for both signing up and signing in.
+//   signup  : name + email  ->  6-digit code
+//   login   : email         ->  6-digit code
+// A returning address is detected by the server, so entering an existing email
 // on the sign-up form simply signs that person in instead of erroring.
 const apiError = (data, fallback) => {
   if (data?.issues) {
@@ -20,16 +21,15 @@ const apiError = (data, fallback) => {
 
 export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer = true }) {
   const isSignup = mode === 'signup'
-  const [step, setStep] = useState(1) // 1 = details/mobile, 2 = verify
+  const [step, setStep] = useState(1) // 1 = details/email, 2 = verify
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [sentTo, setSentTo] = useState('')
   const [devCode, setDevCode] = useState('')
-  const [notDelivered, setNotDelivered] = useState(false) // server has no SMS gateway and won't reveal the code
+  const [notDelivered, setNotDelivered] = useState(false) // server has no mail set-up and won't reveal the code
   const [secondsLeft, setSecondsLeft] = useState(0)
   const boxes = useRef([])
 
@@ -53,18 +53,19 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
   const sendCode = useCallback(
     async (resend = false) => {
       setError('')
-      if (!/^[6-9]\d{9}$/.test(phone)) return setError('Enter a valid 10-digit mobile number')
+      const clean = email.trim().toLowerCase()
+      if (!EMAIL_RE.test(clean)) return setError('Enter a valid email address')
       if (isSignup && !resend && name.trim().length < 2) return setError('Enter your full name')
       setBusy(true)
       try {
         const res = await fetch('/api/auth/otp/send', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, ...(isSignup ? { name: name.trim(), email: email.trim() } : {}) }),
+          body: JSON.stringify({ email: clean, ...(isSignup ? { name: name.trim() } : {}) }),
         })
         const data = await res.json()
         if (!res.ok) throw new Error(apiError(data, 'Could not send the code'))
-        setSentTo(phone)
+        setSentTo(clean)
         setDevCode(data.devCode || '')
         setNotDelivered(data.channel === 'console' && !data.devCode)
         setSecondsLeft(RESEND_SECONDS)
@@ -76,7 +77,7 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
         setBusy(false)
       }
     },
-    [phone, name, email, isSignup],
+    [email, name, isSignup],
   )
 
   const verify = useCallback(
@@ -89,7 +90,7 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
         const res = await fetch('/api/auth/otp/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: sentTo || phone, code: entered }),
+          body: JSON.stringify({ email: sentTo || email.trim().toLowerCase(), code: entered }),
         })
         const data = await res.json()
         if (!res.ok) throw new Error(apiError(data, 'Could not verify the code'))
@@ -102,7 +103,7 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
         setBusy(false)
       }
     },
-    [digits, phone, sentTo, onDone],
+    [digits, email, sentTo, onDone],
   )
 
   const setDigit = (i, v) => {
@@ -147,41 +148,29 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
             {isSignup ? (<>Create your <span className="text-brand">free account</span></>) : (<>Welcome <span className="text-brand">back</span></>)}
           </h2>
           <p className="mt-1.5 text-[14px] text-slate-500">
-            {isSignup ? 'It takes under a minute — no password to remember.' : 'Enter your mobile number and we’ll send you a code.'}
+            {isSignup ? 'It takes under a minute — no password to remember.' : 'Enter your email and we’ll send you a code.'}
           </p>
 
           <div className="mt-6 space-y-4">
             {isSignup && (
-              <>
-                <div>
-                  <label className={label} htmlFor="mwc-name">Full name</label>
-                  <input id="mwc-name" name="name" value={name} onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Rahul Sharma" autoComplete="name" className={`${input} mt-2`} />
-                </div>
-                <div>
-                  <label className={label} htmlFor="mwc-email">Email <span className="font-medium normal-case tracking-normal text-slate-400">(optional)</span></label>
-                  <input id="mwc-email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                    placeholder="rahul@example.com" autoComplete="email" className={`${input} mt-2`} />
-                </div>
-              </>
+              <div>
+                <label className={label} htmlFor="mwc-name">Full name</label>
+                <input id="mwc-name" name="name" value={name} onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Rahul Sharma" autoComplete="name" className={`${input} mt-2`} />
+              </div>
             )}
 
             <div>
-              <label className={label} htmlFor="mwc-phone">Mobile number</label>
-              <div className="mt-2 flex gap-2.5">
-                <span className="grid w-[62px] shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-[14.5px] font-semibold text-slate-600">
-                  +91
-                </span>
-                <input id="mwc-phone" name="phone" inputMode="numeric" autoComplete="tel"
-                  value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="98765 43210" className={input} />
-              </div>
+              <label className={label} htmlFor="mwc-email">Email address</label>
+              <input id="mwc-email" name="email" type="email" value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="rahul@example.com" autoComplete="email" className={`${input} mt-2`} />
             </div>
           </div>
 
           <p className="mt-4 flex items-start gap-2.5 rounded-xl bg-brand/[0.06] px-3.5 py-3 text-[12.5px] leading-relaxed text-slate-600">
             <ShieldCheck className="mt-[1px] h-4 w-4 shrink-0 text-brand" />
-            No passwords. We send a one-time code to your mobile every time you log in.
+            No passwords. We email you a one-time code every time you log in.
           </p>
 
           {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">{error}</p>}
@@ -189,7 +178,7 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
           <button type="submit" disabled={busy}
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-[15px] font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {isSignup ? 'Continue' : 'Send OTP'} <ArrowRight className="h-4 w-4" />
+            {isSignup ? 'Continue' : 'Send code'} <ArrowRight className="h-4 w-4" />
           </button>
 
           {onSwitchMode && (
@@ -209,10 +198,10 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
       ) : (
         <div className="mt-6">
           <h2 className="text-[24px] font-extrabold tracking-tight text-navy-900">
-            Verify your <span className="text-brand">number</span>
+            Verify your <span className="text-brand">email</span>
           </h2>
-          <p className="mt-1.5 text-[14px] text-slate-500">
-            We sent a 6-digit code to +91 {sentTo.replace(/(\d{5})(\d{5})/, '$1 $2')}.
+          <p className="mt-1.5 break-words text-[14px] text-slate-500">
+            We sent a 6-digit code to <b className="text-navy-800">{sentTo}</b>.
           </p>
 
           <div className="mt-6 flex gap-2.5" onPaste={(e) => { e.preventDefault(); setDigit(0, e.clipboardData.getData('text')) }}>
@@ -233,13 +222,13 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
 
           {devCode && (
             <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">
-              <b>Development mode:</b> no SMS gateway is connected yet, so your code is <b className="tracking-widest">{devCode}</b>.
+              <b>Development mode:</b> email sending isn’t configured yet, so your code is <b className="tracking-widest">{devCode}</b>.
             </p>
           )}
           {notDelivered && (
             <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">
-              <b>SMS sending isn’t set up on this server yet.</b> The code was written to the server log only — please ask the site
-              administrator to configure the SMS gateway.
+              <b>Email sending isn’t set up on this server yet.</b> The code was written to the server log only — please ask the site
+              administrator to configure the SMTP settings.
             </p>
           )}
 
@@ -257,6 +246,8 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
             )}
           </div>
 
+          <p className="mt-2 text-[12.5px] text-slate-400">Can’t find it? Check your spam or promotions folder.</p>
+
           {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">{error}</p>}
 
           <button type="button" onClick={() => verify()} disabled={busy}
@@ -267,14 +258,14 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
 
           <button type="button" onClick={() => { setStep(1); setError('') }}
             className="mt-3 w-full text-center text-[13px] font-semibold text-slate-500 transition hover:text-navy-800">
-            Change number
+            Change email
           </button>
         </div>
       )}
 
       {footer && (
         <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-[12.5px] text-slate-400">
-          <Smartphone className="h-3.5 w-3.5" /> Trouble logging in?{' '}
+          <Mail className="h-3.5 w-3.5" /> Trouble logging in?{' '}
           <a href="/contact" className="font-semibold text-brand hover:underline">Contact support</a>
         </p>
       )}
@@ -283,7 +274,7 @@ export default function OtpAuth({ mode = 'login', onDone, onSwitchMode, footer =
 }
 
 function Stepper({ step, isSignup }) {
-  const labels = isSignup ? ['Details', 'Verify'] : ['Mobile', 'Verify']
+  const labels = isSignup ? ['Details', 'Verify'] : ['Email', 'Verify']
   return (
     <div className="flex items-center justify-center gap-0">
       {labels.map((l, i) => {

@@ -67,7 +67,7 @@ async function createListing(ownerId, data) {
 }
 
 // POST /api/listings/submit
-//   Guests:      body includes { name, phone } — creates the owner account with a
+//   Guests:      body includes { name, email } — creates the owner account with a
 //                temporary password (returned once), logs them in, files a pending listing.
 //   Logged-in:   contact fields ignored — files another pending listing on their account.
 // Every listing starts as `pending` and only goes live after admin approval.
@@ -94,17 +94,18 @@ export const POST = handler(async (req) => {
     )
   }
 
-  // --- Guest: name + phone are required to open an account. ---
-  if (!data.name || !data.phone) {
-    throw new ApiError('Your name and mobile number are required to list a property', 422)
+  // --- Guest: name + email are required to open an account. ---
+  if (!data.name || !data.email) {
+    throw new ApiError('Your name and email address are required to list a property', 422)
   }
 
-  let user = await User.findOne({ phone: data.phone })
+  const email = String(data.email).trim().toLowerCase()
+  let user = await User.findOne({ email })
   let tempPassword = null
 
   if (user && user.passwordHash) {
-    // The number already has a real account — don't leak or reset it. Ask them to log in.
-    throw new ApiError('This number is already registered. Please log in to add a listing.', 409, {
+    // The address already has a real account — don't leak or reset it. Ask them to log in.
+    throw new ApiError('This email is already registered. Please log in to add a listing.', 409, {
       existingAccount: true,
     })
   }
@@ -117,14 +118,14 @@ export const POST = handler(async (req) => {
     user.passwordHash = passwordHash
     user.mustChangePassword = true
     if (data.name && !user.name) user.name = data.name
-    if (data.email && !user.email) user.email = data.email
+    if (data.phone && !user.phone) user.phone = data.phone
     if (!user.roles.includes('owner')) user.roles.push('owner')
     await user.save()
   } else {
     user = await User.create({
-      phone: data.phone,
+      email,
       name: data.name,
-      email: data.email || undefined,
+      phone: data.phone || undefined,
       passwordHash,
       mustChangePassword: true,
       roles: ['owner'],
@@ -133,7 +134,7 @@ export const POST = handler(async (req) => {
     })
   }
 
-  await syncAdminRole(user) // in case this phone is configured as an admin
+  await syncAdminRole(user) // in case this address is configured as an admin
   const doc = await createListing(user._id, data)
   await createSession(user) // auto-login so they land straight in their dashboard
 
@@ -142,9 +143,9 @@ export const POST = handler(async (req) => {
       property: toPropertyCard(doc.toObject()),
       id: String(doc._id),
       status: 'pending',
-      // Shown once on the success screen. In production this would also be sent by SMS.
+      // Shown once on the success screen. In production this would also be emailed.
       tempPassword,
-      phone: user.phone,
+      email: user.email,
     },
     { status: 201 },
   )

@@ -14,9 +14,9 @@ export const GET = handler(async () => {
   return ok({
     user: {
       id: String(user._id),
-      phone: user.phone,
+      email: user.email,
       name: user.name ?? null,
-      email: user.email ?? null,
+      phone: user.phone ?? null,
       avatar: user.avatar ?? null,
       roles: user.roles,
       mustChangePassword: !!user.mustChangePassword,

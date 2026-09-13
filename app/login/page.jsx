@@ -27,7 +27,7 @@ function LoginInner() {
   // Owners issued a temporary password can still sign in the old way.
   const [usePassword, setUsePassword] = useState(false)
 
-  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -44,7 +44,7 @@ function LoginInner() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Login failed')
@@ -75,22 +75,19 @@ function LoginInner() {
               )}
 
               <form onSubmit={submitPassword} className="mt-5 space-y-3.5">
-                <div className="flex items-center overflow-hidden rounded-xl border border-slate-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
-                  <span className="border-r border-slate-200 px-3.5 py-3 text-[14px] font-semibold text-slate-700">+91</span>
-                  <input
-                    autoFocus type="tel" inputMode="numeric" maxLength={10} required
-                    value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    placeholder="10-digit mobile number"
-                    className="w-full px-3.5 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none"
-                  />
-                </div>
+                <input
+                  autoFocus type="email" required autoComplete="email"
+                  value={email} onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email address"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                />
                 <input
                   type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                 />
                 <button
-                  type="submit" disabled={busy || phone.length !== 10 || !password}
+                  type="submit" disabled={busy || !email.trim() || !password}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-navy-800 py-3.5 text-[15px] font-semibold text-white transition hover:bg-navy-700 disabled:opacity-50"
                 >
                   {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Log in <ArrowRight className="h-[18px] w-[18px]" /></>}
