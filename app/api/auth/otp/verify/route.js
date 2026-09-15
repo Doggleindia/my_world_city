@@ -19,7 +19,7 @@ export const POST = handler(async (req) => {
 
   await dbConnect()
 
-  const record = await Otp.findOne({ email })
+  const record = await Otp.findOne({ email, purpose: 'login' })
   if (!record || record.consumedAt) throw new ApiError('Request a new code to continue.', 400)
   if (record.expiresAt < new Date()) {
     await Otp.deleteOne({ _id: record._id })

@@ -4,18 +4,12 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
+import ProfileMenu, { adminDisplayName, adminInitials, adminRoleLabel } from '@/components/admin/ProfileMenu'
 import {
   LayoutDashboard, Inbox, Lightbulb, Building2, Wrench, MessageSquare,
   UserSearch, BookUser, Map, Search, Bell, HelpCircle, ShieldAlert, Loader2,
   Menu, X, ClipboardCheck, ChevronRight,
 } from 'lucide-react'
-
-function roleLabel(user) {
-  const r = user?.roles || []
-  if (r.includes('admin')) return 'Super Admin'
-  if (r.includes('owner')) return 'Property Owner'
-  return 'Team Member'
-}
 
 const NAV = [
   {
@@ -56,6 +50,15 @@ export function useAdminStats() {
 export default function AdminLayout({ children }) {
   const { user, loading } = useAuth()
   const isAdmin = user?.roles?.includes('admin')
+  const pathname = usePathname()
+  const router = useRouter()
+  // The sign-in page lives under /admin but must render for signed-out visitors.
+  const isLoginPage = pathname === '/admin/login'
+
+  // No session at all -> the admin sign-in page, not the "admins only" wall.
+  useEffect(() => {
+    if (!loading && !user && !isLoginPage) router.replace('/admin/login')
+  }, [loading, user, isLoginPage, router])
 
   const [data, setData] = useState(null)
   const [statsLoading, setStatsLoading] = useState(true)
@@ -81,7 +84,9 @@ export default function AdminLayout({ children }) {
     if (isAdmin) refresh()
   }, [isAdmin, refresh])
 
-  if (loading) {
+  if (isLoginPage) return children
+
+  if (loading || !user) {
     return (
       <div className="grid min-h-screen place-items-center bg-[#f4f6fb]">
         <Loader2 className="h-8 w-8 animate-spin text-brand" />
@@ -96,9 +101,12 @@ export default function AdminLayout({ children }) {
           <ShieldAlert className="h-10 w-10 text-slate-300" />
           <h2 className="mt-4 text-[18px] font-bold text-navy-800">Admins only</h2>
           <p className="mt-1.5 px-8 text-[14px] text-slate-500">
-            You need an admin account to open the console.
+            You’re signed in as {user.email}, which isn’t an admin account.
           </p>
-          <Link href="/" className="mt-6 rounded-full bg-brand px-6 py-3 text-[14px] font-semibold text-white hover:bg-brand-700">
+          <Link href="/admin/login" className="mt-6 rounded-full bg-brand px-6 py-3 text-[14px] font-semibold text-white hover:bg-brand-700">
+            Sign in as admin
+          </Link>
+          <Link href="/" className="mt-3 text-[13px] font-semibold text-slate-500 hover:text-navy-800">
             Back to site
           </Link>
         </div>
@@ -122,13 +130,7 @@ export default function AdminLayout({ children }) {
 }
 
 function Sidebar({ badges, user, drawer, onClose }) {
-  const initials =
-    (user?.name || 'Admin')
-      .split(' ')
-      .map((w) => w[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase() || 'AD'
+  const initials = adminInitials(user)
 
   return (
     <>
@@ -165,16 +167,22 @@ function Sidebar({ badges, user, drawer, onClose }) {
           ))}
         </nav>
 
-        <div className="border-t border-white/10 px-4 py-4">
-          <div className="flex items-center gap-3">
+        <div className="border-t border-white/10 px-3 py-3">
+          <Link
+            href="/admin/account"
+            onClick={onClose}
+            title="Account details"
+            className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-white/10"
+          >
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/15 text-[12px] font-bold">
               {initials}
             </span>
-            <div className="min-w-0">
-              <p className="truncate text-[13.5px] font-semibold">{user?.name || 'Admin'}</p>
-              <p className="text-[11.5px] text-white/50">{roleLabel(user)}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[13.5px] font-semibold">{adminDisplayName(user)}</p>
+              <p className="truncate text-[11.5px] text-white/50">{adminRoleLabel(user)}</p>
             </div>
-          </div>
+            <ChevronRight className="h-4 w-4 shrink-0 text-white/40" />
+          </Link>
         </div>
       </aside>
     </>
@@ -251,15 +259,7 @@ function Topbar({ onMenu }) {
           <HelpCircle className="h-5 w-5" />
         </a>
         <div className="hidden h-8 w-px bg-slate-200 sm:block" />
-        <div className="flex items-center gap-2.5">
-          <div className="hidden text-right sm:block">
-            <p className="text-[13px] font-bold text-navy-800">{user?.name || 'Admin User'}</p>
-            <p className="text-[11px] text-slate-400">{roleLabel(user)}</p>
-          </div>
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-brand/10 text-[12px] font-bold text-brand">
-            {(user?.name || 'AD').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()}
-          </span>
-        </div>
+        <ProfileMenu />
       </div>
     </header>
   )

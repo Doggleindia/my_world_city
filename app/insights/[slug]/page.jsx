@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Eye } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import SiteFooter from '@/components/property/SiteFooter'
 import { insights } from '@/data'
+import { getArticleViews, formatViews } from '@/lib/articleViews'
+import ViewBeacon from '@/components/insights/ViewBeacon'
+
+// Re-render at most once a minute so the view count stays fresh without
+// hitting the database on every request.
+export const revalidate = 60
 
 export function generateStaticParams() {
   return insights.map((p) => ({ slug: p.slug }))
@@ -25,6 +31,7 @@ export default async function InsightPage({ params }) {
   if (!post) notFound()
 
   const related = insights.filter((p) => p.slug !== slug).slice(0, 3)
+  const views = (await getArticleViews())[slug] || 0
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -43,7 +50,14 @@ export default async function InsightPage({ params }) {
           <span>{post.date}</span>
           <span>·</span>
           <span>{post.readTime}</span>
+          {views > 0 && (
+            <>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {formatViews(views)} views</span>
+            </>
+          )}
         </div>
+        <ViewBeacon slug={slug} />
 
         <h1 className="mt-4 text-[30px] font-extrabold leading-tight tracking-tight text-navy-900 sm:text-[38px]">
           {post.title}
