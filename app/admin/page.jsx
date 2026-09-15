@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthProvider'
+import { NamePrompt } from '@/components/admin/ProfileMenu'
 import {
   ChevronRight, ChevronDown, Calendar,
   Inbox, UserSearch, ClipboardCheck, MapPin, Layers, TrendingUp,
@@ -41,7 +42,7 @@ export default function AdminDashboard() {
     setGreeting(h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
   }, [])
 
-  const firstName = user?.name?.split(' ')[0] || 'Admin'
+  const firstName = (user?.name || '').trim().split(/\s+/)[0] || 'there'
   const s = data?.stats
   const rangeLabel = RANGES.find(([d]) => d === days)?.[1] || 'Today'
   const enqLabel = days === 1 ? 'Enquiries today' : `Enquiries · ${rangeLabel.toLowerCase()}`
@@ -49,6 +50,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="mx-auto max-w-[1400px]">
+      <NamePrompt />
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>

@@ -2,14 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Building2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, Building2, ChevronLeft, ChevronRight, Eye } from 'lucide-react'
 import { insights } from '../data'
+import { formatViews } from '../lib/formatViews'
 
 export default function Insights() {
   const rail = useRef(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
   const [active, setActive] = useState(0)
+  // Real read counts per article, so the cards can be compared at a glance.
+  const [views, setViews] = useState({})
+  useEffect(() => {
+    fetch('/api/insights/views')
+      .then((r) => r.json())
+      .then((d) => setViews(d.views || {}))
+      .catch(() => {})
+  }, [])
   // How many distinct positions the rail actually has at this width — 4 on a
   // phone (one card per view), 2 on a desktop showing three at a time.
   const [pages, setPages] = useState(insights.length)
@@ -96,6 +105,11 @@ export default function Insights() {
 
               <div className="flex flex-1 flex-col px-2 pb-2 pt-4">
                 <h3 className="text-[17px] font-bold leading-snug text-navy-900">{p.title}</h3>
+                {views[p.slug] > 0 && (
+                  <span className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-semibold text-slate-400">
+                    <Eye className="h-3.5 w-3.5" /> {formatViews(views[p.slug])} views
+                  </span>
+                )}
                 <p className="mb-6 mt-3 line-clamp-4 text-[14px] leading-relaxed text-slate-500">
                   {p.desc}
                 </p>

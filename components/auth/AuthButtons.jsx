@@ -21,7 +21,7 @@ export default function AuthButtons({ cta = 'navy' }) {
   const ctaClass =
     cta === 'brand' ? 'bg-brand hover:bg-brand-700' : 'bg-navy-800 hover:bg-navy-700'
 
-  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Account'
+  const firstName = user?.name?.split(' ')[0] || user?.email || 'Account'
   const isAdmin = user?.roles?.includes('admin')
 
   return (
@@ -29,7 +29,15 @@ export default function AuthButtons({ cta = 'navy' }) {
       {loading ? (
         <span className="h-8 w-20 animate-pulse rounded-full bg-slate-100" />
       ) : user ? (
-        <div className="relative" ref={ref}>
+        <div className="relative flex items-center gap-2" ref={ref}>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="hidden items-center gap-1.5 rounded-full bg-navy-900 px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-navy-700 sm:inline-flex"
+            >
+              <Shield className="h-3.5 w-3.5" /> Admin
+            </Link>
+          )}
           <button
             onClick={() => setMenu((m) => !m)}
             className="flex items-center gap-2 rounded-full border border-slate-200 py-1 pl-1 pr-2.5 text-[13px] font-semibold text-navy-800 transition hover:border-slate-300"

@@ -74,6 +74,14 @@ Seed sample properties + experts from `data.js`:
 Add your email to `ADMIN_EMAILS` (comma-separated). On your next login you'll get
 the `admin` role and the **Admin** console at `/admin`.
 
+The console has its own sign-in at `/admin/login` — **email + password**, no
+emailed code. Set or reset an admin's password with:
+
+```bash
+node set-admin-password.cjs you@example.com "<password>"
+node set-admin-password.cjs --all-admins "<password>"
+```
+
 ## Migrating an existing database
 
 Accounts used to be keyed by phone. Run this once after deploying the email change:

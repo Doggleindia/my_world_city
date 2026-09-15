@@ -2,16 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 import OtpAuth from './OtpAuth'
+import AdminLoginForm, { AudienceSwitch } from './AdminLoginForm'
 
-// Phone + OTP sign-in / sign-up. `initialMode` lets the navbar open it straight
-// on the Sign up tab. Password login still exists at /login for owner accounts
-// that were issued a temporary password.
+// The one Login dialog for everyone. A User / Admin switch at the top decides
+// which form shows: email + emailed code for visitors, email + password for
+// the admin console. `initialMode` lets the navbar open it on the Sign up tab.
 export default function LoginModal({ open, onClose, onAuthed, initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode)
+  const [audience, setAudience] = useState('user') // 'user' | 'admin'
+  const router = useRouter()
 
-  useEffect(() => { if (open) setMode(initialMode) }, [open, initialMode])
+  useEffect(() => { if (open) { setMode(initialMode); setAudience('user') } }, [open, initialMode])
 
   useEffect(() => {
     if (!open) return
@@ -26,6 +30,8 @@ export default function LoginModal({ open, onClose, onAuthed, initialMode = 'log
 
   if (!open || typeof document === 'undefined') return null
 
+  const isAdmin = audience === 'admin'
+
   return createPortal(
     <div className="fixed inset-0 z-[100] overflow-y-auto bg-navy-900/60 backdrop-blur-sm" onMouseDown={onClose}>
       <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
@@ -34,7 +40,7 @@ export default function LoginModal({ open, onClose, onAuthed, initialMode = 'log
           onMouseDown={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
-          aria-label={mode === 'signup' ? 'Create account' : 'Log in'}
+          aria-label={isAdmin ? 'Admin sign in' : mode === 'signup' ? 'Create account' : 'Log in'}
         >
           <button
             onClick={onClose}
@@ -44,11 +50,27 @@ export default function LoginModal({ open, onClose, onAuthed, initialMode = 'log
             <X className="h-5 w-5" />
           </button>
 
-          <OtpAuth
-            mode={mode}
-            onSwitchMode={() => setMode((m) => (m === 'signup' ? 'login' : 'signup'))}
-            onDone={(data) => onAuthed(data.user)}
-          />
+          {/* Sign-up has no admin variant, so the switch only shows on Log in. */}
+          {mode !== 'signup' && (
+            <div className="mb-6">
+              <AudienceSwitch value={audience} onChange={setAudience} />
+            </div>
+          )}
+
+          {isAdmin ? (
+            <AdminLoginForm
+              onDone={(user) => {
+                onAuthed(user)
+                router.push('/admin')
+              }}
+            />
+          ) : (
+            <OtpAuth
+              mode={mode}
+              onSwitchMode={() => setMode((m) => (m === 'signup' ? 'login' : 'signup'))}
+              onDone={(data) => onAuthed(data.user)}
+            />
+          )}
         </div>
       </div>
     </div>,
