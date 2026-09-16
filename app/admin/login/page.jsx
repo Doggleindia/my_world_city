@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import AdminLoginForm from '@/components/auth/AdminLoginForm'
@@ -21,9 +22,10 @@ export default function AdminLoginPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-[#f4f6fb] px-4 py-10">
       <div className="w-full max-w-md">
-        <div className="mb-6 flex items-center justify-center gap-2">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-navy-900 text-[15px] font-black text-white">M</span>
-          <span className="text-[17px] font-extrabold tracking-tight text-navy-900">My World City</span>
+        <div className="mb-6 flex justify-center">
+          <Link href="/" aria-label="My World City — home">
+            <Image src="/logo.png" alt="My World City" width={180} height={70} priority className="h-14 w-auto" />
+          </Link>
         </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-card sm:p-8">
