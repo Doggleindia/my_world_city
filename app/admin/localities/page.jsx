@@ -28,9 +28,9 @@ export default function LocalitiesPage() {
           <p className="mt-1 text-[13.5px] text-slate-500">Localities appear here once properties are listed against them.</p>
         </div>
       ) : (
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_420px]">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
           {/* list */}
-          <div className="space-y-3">
+          <div className="min-w-0 space-y-3">
             {items.map((l) => {
               const on = active?.locality === l.locality
               return (
@@ -52,7 +52,7 @@ export default function LocalitiesPage() {
           </div>
 
           {/* detail / map placeholder */}
-          <div className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
+          <div className="h-fit min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:sticky xl:top-24">
             {active && (
               <>
                 <h2 className="text-[18px] font-bold text-navy-800">{active.locality}</h2>

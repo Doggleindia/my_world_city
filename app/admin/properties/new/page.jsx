@@ -102,7 +102,7 @@ export default function AddPropertyWizard() {
             const done = n < step; const active = n === step
             return (
               <div key={s} className="flex flex-1 items-center last:flex-none">
-                <div className="flex items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2.5">
                   <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[13px] font-bold ${done ? 'bg-emerald-500 text-white' : active ? 'bg-navy-800 text-white' : 'border border-slate-300 text-slate-400'}`}>
                     {done ? <Check className="h-4 w-4" /> : n}
                   </span>

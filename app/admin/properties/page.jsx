@@ -94,7 +94,7 @@ export default function AdminProperties() {
             {(counts.total ?? 0).toLocaleString()} total · {counts.pending ?? 0} pending · {counts.flagged ?? 0} flagged
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button onClick={exportCsv} className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy-800 hover:border-slate-400">
             <Download className="h-4 w-4" /> Export CSV
           </button>

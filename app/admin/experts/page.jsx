@@ -220,7 +220,7 @@ function Row({ l, i, selected, onSelect, onAssign, routable }) {
       <td className="px-3 py-4 text-[13.5px] text-slate-600">{l.locality || '—'}</td>
       <td className="px-3 py-4 text-[13px] text-slate-500">{ago(l.createdAt)}</td>
       <td className="px-3 py-4">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className={`text-[13.5px] font-bold ${w.color}`}>{w.label}</span>
           {w.priority && <span className="rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">Priority</span>}
         </div>

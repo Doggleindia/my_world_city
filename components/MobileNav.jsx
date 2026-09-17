@@ -22,7 +22,7 @@ export default function MobileNav({ links }) {
   const close = () => setOpen(false)
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
@@ -81,15 +81,20 @@ export default function MobileNav({ links }) {
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => {
-                    close()
-                    openLogin()
-                  }}
-                  className="w-full rounded-full border border-slate-200 px-4 py-2.5 text-[14px] font-semibold text-navy-800 transition hover:border-slate-300"
-                >
-                  Login
-                </button>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => { close(); openLogin() }}
+                    className="w-full rounded-full border border-slate-200 px-4 py-2.5 text-[14px] font-semibold text-navy-800 transition hover:border-slate-300"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => { close(); openLogin('signup') }}
+                    className="w-full rounded-full bg-brand px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-brand-700"
+                  >
+                    Create account
+                  </button>
+                </div>
               )}
             </div>
           </div>

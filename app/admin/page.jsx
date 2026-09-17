@@ -106,7 +106,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Chart + Recent activity */}
-      <div className="mt-5 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-[17px] font-bold text-navy-800">Enquiries by types</h2>

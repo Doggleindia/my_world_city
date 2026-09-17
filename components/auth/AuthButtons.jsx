@@ -25,7 +25,7 @@ export default function AuthButtons({ cta = 'navy' }) {
   const isAdmin = user?.roles?.includes('admin')
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
       {loading ? (
         <span className="h-8 w-20 animate-pulse rounded-full bg-slate-100" />
       ) : user ? (
@@ -85,7 +85,7 @@ export default function AuthButtons({ cta = 'navy' }) {
           </button>
           <button
             onClick={openSignup}
-            className="whitespace-nowrap rounded-full border border-slate-300 px-3.5 py-2 text-[13px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+            className="whitespace-nowrap rounded-full border border-slate-300 px-2.5 py-2 text-[12.5px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand xs:px-3.5 xs:text-[13px]"
           >
             Sign up
           </button>
@@ -94,7 +94,7 @@ export default function AuthButtons({ cta = 'navy' }) {
 
       <button
         onClick={() => router.push('/list-property')}
-        className={`whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold text-white transition sm:px-4 ${ctaClass}`}
+        className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[12.5px] font-semibold text-white transition xs:px-3 xs:text-[13px] sm:px-4 ${ctaClass}`}
       >
         <span className="sm:hidden">List Free</span>
         <span className="hidden sm:inline">List Property — Free</span>
