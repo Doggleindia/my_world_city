@@ -3,7 +3,7 @@ import ContactButton from '@/components/contact/ContactButton'
 
 export default function BottomCTA() {
   return (
-    <section className="bg-white">
+    <section className="bg-white/70">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <div className="overflow-hidden rounded-3xl bg-[#0a2a52] text-white shadow-card">
           <div className="grid items-center gap-8 p-6 sm:p-8 lg:grid-cols-2 lg:gap-10 lg:p-10">
