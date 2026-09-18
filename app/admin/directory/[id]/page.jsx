@@ -63,7 +63,7 @@ export default function ExpertDetailPage() {
           <span className="font-bold text-navy-800">{e.name} ({e.code})</span>
           <span className={`rounded px-2 py-0.5 text-[10.5px] font-bold ${cls}`}>{label}</span>
         </p>
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           {e.status !== 'verified' && <button onClick={() => setStatus('verified')} className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-2 text-[13.5px] font-semibold text-white hover:bg-emerald-600"><Check className="h-4 w-4" /> Verify</button>}
           {e.status !== 'suspended' && <button onClick={() => setStatus('suspended')} className="rounded-full border border-amber-300 px-4 py-2 text-[13.5px] font-semibold text-amber-600 hover:bg-amber-50">Suspend</button>}
           {e.status === 'suspended' && <button onClick={() => setStatus('pending')} className="rounded-full border border-slate-300 px-4 py-2 text-[13.5px] font-semibold text-navy-800 hover:border-slate-400">Reinstate</button>}
@@ -74,7 +74,7 @@ export default function ExpertDetailPage() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[320px_1fr]">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         {/* left profile card */}
         <div className="h-fit rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
           {e.photo ? <img src={e.photo} alt="" className="mx-auto h-24 w-24 rounded-full object-cover" /> : <span className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-brand/10 text-[24px] font-bold text-brand">{e.initials}</span>}

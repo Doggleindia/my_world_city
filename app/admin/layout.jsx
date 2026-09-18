@@ -2,13 +2,14 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import ProfileMenu, { adminDisplayName, adminInitials, adminRoleLabel } from '@/components/admin/ProfileMenu'
 import {
   LayoutDashboard, Inbox, Lightbulb, Building2, Wrench, MessageSquare,
   UserSearch, BookUser, Map, Search, Bell, HelpCircle, ShieldAlert, Loader2,
-  Menu, X, ClipboardCheck, ChevronRight,
+  Menu, X, ClipboardCheck, ChevronRight, ArrowUpRight,
 } from 'lucide-react'
 
 const NAV = [
@@ -143,8 +144,8 @@ function Sidebar({ badges, user, drawer, onClose }) {
         }`}
       >
         <div className="flex items-center justify-between px-5 py-5">
-          <Link href="/admin" className="flex items-center gap-2" onClick={onClose}>
-            <span className="text-[17px] font-extrabold tracking-tight">My World City</span>
+          <Link href="/admin" className="flex items-center gap-2.5" onClick={onClose}>
+            <Image src="/logo-white.png" alt="My World City" width={118} height={46} priority className="h-9 w-auto" />
             <span className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white/90">
               ADMIN
             </span>
@@ -154,7 +155,19 @@ function Sidebar({ badges, user, drawer, onClose }) {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 pb-4">
+        {/* Quick way back to the public site, right under the logo */}
+        <div className="px-4 pb-2">
+          <Link
+            href="/"
+            onClick={onClose}
+            className="group inline-flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-[12px] font-semibold text-white/80 transition hover:border-white/40 hover:bg-white/10 hover:text-white"
+          >
+            Go to website
+            <ArrowUpRight className="h-3.5 w-3.5 text-white/50 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
+          </Link>
+        </div>
+
+        <nav className="mwc-sidebar-scroll flex-1 overflow-y-auto px-3 pb-4">
           {NAV.map((group) => (
             <div key={group.section} className="mt-4 first:mt-2">
               <p className="px-3 pb-1.5 text-[10.5px] font-bold uppercase tracking-wider text-white/35">

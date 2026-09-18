@@ -1,4 +1,4 @@
-import { Inter, Poppins } from 'next/font/google'
+import { Inter, Montserrat } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { SavedProvider } from '@/components/saved/SavedProvider'
@@ -11,7 +11,7 @@ const inter = Inter({
 })
 
 // Display face for big headlines — geometric and wide, where Inter is narrow.
-const poppins = Poppins({
+const display = Montserrat({
   subsets: ['latin'],
   weight: ['600', '700', '800'],
   variable: '--font-display',
@@ -26,7 +26,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+    <html lang="en" className={`${inter.variable} ${display.variable}`}>
       <body className="font-sans antialiased">
         <AuthProvider>
           <SavedProvider>{children}</SavedProvider>

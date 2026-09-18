@@ -95,7 +95,7 @@ export default function EnquiryDetailPage() {
       </div>
 
       {tab === 'Overview' ? (
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_340px]">
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
           {/* main */}
           <div className="space-y-5">
             {/* Enquiry summary */}

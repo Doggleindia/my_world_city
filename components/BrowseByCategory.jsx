@@ -3,7 +3,7 @@ import { categories } from '../data'
 
 export default function BrowseByCategory() {
   return (
-    <section className="bg-slate-50">
+    <section className="bg-slate-50/70">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <h2 className="text-[30px] font-extrabold tracking-tight text-navy-900 sm:text-[34px]">
           Browse by Category

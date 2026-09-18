@@ -1,6 +1,6 @@
 export default function WhyJoinUs() {
   return (
-    <section className="mt-16 bg-slate-50">
+    <section className="mt-16 bg-slate-50/70">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>

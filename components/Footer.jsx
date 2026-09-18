@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Globe } from 'lucide-react'
+import Image from 'next/image'
 
 const cols = [
   {
@@ -36,9 +36,8 @@ export default function Footer() {
     <footer className="bg-navy-900 text-slate-300">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div>
-          <Link href="/" className="flex items-center gap-2 font-extrabold text-white">
-            <Globe className="h-5 w-5 text-sky-400" />
-            <span className="text-[15px]">My World City</span>
+          <Link href="/" aria-label="My World City — home" className="inline-flex items-center">
+            <Image src="/logo-white.png" alt="My World City" width={154} height={60} className="h-11 w-auto" />
           </Link>
           <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-slate-400">
             Jaipur's verified property platform connecting buyers, builders and investors —

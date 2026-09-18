@@ -13,6 +13,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      // Extra breakpoint for the narrowest phones. Inside `extend` so the
+      // default sm/md/lg/xl breakpoints are kept, not replaced.
+      screens: { xs: '400px' },
       fontFamily: {
         sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'var(--font-inter)', 'ui-sans-serif', 'sans-serif'],

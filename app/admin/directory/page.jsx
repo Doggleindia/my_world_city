@@ -70,7 +70,7 @@ export default function ExpertDirectory() {
             <span className="text-slate-300">|</span> {c.suspended ?? 0} suspended
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button onClick={exportCsv} className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy-800 hover:border-slate-400"><Download className="h-4 w-4" /> Export</button>
           <button onClick={bulkVerify} disabled={selected.size === 0 || bulking} className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy-800 hover:border-slate-400 disabled:opacity-40">{bulking ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />} Bulk Verify{selected.size > 0 ? ` (${selected.size})` : ''}</button>
           <button onClick={() => router.push('/admin/directory/new')} className="inline-flex items-center gap-2 rounded-full bg-navy-800 px-4 py-2.5 text-[13.5px] font-semibold text-white hover:bg-navy-700"><Plus className="h-4 w-4" /> Add Expert</button>

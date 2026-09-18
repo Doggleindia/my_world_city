@@ -75,7 +75,7 @@ export default function PropertyEditor() {
           <span className="font-bold text-navy-800">{p.title} ({p.code})</span>
           <span className={`rounded px-2 py-0.5 text-[10.5px] font-bold ${statusMeta[1]}`}>{statusMeta[0]}</span>
         </p>
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button onClick={() => save({ status: p.status === 'active' ? 'pending' : 'active' }).then(() => setP((s) => ({ ...s, status: s.status === 'active' ? 'pending' : 'active' })))} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-[13.5px] font-semibold text-navy-800 hover:border-slate-400">
             {p.status === 'active' ? 'Unpublish' : 'Publish'}
           </button>
@@ -86,7 +86,7 @@ export default function PropertyEditor() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,360px)]">
         {/* MAIN FORM */}
         <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <Section title="Basic Info">
