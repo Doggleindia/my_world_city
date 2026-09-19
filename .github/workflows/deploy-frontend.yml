@@ -1,8 +1,10 @@
-name: Deploy My World City frontend
+name: Deploy My World City
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+
   workflow_dispatch:
 
 concurrency:
@@ -14,43 +16,69 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy frontend to EC2
+    name: Deploy My World City to EC2
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
+
     steps:
+      - name: Prepare SSH key
+        shell: bash
+        env:
+          SSH_KEY_B64: ${{ secrets.EC2_SSH_KEY_B64 }}
+        run: |
+          set -euo pipefail
+
+          echo "$SSH_KEY_B64" | base64 --decode > "$RUNNER_TEMP/my_world_city_actions"
+
+          chmod 600 "$RUNNER_TEMP/my_world_city_actions"
+
+          echo "SSH key prepared."
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key_path: ${{ runner.temp }}/my_world_city_actions
           command_timeout: 20m
+
           script: |
-            set -euo pipefail
+            set -e
 
-            app_dir=/home/ubuntu/my_world_city
-            expected_dir=/home/ubuntu/my_world_city
-            pm2_process=my-world-city
-            app_port=3001
+            APP_DIR="/home/ubuntu/my_world_city"
+            PM2_APP="my-world-city"
 
-            export PORT="$app_port"
+            echo "======================================"
+            echo "Deploying My World City"
+            echo "======================================"
 
-            cd "$app_dir"
-            [ "$(pwd -P)" = "$expected_dir" ]
-            [ -f package.json ]
-            [ -f package-lock.json ]
-            [ -d .git ]
+            cd "$APP_DIR"
 
+            echo "Checking application directory..."
+            test "$(pwd -P)" = "$APP_DIR"
+            test -f package.json
+            test -d .git
+
+            echo "Fetching latest code..."
             git fetch origin main
+
+            echo "Updating application..."
             git reset --hard origin/main
+
+            echo "Installing dependencies..."
             npm ci
+
+            echo "Building application..."
             npm run build
 
-            if pm2 describe "$pm2_process" >/dev/null 2>&1; then
-              pm2 restart "$pm2_process" --update-env
-            else
-              pm2 start npm --name "$pm2_process" -- start
-            fi
+            echo "Restarting My World City..."
+            pm2 restart "$PM2_APP" --update-env
 
             pm2 save
-            pm2 status "$pm2_process"
+
+            echo "Checking PM2..."
+            pm2 status "$PM2_APP"
+
+            echo "======================================"
+            echo "Deployment completed successfully"
+            echo "======================================"
