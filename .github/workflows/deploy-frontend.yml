@@ -1,0 +1,64 @@
+name: Deploy My World City frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-my-world-city-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy frontend to EC2
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Update and restart My World City only
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            app_dir=/home/ubuntu/my_world_city
+            expected_dir=/home/ubuntu/my_world_city
+            pm2_process=my-world-city
+            app_port=3001
+
+            export PORT="$app_port"
+
+            cd "$app_dir"
+            [ "$(pwd -P)" = "$expected_dir" ]
+            [ -f package.json ]
+            [ -f package-lock.json ]
+            [ -d .git ]
+
+            git fetch origin main
+            git reset --hard origin/main
+            npm ci
+            npm run build
+
+            if pm2 describe "$pm2_process" >/dev/null 2>&1; then
+              pm2 restart "$pm2_process" --update-env
+            else
+              pm2 start npm --name "$pm2_process" -- start
+            fi
+
+            pm2 save
+            pm2 status "$pm2_process"
+            pm2 jlist | node -e '
+              let data = "";
+              process.stdin.on("data", (chunk) => (data += chunk));
+              process.stdin.on("end", () => {
+                const app = JSON.parse(data).find((item) => item.name === process.argv[1]);
+                if (!app || app.pm2_env.status !== "online") process.exit(1);
+              });
+            ' "$pm2_process"
