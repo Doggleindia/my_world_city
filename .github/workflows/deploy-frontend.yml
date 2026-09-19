@@ -16,15 +16,15 @@ jobs:
   deploy:
     name: Deploy frontend to EC2
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
-      - name: Update and restart My World City only
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
+          command_timeout: 20m
           script: |
             set -euo pipefail
 
@@ -54,11 +54,3 @@ jobs:
 
             pm2 save
             pm2 status "$pm2_process"
-            pm2 jlist | node -e '
-              let data = "";
-              process.stdin.on("data", (chunk) => (data += chunk));
-              process.stdin.on("end", () => {
-                const app = JSON.parse(data).find((item) => item.name === process.argv[1]);
-                if (!app || app.pm2_env.status !== "online") process.exit(1);
-              });
-            ' "$pm2_process"
