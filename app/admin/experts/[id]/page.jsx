@@ -75,7 +75,7 @@ export default function ExpertMatchWorkspace() {
         <button onClick={back} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full text-slate-400 hover:bg-slate-100"><X className="h-5 w-5" /></button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[440px_1fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
         {/* LEFT */}
         <div className="flex h-fit flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-[18px] font-extrabold text-navy-900">Request Details</h2>

@@ -1,6 +1,8 @@
 import TopBar from '@/components/TopBar'
+import ScrollBackdrop from '@/components/ScrollBackdrop'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
+import Reveal from '@/components/Reveal'
 import ActionSelector from '@/components/ActionSelector'
 import WhyJoinUs from '@/components/WhyJoinUs'
 import Stats from '@/components/Stats'
@@ -17,19 +19,25 @@ export const revalidate = 60
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-slate-900">
+    <main className="relative min-h-screen text-slate-900">
+      <ScrollBackdrop />
       <TopBar />
-      <Navbar />
-      <Hero />
-      <ActionSelector />
-      <WhyJoinUs />
-      <Stats />
-      <BrowseByCategory />
-      <FeaturedProperties />
-      <TalkToExpert />
-      <Gallery />
-      <Insights />
-      <BottomCTA />
+      {/* The bar sits transparent over the hero video, then pins to the top of
+          the window as a solid bar once the user scrolls. */}
+      <div className="relative">
+        <Navbar overlay />
+        <Hero />
+      </div>
+
+      <Reveal stagger><ActionSelector /></Reveal>
+      <Reveal><WhyJoinUs /></Reveal>
+      <Reveal><Stats /></Reveal>
+      <Reveal stagger><BrowseByCategory /></Reveal>
+      <Reveal stagger><FeaturedProperties /></Reveal>
+      <Reveal><TalkToExpert /></Reveal>
+      <Reveal><Gallery /></Reveal>
+      <Reveal><Insights /></Reveal>
+      <Reveal><BottomCTA /></Reveal>
       <Footer />
     </main>
   )

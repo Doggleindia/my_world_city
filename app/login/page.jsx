@@ -7,6 +7,7 @@ import { ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import SiteFooter from '@/components/property/SiteFooter'
 import OtpAuth from '@/components/auth/OtpAuth'
+import AdminLoginForm, { AudienceSwitch } from '@/components/auth/AdminLoginForm'
 import { useAuth } from '@/components/auth/AuthProvider'
 
 export default function LoginPage() {
@@ -26,6 +27,8 @@ function LoginInner() {
   const [mode, setMode] = useState(params.get('signup') ? 'signup' : 'login')
   // Owners issued a temporary password can still sign in the old way.
   const [usePassword, setUsePassword] = useState(false)
+  // ?admin=1 opens straight on the admin form.
+  const [audience, setAudience] = useState(params.get('admin') ? 'admin' : 'user')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -61,7 +64,20 @@ function LoginInner() {
       <Navbar cta="brand" />
       <div className="mx-auto flex max-w-md flex-col px-4 py-14 sm:px-6">
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-card sm:p-8">
-          {usePassword ? (
+          {mode !== 'signup' && !usePassword && (
+            <div className="mb-6">
+              <AudienceSwitch value={audience} onChange={setAudience} />
+            </div>
+          )}
+
+          {audience === 'admin' && !usePassword ? (
+            <AdminLoginForm
+              onDone={async () => {
+                await refresh()
+                router.replace('/admin')
+              }}
+            />
+          ) : usePassword ? (
             <>
               <h1 className="text-[24px] font-extrabold tracking-tight text-navy-900">
                 Log in with a <span className="text-brand">password</span>

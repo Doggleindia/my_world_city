@@ -93,7 +93,7 @@ export default function ServiceRequestWorkspace() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[440px_1fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
         {/* LEFT — request details */}
         <div className="flex h-fit flex-col rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">

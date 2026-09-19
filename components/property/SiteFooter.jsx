@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Building2, Globe, Mail, MessageCircle, ArrowRight } from 'lucide-react'
+import Image from 'next/image'
+import { Globe, Mail, MessageCircle, ArrowRight } from 'lucide-react'
 import ContactButton from '@/components/contact/ContactButton'
 
 const cols = [
@@ -50,11 +51,8 @@ export default function SiteFooter() {
       {/* Main */}
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
         <div>
-          <Link href="/" className="flex items-center gap-2 font-extrabold text-white">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand">
-              <Building2 className="h-4 w-4 text-white" />
-            </span>
-            <span className="text-[15px] tracking-wide">MY WORLD CITY</span>
+          <Link href="/" aria-label="My World City — home" className="inline-flex items-center">
+            <Image src="/logo-white.png" alt="My World City" width={154} height={60} className="h-11 w-auto" />
           </Link>
           <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-slate-400">
             Jaipur's premier data-driven real estate marketplace. Bringing transparency and trust to

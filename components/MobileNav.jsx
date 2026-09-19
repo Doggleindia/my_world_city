@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, Heart, LayoutDashboard, Shield, LogOut, Globe } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X, Heart, LayoutDashboard, Shield, LogOut } from 'lucide-react'
 import { useAuth } from '@/components/auth/AuthProvider'
 
-export default function MobileNav({ links }) {
+export default function MobileNav({ links, onDark = false }) {
   const [open, setOpen] = useState(false)
   const { user, openLogin, logout } = useAuth()
   const isAdmin = user?.roles?.includes('admin')
@@ -21,11 +22,13 @@ export default function MobileNav({ links }) {
   const close = () => setOpen(false)
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
-        className="grid h-9 w-9 place-items-center rounded-lg text-navy-800 transition hover:bg-slate-100"
+        className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+          onDark ? 'text-white hover:bg-white/15' : 'text-navy-800 hover:bg-slate-100'
+        }`}
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -38,9 +41,8 @@ export default function MobileNav({ links }) {
           />
           <div className="absolute right-0 top-0 flex h-full w-72 max-w-[85%] flex-col bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-              <Link href="/" onClick={close} className="flex items-center gap-2 font-extrabold text-navy-800">
-                <Globe className="h-5 w-5 text-brand" />
-                <span className="text-[15px]">My World City</span>
+              <Link href="/" onClick={close} aria-label="My World City — home" className="flex items-center">
+                <Image src="/logo.png" alt="My World City" width={112} height={44} className="h-9 w-auto" />
               </Link>
               <button
                 onClick={close}
@@ -81,15 +83,20 @@ export default function MobileNav({ links }) {
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => {
-                    close()
-                    openLogin()
-                  }}
-                  className="w-full rounded-full border border-slate-200 px-4 py-2.5 text-[14px] font-semibold text-navy-800 transition hover:border-slate-300"
-                >
-                  Login
-                </button>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => { close(); openLogin() }}
+                    className="w-full rounded-full border border-slate-200 px-4 py-2.5 text-[14px] font-semibold text-navy-800 transition hover:border-slate-300"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => { close(); openLogin('signup') }}
+                    className="w-full rounded-full bg-brand px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-brand-700"
+                  >
+                    Create account
+                  </button>
+                </div>
               )}
             </div>
           </div>

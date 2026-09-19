@@ -67,7 +67,7 @@ export default function AddExpertWizard() {
             const n = i + 1; const done = n < step; const active = n === step
             return (
               <div key={s} className="flex flex-1 items-center last:flex-none">
-                <div className="flex items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2.5">
                   <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[13px] font-bold ${done ? 'bg-emerald-500 text-white' : active ? 'bg-navy-800 text-white' : 'border border-slate-300 text-slate-400'}`}>{done ? <Check className="h-4 w-4" /> : n}</span>
                   <span className={`hidden text-[13px] font-semibold sm:block ${active ? 'text-navy-800' : done ? 'text-emerald-600' : 'text-slate-400'}`}>{s}</span>
                 </div>
@@ -78,7 +78,7 @@ export default function AddExpertWizard() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm xs:p-6 sm:p-8">
         {step === 1 && <Step1 form={form} set={set} />}
         {step === 2 && <Step2 form={form} set={set} setIn={setIn} setForm={setForm} toggleArr={toggleArr} />}
         {step === 3 && <Step3 form={form} set={set} setIn={setIn} setForm={setForm} />}
@@ -86,10 +86,10 @@ export default function AddExpertWizard() {
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-6">
           <button onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-slate-600 hover:text-navy-800 disabled:opacity-0"><ArrowLeft className="h-4 w-4" /> Back</button>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <button onClick={() => submit('draft')} disabled={busy} className="text-[14px] font-semibold text-slate-500 hover:text-navy-800">Save as Draft</button>
             {step < 4 ? (
-              <button onClick={() => setStep((s) => s + 1)} className="inline-flex items-center gap-2 rounded-full bg-navy-800 px-6 py-3 text-[14px] font-semibold text-white hover:bg-navy-700">Continue to {STEPS[step]} <ArrowRight className="h-4 w-4" /></button>
+              <button onClick={() => setStep((s) => s + 1)} className="inline-flex items-center gap-2 rounded-full bg-navy-800 px-4 py-3 text-[13.5px] font-semibold text-white hover:bg-navy-700 sm:px-6 sm:text-[14px]">Continue to {STEPS[step]} <ArrowRight className="h-4 w-4" /></button>
             ) : (
               <button onClick={() => submit()} disabled={busy || !form.name.trim()} className="inline-flex items-center gap-2 rounded-full bg-navy-800 px-6 py-3 text-[14px] font-semibold text-white hover:bg-navy-700 disabled:opacity-50">{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Review &amp; Publish <ArrowRight className="h-4 w-4" /></>}</button>
             )}
@@ -104,7 +104,7 @@ function Step1({ form, set }) {
   return (
     <div>
       <H title="Basic Info" sub="Start with the essentials — you can edit any of this later." />
-      <div className="mt-6 grid gap-5 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-2">
         <Field label="Full Name *"><input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. Jonathan Aris" className={inp} /></Field>
         <Field label="Expert ID"><input value="Auto-assigned on save" disabled className={`${inp} bg-brand/5 text-slate-400`} /></Field>
         <Field label="Professional Title *"><input value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="e.g. Senior Principal Architect" className={inp} /></Field>
@@ -112,7 +112,7 @@ function Step1({ form, set }) {
         <Field label="Expert Type *"><Select value={form.cat} onChange={(v) => set('cat', v)} options={[['', 'Select Category'], ...CATEGORIES.map((c) => [c, c])]} /></Field>
         <div>
           <Label>Firm Type</Label>
-          <div className="mt-2 flex gap-6">
+          <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
             {['Corporate', 'Boutique', 'Freelance'].map((t) => (
               <label key={t} className="flex cursor-pointer items-center gap-2 text-[14px] text-slate-700"><input type="radio" checked={form.firmType === t} onChange={() => set('firmType', t)} className="h-4 w-4 text-brand" /> {t}</label>
             ))}
@@ -147,7 +147,7 @@ function Step2({ form, set, setIn, setForm, toggleArr }) {
     <div>
       <H title="Profile Details & Specialties" sub="Update contact reachability and showcase professional expertise." />
       <SubH icon={Contact}>Contact Information</SubH>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-2">
         <Field label="Phone Number *"><input value={form.phone} onChange={(e) => set('phone', e.target.value.replace(/[^\d]/g, ''))} maxLength={10} placeholder="+91 98765 43210" className={inp} /></Field>
         <Field label="Email Address *"><input value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="expert@myworldcity.com" className={inp} /></Field>
         <ToggleCard title="WhatsApp Notifications" sub="Send lead alerts directly to WhatsApp" on={form.whatsapp} onClick={() => set('whatsapp', !form.whatsapp)} />
@@ -218,7 +218,7 @@ function Step3({ form, set, setIn, setForm }) {
     <div>
       <H title="Verification & Credentials" sub="Provide legal identity details and upload supporting documents for expert validation." />
       <SubH icon={IdCard}>Identity Verification</SubH>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-2">
         <Field label="Legal Name *"><input value={v.legalName} onChange={(e) => setV('legalName', e.target.value)} placeholder="Full legal name" className={inp} /></Field>
         <Field label="PAN Number *"><input value={v.pan} onChange={(e) => setV('pan', e.target.value.toUpperCase())} placeholder="ABCDE1234F" className={inp} /></Field>
         <Field label="Aadhaar Number"><input value={v.aadhaar} onChange={(e) => setV('aadhaar', e.target.value)} placeholder="XXXX-XXXX-XXXX" className={inp} /></Field>
@@ -283,7 +283,7 @@ function Step4({ form, setIn, setForm }) {
     <div>
       <H title="Availability & Financial Terms" sub="Define the expert's working hours, consultation fees, and revenue sharing model." />
       <SubH>Availability</SubH>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-2">
         <Field label="Account Status"><Select value={a.accountStatus} onChange={(v) => setA('accountStatus', v)} options={['Active & Accepting Bookings', 'Active (Manual approval)', 'Paused', 'Suspended']} /></Field>
         <ToggleCard title="Auto-Accept Bookings" sub="Skip manual approval for available slots" on={a.autoAccept} onClick={() => setA('autoAccept', !a.autoAccept)} />
       </div>
@@ -339,12 +339,12 @@ const inpSm = 'w-full rounded-lg border border-slate-200 px-2.5 py-2 text-[13px]
 function H({ title, sub }) { return <div><h2 className="text-[22px] font-extrabold text-navy-900">{title}</h2><p className="mt-1 text-[14px] text-slate-500">{sub}</p></div> }
 function SubH({ icon: Icon, children, tight }) { return <h3 className={`${tight ? 'mb-2' : 'mb-3 mt-8'} flex items-center gap-2 text-[16px] font-bold text-navy-800`}>{Icon ? <Icon className="h-4 w-4 text-brand" /> : <span className="h-4 w-1 rounded bg-brand" />}{children}</h3> }
 function Label({ children }) { return <span className="block text-[12.5px] font-semibold text-slate-600">{children}</span> }
-function Field({ label, children }) { return <label className="block"><Label>{label}</Label><div className="mt-1">{children}</div></label> }
+function Field({ label, children }) { return <label className="block min-w-0"><Label>{label}</Label><div className="mt-1">{children}</div></label> }
 function Select({ value, onChange, options }) {
   const opts = options.map((o) => (Array.isArray(o) ? o : [o, o]))
   return (
     <div className="relative">
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 pr-8 text-[14px] text-slate-800 focus:border-brand focus:outline-none">{opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full min-w-0 appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 pr-8 text-[14px] text-slate-800 focus:border-brand focus:outline-none">{opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
       <ChevronRight className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-400" />
     </div>
   )

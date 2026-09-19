@@ -2,7 +2,7 @@ import { stats } from '../data'
 
 export default function Stats() {
   return (
-    <section className="border-y border-slate-100 bg-white">
+    <section className="border-y border-slate-100 bg-white/70">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-8 px-4 py-10 sm:px-6 lg:grid-cols-4">
         {stats.map((s, i) => (
           <div

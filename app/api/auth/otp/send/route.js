@@ -31,10 +31,11 @@ export const POST = handler(async (req) => {
 
   // One live code per address — requesting a new one replaces the old.
   await Otp.findOneAndUpdate(
-    { email },
+    { email, purpose: 'login' },
     {
       $set: {
         email,
+        purpose: 'login',
         codeHash: hashCode(code),
         name: name || undefined,
         phone: phone || undefined,
@@ -53,7 +54,7 @@ export const POST = handler(async (req) => {
     // Log the mail server's own response for whoever is on call, but keep the
     // internals out of what the visitor sees.
     console.error(`[otp] delivery failed for ${email}:`, e.message)
-    await Otp.deleteOne({ email }) // nothing was sent, so don't leave a live code behind
+    await Otp.deleteOne({ email, purpose: 'login' }) // nothing was sent, so don't leave a live code behind
     throw new ApiError('We couldn’t send the email right now. Please try again in a moment.', 502)
   }
 

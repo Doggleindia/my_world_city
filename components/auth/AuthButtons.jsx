@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useAuth } from './AuthProvider'
 import { User, Heart, LayoutDashboard, Shield, LogOut, ChevronDown } from 'lucide-react'
 
-export default function AuthButtons({ cta = 'navy' }) {
+export default function AuthButtons({ cta = 'navy', onDark = false }) {
   const { user, loading, openLogin, openSignup, logout } = useAuth()
   const router = useRouter()
   const [menu, setMenu] = useState(false)
@@ -21,23 +21,33 @@ export default function AuthButtons({ cta = 'navy' }) {
   const ctaClass =
     cta === 'brand' ? 'bg-brand hover:bg-brand-700' : 'bg-navy-800 hover:bg-navy-700'
 
-  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Account'
+  const firstName = user?.name?.split(' ')[0] || user?.email || 'Account'
   const isAdmin = user?.roles?.includes('admin')
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
       {loading ? (
         <span className="h-8 w-20 animate-pulse rounded-full bg-slate-100" />
       ) : user ? (
-        <div className="relative" ref={ref}>
+        <div className="relative flex items-center gap-2" ref={ref}>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="hidden items-center gap-1.5 rounded-full bg-navy-900 px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-navy-700 sm:inline-flex"
+            >
+              <Shield className="h-3.5 w-3.5" /> Admin
+            </Link>
+          )}
           <button
             onClick={() => setMenu((m) => !m)}
-            className="flex items-center gap-2 rounded-full border border-slate-200 py-1 pl-1 pr-2.5 text-[13px] font-semibold text-navy-800 transition hover:border-slate-300"
+            className={`flex items-center gap-2 rounded-full border py-1 pl-1 pr-2.5 text-[13px] font-semibold transition ${
+              onDark ? 'border-white/50 text-white hover:border-white' : 'border-slate-200 text-navy-800 hover:border-slate-300'
+            }`}
           >
             <span className="grid h-7 w-7 place-items-center rounded-full bg-brand/10 text-brand">
               <User className="h-4 w-4" />
             </span>
-            <span className="hidden max-w-[120px] truncate sm:block">{firstName}</span>
+            <span className={`hidden max-w-[120px] truncate sm:block ${onDark ? 'text-white' : ''}`}>{firstName}</span>
             <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
           </button>
 
@@ -71,13 +81,19 @@ export default function AuthButtons({ cta = 'navy' }) {
         <>
           <button
             onClick={() => openLogin()}
-            className="hidden text-[14px] font-medium text-slate-600 transition hover:text-navy-800 sm:block"
+            className={`hidden text-[14px] font-medium transition sm:block ${
+              onDark ? 'text-white/85 drop-shadow-[0_1px_6px_rgba(8,26,51,0.5)] hover:text-white' : 'text-slate-600 hover:text-navy-800'
+            }`}
           >
             Login
           </button>
           <button
             onClick={openSignup}
-            className="whitespace-nowrap rounded-full border border-slate-300 px-3.5 py-2 text-[13px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+            className={`whitespace-nowrap rounded-full border px-2.5 py-2 text-[12.5px] font-semibold transition xs:px-3.5 xs:text-[13px] ${
+              onDark
+                ? 'border-white/60 text-white hover:border-white hover:bg-white/10'
+                : 'border-slate-300 text-navy-800 hover:border-brand hover:text-brand'
+            }`}
           >
             Sign up
           </button>
@@ -86,7 +102,7 @@ export default function AuthButtons({ cta = 'navy' }) {
 
       <button
         onClick={() => router.push('/list-property')}
-        className={`whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold text-white transition sm:px-4 ${ctaClass}`}
+        className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[12.5px] font-semibold text-white transition xs:px-3 xs:text-[13px] sm:px-4 ${ctaClass}`}
       >
         <span className="sm:hidden">List Free</span>
         <span className="hidden sm:inline">List Property — Free</span>

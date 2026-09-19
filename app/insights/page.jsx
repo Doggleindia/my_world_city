@@ -1,14 +1,19 @@
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import SiteFooter from '@/components/property/SiteFooter'
+import { Eye } from 'lucide-react'
 import { insights } from '@/data'
+import { getArticleViews, formatViews } from '@/lib/articleViews'
+
+export const revalidate = 60
 
 export const metadata = {
   title: 'Insights — My World City',
   description: 'Latest insights on real-estate technology, smart living and property trends in Jaipur.',
 }
 
-export default function InsightsPage() {
+export default async function InsightsPage() {
+  const views = await getArticleViews()
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <Navbar cta="brand" />
@@ -34,6 +39,11 @@ export default function InsightsPage() {
                   <span>{p.date}</span>
                   <span>·</span>
                   <span>{p.readTime}</span>
+                  {views[p.slug] > 0 && (
+                    <span className="ml-auto inline-flex items-center gap-1 text-slate-400">
+                      <Eye className="h-3.5 w-3.5" /> {formatViews(views[p.slug])}
+                    </span>
+                  )}
                 </div>
                 <h2 className="mt-3 text-[19px] font-bold leading-snug text-navy-800 group-hover:text-brand">
                   {p.title}
