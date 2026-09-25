@@ -13,7 +13,15 @@ export const GET = handler(async (req) => {
   const filter = { status: 'active' }
   if (qp.category && qp.category !== 'All') filter.category = qp.category
   if (qp.listingType) filter.listingType = qp.listingType
-  if (qp.locality) filter['location.locality'] = qp.locality
+  // Localities are typed by hand on the listing wizard, so the same place is
+  // stored as "Jagatpura" on one record and "jagatpura,jaipur" on another. An
+  // exact match finds neither reliably, so match the name case-insensitively
+  // wherever it appears in the field. Anything that isn't part of a place name
+  // is stripped, which also keeps the value safe to use as a pattern.
+  if (qp.locality) {
+    const safe = qp.locality.replace(/[^\p{L}\p{N} .'-]/gu, '').trim()
+    if (safe) filter['location.locality'] = { $regex: safe, $options: 'i' }
+  }
   if (qp.bedrooms) {
     const n = parseInt(qp.bedrooms, 10)
     filter['details.bedrooms'] = qp.bedrooms.endsWith('+') ? { $gte: n } : n

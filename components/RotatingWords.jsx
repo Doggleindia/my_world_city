@@ -66,6 +66,7 @@ export default function RotatingWords({ items }) {
   }, [phase, text, i, items, reduced])
 
   const shown = reduced ? items[i] : text
+  const complete = shown === items[i]
 
   return (
     <span className="relative inline-block whitespace-nowrap align-bottom">
@@ -76,14 +77,11 @@ export default function RotatingWords({ items }) {
           shrink-wraps the typed text, so the rule under it grows and shrinks
           with the word instead of spanning the whole reserved width. */}
       <span className="absolute inset-0 flex items-start">
-        <span className="relative inline-block pb-3">
-          <span className="mwc-hero-gradient">{shown}</span>
-          <span
-            aria-hidden="true"
-            className="absolute bottom-0 left-0 h-[6px] w-full rounded-sm bg-white/90"
-          />
+        <span className="relative inline-block">
+          <span>{shown}</span>
+          {complete && <span className="text-accent">.</span>}
         </span>
-        {!reduced && <span aria-hidden="true" className="mwc-caret" />}
+        {!reduced && !complete && <span aria-hidden="true" className="mwc-caret" />}
       </span>
     </span>
   )

@@ -22,12 +22,8 @@ export default function Home() {
     <main className="relative min-h-screen text-slate-900">
       <ScrollBackdrop />
       <TopBar />
-      {/* The bar sits transparent over the hero video, then pins to the top of
-          the window as a solid bar once the user scrolls. */}
-      <div className="relative">
-        <Navbar overlay />
-        <Hero />
-      </div>
+      <Navbar />
+      <Hero />
 
       <Reveal stagger><ActionSelector /></Reveal>
       <Reveal><WhyJoinUs /></Reveal>

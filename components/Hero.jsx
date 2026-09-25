@@ -12,20 +12,20 @@ export default function Hero() {
         <HeroMedia src={hero.video} poster={hero.bg} />
 
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900/60 via-navy-900/32 to-transparent" />
-        {/* scrim behind the transparent navbar, so white links stay readable
-            whatever frame of the video is showing */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-navy-900/60 via-navy-900/20 to-transparent" />
-
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6">
-          <div className="max-w-3xl pt-16 sm:pt-20">
+          <div className="max-w-3xl">
             {/* Fluid size: the longest phrase always fits on two lines, from a
-                320px phone up to desktop. pb-1 so bg-clip-text keeps descenders. */}
-            <h1 className="mwc-hero-gradient font-display pb-1 text-[clamp(22px,6.1vw,56px)] font-bold leading-[1.16] tracking-[-0.025em] drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)]">
+                320px phone up to desktop. */}
+            <h1 className="pb-1 text-[clamp(22px,6.1vw,56px)] font-bold leading-[1.16] text-white drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)]">
               <span className="block whitespace-nowrap">Space and investment</span>
               <span className="block whitespace-nowrap">
                 solutions for <RotatingWords items={heroRotatingWords} />
               </span>
             </h1>
+
+            <p className="mt-4 max-w-xl text-[clamp(13px,1.6vw,18px)] font-medium text-white/80 drop-shadow-[0_1px_8px_rgba(8,26,51,0.5)]">
+              Every property, real. Every partner, verified. Every step, guided.
+            </p>
           </div>
         </div>
       </div>
