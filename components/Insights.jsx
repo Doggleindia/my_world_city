@@ -76,10 +76,10 @@ export default function Insights() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         {/* Heading */}
         <div className="text-center">
-          <h2 className="text-[34px] font-extrabold tracking-tight text-navy-900 sm:text-[40px]">
+          <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-[#0A0A0A]">
             Our Latest Insights
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-[17px] leading-relaxed text-slate-500">
+          <p className="mx-auto mt-4 max-w-5xl text-[17px] leading-relaxed text-slate-600 sm:text-[20px] lg:mt-6 lg:text-[24px]">
             Get the latest insights on cutting-edge projects, smart living solutions, and
             real-estate technology breakthroughs
           </p>

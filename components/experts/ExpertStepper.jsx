@@ -11,7 +11,7 @@ export default function ExpertStepper() {
         {ownershipSteps.map((s) => (
           <div key={s.n} className="relative flex h-full flex-col items-center text-center">
             <div
-              className={`grid h-14 w-14 place-items-center rounded-full text-[18px] font-bold text-white shadow-md ring-4 ring-slate-100 ${s.ring}`}
+              className={`font-display grid h-14 w-14 place-items-center rounded-full text-[18px] font-bold text-white shadow-md ring-4 ring-slate-100 ${s.ring}`}
             >
               {s.n}
             </div>

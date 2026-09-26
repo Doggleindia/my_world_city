@@ -29,7 +29,7 @@ export default function OwnershipSteps({ steps }) {
                 )}
 
                 <div
-                  className={`relative grid h-14 w-14 shrink-0 place-items-center rounded-full text-[18px] font-bold text-white shadow-md ring-4 ring-white ${s.ring}`}
+                  className={`font-display relative grid h-14 w-14 shrink-0 place-items-center rounded-full text-[18px] font-bold text-white shadow-md ring-4 ring-white ${s.ring}`}
                 >
                   {s.n}
                 </div>

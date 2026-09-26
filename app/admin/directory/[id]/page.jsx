@@ -77,8 +77,8 @@ export default function ExpertDetailPage() {
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         {/* left profile card */}
         <div className="h-fit rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-          {e.photo ? <img src={e.photo} alt="" className="mx-auto h-24 w-24 rounded-full object-cover" /> : <span className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-brand/10 text-[24px] font-bold text-brand">{e.initials}</span>}
-          <p className="mt-3 text-[19px] font-extrabold text-navy-900">{e.name}</p>
+          {e.photo ? <img src={e.photo} alt="" className="mx-auto h-24 w-24 rounded-full object-cover" /> : <span className="font-display mx-auto grid h-24 w-24 place-items-center rounded-full bg-brand/10 text-[24px] font-bold text-brand">{e.initials}</span>}
+          <p className="font-display mt-3 text-[19px] font-extrabold text-navy-900">{e.name}</p>
           <p className="text-[13.5px] text-slate-500">{e.role}</p>
           {e.featured && <span className="mt-2 inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-700">★ Featured</span>}
 
@@ -138,7 +138,7 @@ export default function ExpertDetailPage() {
 function Metric({ value, label, icon: Icon }) {
   return (
     <div>
-      <p className="flex items-center justify-center gap-1 text-[18px] font-extrabold text-navy-900">{Icon && <Icon className="h-4 w-4 fill-amber-400 text-amber-400" />}{value}</p>
+      <p className="font-display flex items-center justify-center gap-1 text-[18px] font-extrabold text-navy-900">{Icon && <Icon className="h-4 w-4 fill-amber-400 text-amber-400" />}{value}</p>
       <p className="text-[11px] text-slate-400">{label}</p>
     </div>
   )

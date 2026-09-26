@@ -93,7 +93,7 @@ function Metric({ label, value, wide }) {
   return (
     <div className={`rounded-xl border border-slate-100 bg-slate-50 p-3 ${wide ? 'col-span-2' : ''}`}>
       <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-      <p className="mt-1 text-[18px] font-extrabold text-navy-900">{value}</p>
+      <p className="font-display mt-1 text-[18px] font-extrabold text-navy-900">{value}</p>
     </div>
   )
 }

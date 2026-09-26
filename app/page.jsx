@@ -1,5 +1,4 @@
 import TopBar from '@/components/TopBar'
-import ScrollBackdrop from '@/components/ScrollBackdrop'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import Reveal from '@/components/Reveal'
@@ -13,6 +12,7 @@ import Gallery from '@/components/Gallery'
 import Insights from '@/components/Insights'
 import BottomCTA from '@/components/BottomCTA'
 import Footer from '@/components/Footer'
+import AssistantLauncher from '@/components/assistant/AssistantLauncher'
 
 // Revalidate so DB-backed Featured properties stay fresh in production.
 export const revalidate = 60
@@ -20,7 +20,6 @@ export const revalidate = 60
 export default function Home() {
   return (
     <main className="relative min-h-screen text-slate-900">
-      <ScrollBackdrop />
       <TopBar />
       <Navbar />
       <Hero />
@@ -35,6 +34,9 @@ export default function Home() {
       <Reveal><Insights /></Reveal>
       <Reveal><BottomCTA /></Reveal>
       <Footer />
+
+      {/* follows the visitor down the page */}
+      <AssistantLauncher />
     </main>
   )
 }

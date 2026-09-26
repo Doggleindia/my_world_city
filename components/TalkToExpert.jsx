@@ -13,11 +13,11 @@ export default function TalkToExpert() {
 
   return (
     <section className="bg-[#0a3d7a]">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="flex items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-extrabold text-white sm:text-3xl">Talk to the right expert.</h2>
-            <p className="mt-3 text-[14px] leading-relaxed text-sky-100/90">
+          <div className="max-w-5xl">
+            <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-white">Talk to the right expert.</h2>
+            <p className="mt-5 text-[16px] leading-[1.5] text-white/90 sm:text-[18px] lg:text-[21px]">
               From search to possession — handled, end-to-end. No vetting, no fees. We connect
               you with verified professionals across every stage of your property journey.
             </p>
@@ -78,9 +78,10 @@ export default function TalkToExpert() {
           })}
         </div>
 
-        <div className="mt-8 flex justify-center">
-          <Link href="/experts" className="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-navy-800 transition hover:bg-sky-50">
-            View all experts <ArrowRight className="h-4 w-4" />
+        <div className="mt-10 flex justify-center lg:mt-12">
+          {/* outlined pill on the navy band, as in the design */}
+          <Link href="/experts" className="inline-flex items-center gap-3 rounded-full border-[1.5px] border-white/45 bg-white/10 px-6 py-2.5 text-[15px] font-semibold text-white transition hover:border-white hover:bg-white/20 sm:px-8 sm:py-3 sm:text-[17px] lg:px-9 lg:py-3.5 lg:text-[19px]">
+            View all experts <ArrowRight className="h-[18px] w-[18px] sm:h-5 sm:w-5" strokeWidth={2.5} />
           </Link>
         </div>
       </div>

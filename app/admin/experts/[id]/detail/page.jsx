@@ -61,7 +61,7 @@ export default function EnquiryDetailPage() {
         <div className="flex items-start gap-4">
           <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-brand/10 text-[16px] font-bold text-brand">{initials(lead.name)}</span>
           <div>
-            <p className="text-[19px] font-extrabold text-navy-900">{lead.name}</p>
+            <p className="font-display text-[19px] font-extrabold text-navy-900">{lead.name}</p>
             <div className="mt-1 flex flex-wrap gap-2">
               <Badge cls="bg-ember/10 text-ember">Expert Request</Badge>
               {priority && <Badge cls="bg-red-100 text-red-600">Priority</Badge>}
@@ -172,7 +172,7 @@ export default function EnquiryDetailPage() {
                   <div className="mt-3 space-y-2">
                     {lead.related.map((r) => (
                       <div key={r.id} className="flex items-center justify-between rounded-lg bg-white/10 px-3 py-2 text-[12.5px]">
-                        <span className="font-mono text-white/90">{r.refId || r.id.slice(-6)}</span>
+                        <span className="text-white/90">{r.refId || r.id.slice(-6)}</span>
                         <span className="capitalize text-white/60">{r.type}</span>
                       </div>
                     ))}

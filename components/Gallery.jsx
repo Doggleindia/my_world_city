@@ -5,10 +5,10 @@ export default function Gallery({ bg = 'bg-[#f5f6f8]' }) {
     <section className={bg}>
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="text-center">
-          <h2 className="text-[34px] font-extrabold tracking-tight text-navy-900 sm:text-[40px]">
+          <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-[#0A0A0A]">
             Gallery
           </h2>
-          <p className="mx-auto mt-3 text-[17px] leading-relaxed text-slate-500">
+          <p className="mx-auto mt-4 text-[17px] leading-relaxed text-slate-600 sm:text-[21px] lg:mt-6 lg:text-[26px]">
             Snapshots from our latest live campaigns
           </p>
         </div>

@@ -36,7 +36,7 @@ export default function AccountPage() {
       {/* ---- identity card ---- */}
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand/10 text-[20px] font-extrabold text-brand">
+          <span className="font-display grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand/10 text-[20px] font-extrabold text-brand">
             {adminInitials(user)}
           </span>
           <div className="min-w-0 flex-1">

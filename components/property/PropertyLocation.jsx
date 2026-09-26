@@ -1,42 +1,66 @@
-import { MapPin, Navigation } from 'lucide-react'
+'use client'
 
-// Location band: a map of the property with the distances the owner listed
-// beside it. Uses Google's keyless embed, so there is nothing to configure.
+import { useState } from 'react'
+import { Navigation } from 'lucide-react'
+import { iconFor } from './icons'
+
+// Location band: a map of the property with a Map / Satellite toggle, and the
+// nearby connections beside it. Uses Google's keyless embed, so there is
+// nothing to configure.
 export default function PropertyLocation({ query, nearby = [] }) {
+  const [mode, setMode] = useState('map')
   if (!query) return null
   const q = encodeURIComponent(query)
 
   return (
-    <section className="bg-slate-100">
+    <section className="bg-[#f1f1f1]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <h2 className="text-[26px] font-bold text-navy-900 sm:text-[30px]">Location</h2>
+        <h2 className="text-[26px] font-semibold text-navy-900 sm:text-[30px]">Location</h2>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
-          <div className="min-w-0 overflow-hidden rounded border border-slate-200 bg-white">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
+          <div className="relative min-w-0 overflow-hidden border border-slate-300 bg-white">
             <iframe
+              key={mode}
               title={`Map of ${query}`}
-              src={`https://www.google.com/maps?q=${q}&output=embed`}
+              src={`https://www.google.com/maps?q=${q}&t=${mode === 'satellite' ? 'k' : 'm'}&output=embed`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="h-[300px] w-full border-0 sm:h-[360px]"
             />
+            {/* Map / Satellite switch, top-left like the design */}
+            <div className="absolute left-4 top-4 flex shadow-md">
+              {[['map', 'Map'], ['satellite', 'Satellite']].map(([k, label]) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setMode(k)}
+                  className={`px-4 py-1.5 text-[13px] font-semibold transition ${
+                    mode === k ? 'bg-cyan text-navy-900' : 'bg-white text-navy-900 hover:bg-slate-50'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="min-w-0">
             {nearby.length > 0 && (
               <>
-                <h3 className="text-[15px] font-bold text-navy-900">Nearby</h3>
+                <h3 className="text-[13px] font-bold text-navy-900">Nearby Connections</h3>
                 <ul className="mt-3 space-y-2.5">
-                  {nearby.slice(0, 6).map((n, i) => (
-                    <li key={i}
-                      className="flex items-center gap-3 rounded border border-slate-200 bg-white px-3.5 py-3">
-                      <MapPin className="h-[18px] w-[18px] shrink-0 text-brand" />
-                      <div className="min-w-0">
-                        <p className="truncate text-[13.5px] font-bold text-navy-900">{n.label}</p>
-                        {n.value && <p className="text-[12.5px] text-slate-500">{n.value}</p>}
-                      </div>
-                    </li>
-                  ))}
+                  {nearby.slice(0, 6).map((n, i) => {
+                    const Icon = iconFor(n.icon)
+                    return (
+                      <li key={i} className="flex items-center gap-3 border border-brand-800 bg-white px-4 py-3">
+                        <Icon className="h-5 w-5 shrink-0 text-brand-800" />
+                        <div className="min-w-0">
+                          <p className="text-[17px] font-bold leading-tight text-brand-800">{n.label}</p>
+                          {n.value && <p className="mt-0.5 text-[12px] text-slate-500">{n.value}</p>}
+                        </div>
+                      </li>
+                    )
+                  })}
                 </ul>
               </>
             )}
@@ -45,7 +69,7 @@ export default function PropertyLocation({ query, nearby = [] }) {
               href={`https://www.google.com/maps/dir/?api=1&destination=${q}`}
               target="_blank"
               rel="noreferrer"
-              className={`${nearby.length ? 'mt-3' : ''} flex items-center justify-center gap-2 rounded bg-cyan px-5 py-3 text-[14px] font-bold text-navy-900 transition hover:bg-cyan-600`}
+              className={`${nearby.length ? 'mt-4' : ''} flex items-center justify-center gap-2 bg-cyan px-5 py-3 text-[13.5px] font-bold text-navy-900 transition hover:bg-cyan-600`}
             >
               <Navigation className="h-4 w-4" /> Get directions
             </a>

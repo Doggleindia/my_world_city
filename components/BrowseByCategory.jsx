@@ -3,9 +3,9 @@ import { categories } from '../data'
 
 export default function BrowseByCategory() {
   return (
-    <section className="bg-slate-50/70">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-        <h2 className="text-[30px] font-extrabold tracking-tight text-navy-900 sm:text-[34px]">
+    <section className="bg-white">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:pb-16 lg:pt-14">
+        <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-[#0A0A0A]">
           Browse by Category
         </h2>
 

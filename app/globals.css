@@ -240,67 +240,6 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   Travelling backdrop (ScrollBackdrop.jsx)
-   Sits behind the page. Three layers drift upward at different speeds as the
-   page scrolls, which is what sells the feeling of moving forward. Kept very
-   faint so text contrast is unaffected.
---------------------------------------------------------------------------- */
-.mwc-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  background: #ffffff;
-  --mwc-far: 0px;
-  --mwc-mid: 0px;
-  --mwc-near: 0px;
-}
-
-/* faint grid that slides up — the clearest "we are moving" cue */
-.mwc-backdrop-grid {
-  position: absolute;
-  inset: -20% -10%;
-  background-image:
-    linear-gradient(to right, rgba(31, 95, 191, 0.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(31, 95, 191, 0.055) 1px, transparent 1px);
-  background-size: 74px 74px;
-  transform: translate3d(0, var(--mwc-near), 0);
-  will-change: transform;
-  -webkit-mask-image: radial-gradient(120% 90% at 50% 25%, #000 35%, transparent 78%);
-  mask-image: radial-gradient(120% 90% at 50% 25%, #000 35%, transparent 78%);
-}
-
-.mwc-backdrop-glow {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(90px);
-  will-change: transform;
-}
-.mwc-backdrop-glow-a {
-  top: 4%; left: -12%;
-  width: 46vw; height: 46vw;
-  background: rgba(31, 95, 191, 0.16);
-  transform: translate3d(0, var(--mwc-far), 0);
-}
-.mwc-backdrop-glow-b {
-  top: 46%; right: -14%;
-  width: 52vw; height: 52vw;
-  background: rgba(255, 152, 0, 0.11);
-  transform: translate3d(0, var(--mwc-mid), 0);
-}
-.mwc-backdrop-glow-c {
-  bottom: -14%; left: 22%;
-  width: 44vw; height: 44vw;
-  background: rgba(31, 95, 191, 0.12);
-  transform: translate3d(0, var(--mwc-near), 0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mwc-backdrop-grid,
-  .mwc-backdrop-glow { transform: none !important; }
-}
-
-/* ---------------------------------------------------------------------------
    Typography: every heading is set in the display face (Syne), body copy in
    Inter. Doing it here means a new section picks it up automatically instead
    of each component having to remember a font-display class.

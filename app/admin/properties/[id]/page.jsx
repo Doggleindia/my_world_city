@@ -187,8 +187,8 @@ export default function PropertyEditor() {
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Activity</p>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <div><p className="text-[11px] uppercase tracking-wide text-slate-400">Views</p><p className="text-[24px] font-extrabold text-navy-900">{p.views.toLocaleString()}</p></div>
-              <div><p className="text-[11px] uppercase tracking-wide text-slate-400">Enquiries</p><p className="text-[24px] font-extrabold text-navy-900">{p.enquiries}</p></div>
+              <div><p className="text-[11px] uppercase tracking-wide text-slate-400">Views</p><p className="font-display text-[24px] font-extrabold text-navy-900">{p.views.toLocaleString()}</p></div>
+              <div><p className="text-[11px] uppercase tracking-wide text-slate-400">Enquiries</p><p className="font-display text-[24px] font-extrabold text-navy-900">{p.enquiries}</p></div>
             </div>
           </div>
 

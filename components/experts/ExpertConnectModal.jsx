@@ -68,7 +68,7 @@ export default function ExpertConnectModal({ open, onClose, expert }) {
                 <span className="inline-block rounded-full bg-brand/10 px-2.5 py-1 text-[11.5px] font-bold tracking-wide text-brand">
                   {expert.tag}
                 </span>
-                <p className="mt-1 text-[18px] font-bold text-navy-800">{expert.name}</p>
+                <p className="font-display mt-1 text-[18px] font-bold text-navy-800">{expert.name}</p>
                 <p className="truncate text-[13.5px] text-slate-500">{expert.specialty}</p>
               </div>
               <button

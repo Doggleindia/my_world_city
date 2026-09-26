@@ -19,12 +19,12 @@ export default function Navbar({ links = navLinks, cta = 'navy' }) {
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex xl:gap-8">
+        <nav className="hidden items-center gap-6 lg:flex">
           {links.map((l) => (
             <Link
               key={l.label}
               href={l.href}
-              className="whitespace-nowrap text-[14px] font-medium text-slate-600 transition hover:text-navy-800"
+              className="whitespace-nowrap font-sans text-[16px] font-semibold text-[#0A0A0A] transition hover:text-brand"
             >
               {l.label}
             </Link>
