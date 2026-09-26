@@ -5,13 +5,24 @@ import { dbConnect } from '@/lib/db'
 import Property from '@/lib/models/Property'
 import { toPropertyCard } from '@/lib/serialize'
 
+const COUNT = 6
+
+// Always a full two rows of three: featured listings first, then the newest
+// active listings to top the grid up when fewer than six are flagged.
 async function getFeatured() {
   try {
     await dbConnect()
     const docs = await Property.find({ status: 'active', featured: true })
       .sort({ createdAt: -1 })
-      .limit(6)
+      .limit(COUNT)
       .lean()
+    if (docs.length < COUNT) {
+      const fill = await Property.find({ status: 'active', _id: { $nin: docs.map((d) => d._id) } })
+        .sort({ createdAt: -1 })
+        .limit(COUNT - docs.length)
+        .lean()
+      docs.push(...fill)
+    }
     if (docs.length) return docs.map(toPropertyCard)
   } catch {
     // DB unavailable — fall back to static content so the page still renders.

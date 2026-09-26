@@ -1,11 +1,4 @@
-'use client'
-
-import { MessageCircle } from 'lucide-react'
-import { useAssistant } from '@/components/assistant/AssistantProvider'
-
 export default function WhyJoinUs() {
-  const { openAssistant } = useAssistant()
-
   return (
     <section className="mt-10 bg-white sm:mt-14">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-4">
@@ -28,8 +21,9 @@ export default function WhyJoinUs() {
             </p>
           </div>
 
-          {/* the artwork carries its own pale background and line pattern */}
-          <div className="relative mx-auto w-full max-w-[554px] lg:ml-auto lg:mr-0">
+          {/* the artwork carries its own pale background and line pattern;
+              the "Find property" shortcut is the floating button on the page */}
+          <div className="mx-auto w-full max-w-[554px] lg:ml-auto lg:mr-0">
             <img
               src="/why-join-us.png"
               alt="A hand holding a model house"
@@ -37,16 +31,6 @@ export default function WhyJoinUs() {
               height={400}
               className="block h-auto w-full"
             />
-            {/* shortcut straight into search, sitting over the image */}
-            <button
-              id="why-join-find-property"
-              type="button"
-              onClick={openAssistant}
-              className="absolute right-1.5 top-0 inline-flex items-center gap-2.5 rounded-md bg-brand-800 px-4 py-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_-10px_rgba(8,26,51,0.6)] transition hover:bg-navy-700 sm:px-5 sm:py-[18px] sm:text-[15px]"
-            >
-              <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
-              Find property
-            </button>
           </div>
         </div>
       </div>

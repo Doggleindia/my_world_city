@@ -35,8 +35,8 @@ export default function Home() {
       <Reveal><BottomCTA /></Reveal>
       <Footer />
 
-      {/* follows the visitor down the page; hides while the Why Join Us button is on screen */}
-      <AssistantLauncher watch="why-join-find-property" />
+      {/* follows the visitor down the page */}
+      <AssistantLauncher />
     </main>
   )
 }

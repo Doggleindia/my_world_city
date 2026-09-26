@@ -9,7 +9,7 @@ export default function Stats() {
             key={s.label}
             className={`px-2 lg:px-0 ${i !== 0 ? 'lg:border-l lg:border-slate-300 lg:pl-[60px]' : ''}`}
           >
-            <div className={`font-display text-[28px] font-bold leading-none sm:text-[34px] lg:text-[40px] ${s.color || 'text-brand'}`}>{s.value}</div>
+            <div className={`font-sans text-[28px] font-bold leading-none sm:text-[34px] lg:text-[40px] ${s.color || 'text-brand'}`}>{s.value}</div>
             <div className="mt-3 text-[12px] font-bold uppercase tracking-[0.04em] text-[#0A0A0A] sm:text-[13px]">
               {s.label}
             </div>
