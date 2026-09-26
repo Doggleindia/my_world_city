@@ -19,7 +19,7 @@ export default function ContactCard({ property }) {
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
         {property.priceLabel && (
           <div className="mb-4 border-b border-slate-100 pb-4">
-            <p className="text-[24px] font-extrabold text-navy-900">{property.priceLabel}</p>
+            <p className="font-display text-[24px] font-extrabold text-navy-900">{property.priceLabel}</p>
             {property.negotiable && <p className="text-[12.5px] font-semibold text-emerald-600">Negotiable</p>}
           </div>
         )}

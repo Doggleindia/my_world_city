@@ -443,7 +443,7 @@ function Success({ result, form, onAnother }) {
       <div className="mt-8 grid gap-4 text-left sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Property ID</p>
-          <p className="mt-1 text-[22px] font-extrabold text-navy-900">{result.code}</p>
+          <p className="font-display mt-1 text-[22px] font-extrabold text-navy-900">{result.code}</p>
           <span className="mt-2 inline-block rounded-full bg-emerald-600 px-2.5 py-0.5 text-[11px] font-bold text-white">Active Listing</span>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -453,7 +453,7 @@ function Success({ result, form, onAnother }) {
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Listing</p>
-          <p className="mt-1 text-[18px] font-extrabold text-navy-900">{form.category}{form.subType ? ` · ${form.subType}` : ''}</p>
+          <p className="font-display mt-1 text-[18px] font-extrabold text-navy-900">{form.category}{form.subType ? ` · ${form.subType}` : ''}</p>
           <p className="mt-2 text-[12.5px] font-semibold text-emerald-600">{form.location.locality ? `Live in ${form.location.locality}` : 'Now live'}</p>
         </div>
       </div>

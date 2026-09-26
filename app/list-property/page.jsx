@@ -659,7 +659,7 @@ function Goals({ form, set, toggle }) {
     <div className="space-y-6">
       <Field label="Leads needed per month">
         <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 text-center">
-          <p className="text-[34px] font-extrabold leading-none text-brand">
+          <p className="font-display text-[34px] font-extrabold leading-none text-brand">
             {form.leadGoal} <span className="text-[15px] font-semibold text-slate-500">leads</span>
           </p>
           <input

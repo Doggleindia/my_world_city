@@ -79,7 +79,7 @@ export default function AuthButtons({ cta = 'navy' }) {
         <>
           <button
             onClick={() => openLogin()}
-            className="hidden text-[14px] font-medium text-slate-600 transition hover:text-navy-800 sm:block"
+            className="hidden whitespace-nowrap text-center font-sans text-[16px] font-semibold text-[#0A0A0A] transition hover:text-brand sm:block"
           >
             Login
           </button>

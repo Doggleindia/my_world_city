@@ -227,7 +227,7 @@ function StatCard({ accent, label, value, sub, subColor = 'text-emerald-600', lo
           {loading ? (
             <span className="mt-1 h-7 w-16 animate-pulse rounded bg-slate-100" />
           ) : (
-            <span className="text-[26px] font-extrabold leading-none text-navy-900">
+            <span className="font-display text-[26px] font-extrabold leading-none text-navy-900">
               {value ?? '—'}
             </span>
           )}

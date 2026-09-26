@@ -219,7 +219,7 @@ export default function EnquiryModal({ open, onClose, tab, onTabChange, property
                                 {d.wd}
                               </span>
                               <span
-                                className={`mt-0.5 text-[18px] font-bold ${
+                                className={`font-display mt-0.5 text-[18px] font-bold ${
                                   active ? 'text-white' : 'text-navy-800'
                                 }`}
                               >

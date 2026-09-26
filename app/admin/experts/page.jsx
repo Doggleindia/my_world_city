@@ -239,7 +239,7 @@ function Kpi({ label, value, valueCls = 'text-navy-900' }) {
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">{label}</p>
       {value == null ? <span className="mt-2 block h-8 w-16 animate-pulse rounded bg-slate-100" />
-        : <p className={`mt-2 text-[30px] font-extrabold leading-none ${valueCls}`}>{value}</p>}
+        : <p className={`font-display mt-2 text-[30px] font-extrabold leading-none ${valueCls}`}>{value}</p>}
     </div>
   )
 }

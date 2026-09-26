@@ -208,7 +208,7 @@ function Kpi({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand/10 text-brand"><Icon className="h-5 w-5" /></span>
-      <div><p className="text-[12.5px] text-slate-500">{label}</p>{value == null ? <span className="mt-1 block h-6 w-10 animate-pulse rounded bg-slate-100" /> : <p className="text-[22px] font-extrabold text-navy-900">{value}</p>}</div>
+      <div><p className="text-[12.5px] text-slate-500">{label}</p>{value == null ? <span className="mt-1 block h-6 w-10 animate-pulse rounded bg-slate-100" /> : <p className="font-display text-[22px] font-extrabold text-navy-900">{value}</p>}</div>
     </div>
   )
 }

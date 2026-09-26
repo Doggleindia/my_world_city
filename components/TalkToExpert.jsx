@@ -13,11 +13,11 @@ export default function TalkToExpert() {
 
   return (
     <section className="bg-[#0a3d7a]">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="flex items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-extrabold text-white sm:text-3xl">Talk to the right expert.</h2>
-            <p className="mt-3 text-[14px] leading-relaxed text-sky-100/90">
+          <div className="max-w-5xl">
+            <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-white">Talk to the right expert.</h2>
+            <p className="mt-5 text-[16px] leading-[1.5] text-white/90 sm:text-[18px] lg:text-[21px]">
               From search to possession — handled, end-to-end. No vetting, no fees. We connect
               you with verified professionals across every stage of your property journey.
             </p>

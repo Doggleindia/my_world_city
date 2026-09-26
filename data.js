@@ -65,10 +65,10 @@ export const actionCards = [
 
 
 export const stats = [
-  { value: '1,800+', label: 'VERIFIED PROPERTIES', color: 'text-teal-600' },
-  { value: '₹4,200 Cr+', label: 'LISTED VALUE', color: 'text-brand' },
-  { value: '240+', label: 'TRUSTED PARTNERS', color: 'text-ember' },
-  { value: '12 yrs', label: 'ON-GROUND EXPERTISE', color: 'text-amber-500' },
+  { value: '1,800+', label: 'VERIFIED PROPERTIES', color: 'text-[#1d7f8b]' },
+  { value: '₹4,200 Cr+', label: 'LISTED VALUE', color: 'text-[#2c3c8f]' },
+  { value: '240+', label: 'TRUSTED PARTNERS', color: 'text-[#8c3b1c]' },
+  { value: '12 yrs', label: 'ON-GROUND EXPERTISE', color: 'text-[#f0a241]' },
 ]
 
 

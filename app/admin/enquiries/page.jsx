@@ -267,7 +267,7 @@ function Kpi({ label, value, sub, subCls = 'text-slate-400', valueCls = 'text-na
         {value == null ? (
           <span className="h-6 w-12 animate-pulse rounded bg-slate-100" />
         ) : (
-          <span className={`text-[22px] font-extrabold leading-none ${valueCls}`}>{value}</span>
+          <span className={`font-display text-[22px] font-extrabold leading-none ${valueCls}`}>{value}</span>
         )}
         {Icon && <Icon className={`h-4 w-4 ${iconCls}`} />}
         {sub && value != null && <span className={`text-[12px] font-semibold ${subCls}`}>{sub}</span>}

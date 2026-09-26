@@ -40,13 +40,19 @@ export default function AssistantProvider({ children }) {
             onClick={closeAssistant}
             aria-hidden="true"
           />
+          {/* Phones: fills the screen below the header. Larger screens: a
+              400px panel vertically centred against the right edge. The
+              centring lives on this outer flex box because the entrance
+              animation on the inner one ends by resetting `transform`. */}
           <div
             role="dialog"
             aria-modal="true"
             aria-label="My World City Help Desk"
-            className="mwc-assistant fixed inset-x-3 bottom-3 top-16 z-[95] sm:inset-auto sm:bottom-5 sm:right-5 sm:top-auto sm:h-[620px] sm:max-h-[calc(100vh-40px)] sm:w-[400px]"
+            className="fixed inset-x-3 bottom-3 top-16 z-[95] sm:pointer-events-none sm:inset-y-0 sm:left-auto sm:right-10 sm:flex sm:items-center lg:right-16 xl:right-24"
           >
-            <AssistantPanel key={session} onClose={closeAssistant} />
+            <div className="mwc-assistant h-full sm:pointer-events-auto sm:h-[620px] sm:max-h-[calc(100vh-40px)] sm:w-[400px]">
+              <AssistantPanel key={session} onClose={closeAssistant} />
+            </div>
           </div>
         </>
       )}

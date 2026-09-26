@@ -98,7 +98,7 @@ export default function ServiceRequestModal({ open, service, onClose }) {
               </span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-[20px] font-extrabold text-navy-800">{service.title}</span>
+                  <span className="font-display text-[20px] font-extrabold text-navy-800">{service.title}</span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-bold tracking-wide text-brand">
                     <BadgeCheck className="h-3.5 w-3.5" /> VERIFIED
                   </span>

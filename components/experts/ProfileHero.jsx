@@ -25,7 +25,7 @@ export default function ProfileHero({ p }) {
             {p.photo ? (
               <img src={p.photo} alt={p.name} className="h-[320px] w-full object-cover md:h-[340px]" />
             ) : (
-              <div className="grid h-[320px] w-full place-items-center bg-brand/10 text-[56px] font-extrabold text-brand md:h-[340px]">
+              <div className="font-display grid h-[320px] w-full place-items-center bg-brand/10 text-[56px] font-extrabold text-brand md:h-[340px]">
                 {p.initials}
               </div>
             )}
@@ -65,7 +65,7 @@ export default function ProfileHero({ p }) {
             <div className="mt-7 grid max-w-2xl grid-cols-2 gap-6 border-t border-slate-100 pt-6 sm:grid-cols-4">
               {(p.stats || []).map((s) => (
                 <div key={s.label}>
-                  <p className="text-[22px] font-extrabold text-navy-800">{s.value}</p>
+                  <p className="font-display text-[22px] font-extrabold text-navy-800">{s.value}</p>
                   <p className="mt-0.5 text-[12.5px] text-slate-500">{s.label}</p>
                 </div>
               ))}
