@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Menu, X, Heart, LayoutDashboard, Shield, LogOut } from 'lucide-react'
 import { useAuth } from '@/components/auth/AuthProvider'
 
-export default function MobileNav({ links, onDark = false }) {
+export default function MobileNav({ links }) {
   const [open, setOpen] = useState(false)
   const { user, openLogin, logout } = useAuth()
   const isAdmin = user?.roles?.includes('admin')
@@ -26,9 +26,7 @@ export default function MobileNav({ links, onDark = false }) {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
-        className={`grid h-9 w-9 place-items-center rounded-lg transition ${
-          onDark ? 'text-white hover:bg-white/15' : 'text-navy-800 hover:bg-slate-100'
-        }`}
+        className="grid h-9 w-9 place-items-center rounded-lg text-navy-800 transition hover:bg-slate-100"
       >
         <Menu className="h-5 w-5" />
       </button>

@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { Grid2x2, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Grid2x2, Image as ImageIcon, X, ChevronLeft, ChevronRight } from 'lucide-react'
 
 // Renders the "View all N photos" trigger and a fullscreen gallery overlay.
-export default function PhotoLightbox({ images = [], count }) {
+export default function PhotoLightbox({ images = [], count, trigger }) {
   const photos = images.filter(Boolean)
   const [open, setOpen] = useState(false)
   const [idx, setIdx] = useState(0)
@@ -32,18 +32,28 @@ export default function PhotoLightbox({ images = [], count }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          setIdx(0)
-          setOpen(true)
-        }}
-        className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 to-transparent p-3"
-      >
-        <span className="inline-flex items-center gap-1.5 rounded-lg bg-black/55 px-3 py-1.5 text-[12.5px] font-semibold text-white backdrop-blur-sm">
-          <Grid2x2 className="h-4 w-4" /> View all {count || photos.length} photos
-        </span>
-      </button>
+{trigger === 'chip' ? (
+        <button
+          type="button"
+          onClick={() => { setIdx(0); setOpen(true) }}
+          className="inline-flex items-center gap-2 rounded border border-white bg-white px-4 py-2.5 text-[13.5px] font-bold text-brand-800 shadow-sm transition hover:bg-slate-50"
+        >
+          <ImageIcon className="h-[18px] w-[18px]" /> Photos
+          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-800 px-1 text-[11px] font-bold text-white">
+            {count || photos.length}
+          </span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => { setIdx(0); setOpen(true) }}
+          className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 to-transparent p-3"
+        >
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-black/55 px-3 py-1.5 text-[12.5px] font-semibold text-white backdrop-blur-sm">
+            <Grid2x2 className="h-4 w-4" /> View all {count || photos.length} photos
+          </span>
+        </button>
+      )}
 
       {open &&
         typeof document !== 'undefined' &&

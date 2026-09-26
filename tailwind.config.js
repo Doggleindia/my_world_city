@@ -21,6 +21,10 @@ module.exports = {
         display: ['var(--font-display)', 'var(--font-inter)', 'ui-sans-serif', 'sans-serif'],
       },
       colors: {
+        // the pink full-stop that ends the hero headline
+        accent: '#e8467c',
+        // turquoise used for the primary call-to-action buttons
+        cyan: { DEFAULT: '#3fd0e0', 600: '#22b9cb' },
         navy:  { 900: '#081a33', 800: '#0b2547', 700: '#103464' },
         brand: { DEFAULT: '#1f5fbf', 600: '#1f5fbf', 700: '#184d9e', 800: '#0b3f80' },
         ember: { DEFAULT: '#d9532a', 600: '#d9532a', 700: '#bf4421' },

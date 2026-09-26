@@ -16,7 +16,7 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #d5d9e0 transparent;
 }
-.mwc-scrollbar::-webkit-scrollbar { height: 8px; }
+.mwc-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
 .mwc-scrollbar::-webkit-scrollbar-button { display: none; }
 .mwc-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .mwc-scrollbar::-webkit-scrollbar-thumb {
@@ -239,14 +239,6 @@ body {
   .mwc-caret { animation: none; }
 }
 
-/* the overlay navbar sliding in once it pins to the top of the window */
-.mwc-nav-drop { animation: mwc-nav-drop 320ms cubic-bezier(0.22, 0.75, 0.3, 1) both; }
-@keyframes mwc-nav-drop {
-  from { transform: translate3d(0, -100%, 0); }
-  to   { transform: none; }
-}
-@media (prefers-reduced-motion: reduce) { .mwc-nav-drop { animation: none; } }
-
 /* ---------------------------------------------------------------------------
    Travelling backdrop (ScrollBackdrop.jsx)
    Sits behind the page. Three layers drift upward at different speeds as the
@@ -306,4 +298,42 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .mwc-backdrop-grid,
   .mwc-backdrop-glow { transform: none !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   Typography: every heading is set in the display face (Syne), body copy in
+   Inter. Doing it here means a new section picks it up automatically instead
+   of each component having to remember a font-display class.
+--------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), var(--font-inter), ui-sans-serif, sans-serif;
+  letter-spacing: -0.015em;
+}
+
+/* ---------------------------------------------------------------------------
+   Help Desk assistant (components/assistant/)
+--------------------------------------------------------------------------- */
+.mwc-assistant { animation: mwc-assistant-in 260ms cubic-bezier(0.22, 0.75, 0.3, 1) both; }
+@keyframes mwc-assistant-in {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* the "typing…" dots */
+.mwc-dots { display: inline-flex; gap: 5px; align-items: center; }
+.mwc-dots i {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #94a3b8; display: block;
+  animation: mwc-dot 1.15s ease-in-out infinite;
+}
+.mwc-dots i:nth-child(2) { animation-delay: 0.16s; }
+.mwc-dots i:nth-child(3) { animation-delay: 0.32s; }
+@keyframes mwc-dot {
+  0%, 60%, 100% { opacity: 0.32; transform: translateY(0); }
+  30%           { opacity: 1;    transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mwc-assistant { animation: none; }
+  .mwc-dots i { animation: none; opacity: 0.6; }
 }

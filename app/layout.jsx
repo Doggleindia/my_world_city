@@ -1,7 +1,8 @@
-import { Inter, Montserrat } from 'next/font/google'
+import { Inter, Syne } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { SavedProvider } from '@/components/saved/SavedProvider'
+import AssistantProvider from '@/components/assistant/AssistantProvider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -10,8 +11,8 @@ const inter = Inter({
   display: 'swap',
 })
 
-// Display face for big headlines — geometric and wide, where Inter is narrow.
-const display = Montserrat({
+// Display face for every heading on the site.
+const display = Syne({
   subsets: ['latin'],
   weight: ['600', '700', '800'],
   variable: '--font-display',
@@ -29,7 +30,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${display.variable}`}>
       <body className="font-sans antialiased">
         <AuthProvider>
-          <SavedProvider>{children}</SavedProvider>
+          <SavedProvider>
+            <AssistantProvider>{children}</AssistantProvider>
+          </SavedProvider>
         </AuthProvider>
       </body>
     </html>

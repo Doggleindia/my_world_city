@@ -1,4 +1,11 @@
+'use client'
+
+import { MessageCircle } from 'lucide-react'
+import { useAssistant } from '@/components/assistant/AssistantProvider'
+
 export default function WhyJoinUs() {
+  const { openAssistant } = useAssistant()
+
   return (
     <section className="mt-16 bg-slate-50/70">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
@@ -21,12 +28,21 @@ export default function WhyJoinUs() {
             </p>
           </div>
 
-          <div className="flex justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-white p-4">
+          <div className="relative flex justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-white p-4">
             <img
               src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=900&q=80"
               alt="Verified property in hand"
               className="h-64 w-full max-w-md rounded-2xl object-cover shadow-card"
             />
+            {/* shortcut straight into search, sitting over the image */}
+            <button
+              type="button"
+              onClick={openAssistant}
+              className="absolute right-2 top-2 inline-flex items-center gap-2 rounded-lg bg-brand-800 px-4 py-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_-10px_rgba(8,26,51,0.6)] transition hover:bg-navy-700 sm:right-0 sm:top-0"
+            >
+              <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+              Find property
+            </button>
           </div>
         </div>
       </div>
