@@ -13,9 +13,9 @@ export default function PropertyLocation({ query, nearby = [] }) {
   const q = encodeURIComponent(query)
 
   return (
-    <section className="bg-[#f1f1f1]">
+    <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <h2 className="text-[26px] font-semibold text-navy-900 sm:text-[30px]">Location</h2>
+        <h2 className="text-[30px] text-navy-900 sm:text-[34px]">Location</h2>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
           <div className="relative min-w-0 overflow-hidden border border-slate-300 bg-white">
@@ -47,7 +47,7 @@ export default function PropertyLocation({ query, nearby = [] }) {
           <div className="min-w-0">
             {nearby.length > 0 && (
               <>
-                <h3 className="text-[13px] font-bold text-navy-900">Nearby Connections</h3>
+                <h3 className="text-[16px] font-bold text-navy-900">Nearby Connections</h3>
                 <ul className="mt-3 space-y-2.5">
                   {nearby.slice(0, 6).map((n, i) => {
                     const Icon = iconFor(n.icon)
@@ -55,8 +55,8 @@ export default function PropertyLocation({ query, nearby = [] }) {
                       <li key={i} className="flex items-center gap-3 border border-brand-800 bg-white px-4 py-3">
                         <Icon className="h-5 w-5 shrink-0 text-brand-800" />
                         <div className="min-w-0">
-                          <p className="text-[17px] font-bold leading-tight text-brand-800">{n.label}</p>
-                          {n.value && <p className="mt-0.5 text-[12px] text-slate-500">{n.value}</p>}
+                          <p className="text-[18px] font-bold leading-tight text-brand-800">{n.label}</p>
+                          {n.value && <p className="mt-1 text-[14px] text-[#0A0A0A]">{n.value}</p>}
                         </div>
                       </li>
                     )
@@ -69,7 +69,7 @@ export default function PropertyLocation({ query, nearby = [] }) {
               href={`https://www.google.com/maps/dir/?api=1&destination=${q}`}
               target="_blank"
               rel="noreferrer"
-              className={`${nearby.length ? 'mt-4' : ''} flex items-center justify-center gap-2 bg-cyan px-5 py-3 text-[13.5px] font-bold text-navy-900 transition hover:bg-cyan-600`}
+              className={`${nearby.length ? 'mt-4' : ''} flex items-center justify-center gap-2 bg-brand-800 px-5 py-3.5 text-[16px] font-bold text-white transition hover:bg-navy-700`}
             >
               <Navigation className="h-4 w-4" /> Get directions
             </a>

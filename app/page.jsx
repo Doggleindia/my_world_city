@@ -21,8 +21,11 @@ export default function Home() {
   return (
     <main className="relative min-h-screen text-slate-900">
       <TopBar />
-      <Navbar />
-      <Hero />
+      {/* transparent bar over the hero video; turns white and sticks on scroll */}
+      <div className="relative">
+        <Navbar overlay />
+        <Hero />
+      </div>
 
       <Reveal stagger><ActionSelector /></Reveal>
       <Reveal><WhyJoinUs /></Reveal>

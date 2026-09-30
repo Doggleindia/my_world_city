@@ -40,7 +40,7 @@ export default function AuthButtons({ cta = 'navy' }) {
           )}
           <button
             onClick={() => setMenu((m) => !m)}
-            className="flex items-center gap-2 rounded-full border border-slate-200 py-1 pl-1 pr-2.5 text-[13px] font-semibold text-navy-800 transition hover:border-slate-300"
+            className="nav-ink flex items-center gap-2 rounded-full border border-slate-200 py-1 pl-1 pr-2.5 text-[13px] font-semibold text-navy-800 transition hover:border-slate-300"
           >
             <span className="grid h-7 w-7 place-items-center rounded-full bg-brand/10 text-brand">
               <User className="h-4 w-4" />
@@ -79,13 +79,13 @@ export default function AuthButtons({ cta = 'navy' }) {
         <>
           <button
             onClick={() => openLogin()}
-            className="hidden whitespace-nowrap text-center font-sans text-[16px] font-semibold text-[#0A0A0A] transition hover:text-brand sm:block"
+            className="nav-ink hidden whitespace-nowrap text-center font-sans text-[16px] font-semibold text-[#0A0A0A] transition hover:text-brand sm:block"
           >
             Login
           </button>
           <button
             onClick={openSignup}
-            className="whitespace-nowrap rounded-lg border-[1.5px] border-brand px-2.5 py-2 text-[12.5px] font-semibold text-brand transition hover:bg-brand hover:text-white xs:px-4 xs:text-[13px]"
+            className="nav-outline whitespace-nowrap rounded-lg border-[1.5px] border-brand px-2.5 py-2 text-[12.5px] font-semibold text-brand transition hover:bg-brand hover:text-white xs:px-4 xs:text-[13px]"
           >
             Sign up
           </button>
@@ -94,7 +94,7 @@ export default function AuthButtons({ cta = 'navy' }) {
 
       <button
         onClick={() => router.push('/list-property')}
-        className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-cyan px-2.5 py-2.5 text-[12.5px] font-bold text-navy-900 transition hover:bg-cyan-600 xs:px-3 xs:text-[13px] sm:px-4"
+        className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-brand-800 px-2.5 py-2.5 text-[12.5px] font-bold text-white transition hover:bg-navy-700 xs:px-3 xs:text-[13px] sm:px-4"
       >
         <span className="sm:hidden">List Free</span>
         <span className="hidden sm:inline">List Property — Free</span>

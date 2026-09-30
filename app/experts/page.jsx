@@ -13,7 +13,6 @@ export const metadata = {
 
 export const revalidate = 60;
 
-// AFTER
 export default async function ExpertsPage({ searchParams }) {
   const experts = await getPublicExperts();
 
@@ -32,7 +31,6 @@ export default async function ExpertsPage({ searchParams }) {
           Trusted professionals for every step of buying, building and owning
           property in the Pink City.
         </p>
-        // AFTER
         <ExpertStepper />
         <div id="experts-directory" className="scroll-mt-24">
           <ExpertDirectory

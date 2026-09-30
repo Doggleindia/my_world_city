@@ -26,7 +26,7 @@ export default function MobileNav({ links }) {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
-        className="grid h-9 w-9 place-items-center rounded-lg text-navy-800 transition hover:bg-slate-100"
+        className="nav-ink grid h-9 w-9 place-items-center rounded-lg text-navy-800 transition hover:bg-slate-100"
       >
         <Menu className="h-5 w-5" />
       </button>

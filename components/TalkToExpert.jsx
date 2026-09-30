@@ -12,7 +12,7 @@ export default function TalkToExpert() {
   const scrollBy = (dir) => scroller.current?.scrollBy({ left: dir * 320, behavior: 'smooth' })
 
   return (
-    <section className="bg-[#0a3d7a]">
+    <section data-dark className="bg-[#0a3d7a]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="flex items-start justify-between gap-4">
           <div className="max-w-5xl">

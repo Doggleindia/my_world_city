@@ -111,7 +111,7 @@ export default function EnquireForm({ propertyId, propertyTitle }) {
       <textarea rows={3} value={f.message} onChange={(e) => set('message', e.target.value)}
         placeholder="Type your message here" className={`${box('message')} resize-y`} />
 
-      <label className="flex items-start gap-2.5 pt-1 text-[12px] leading-relaxed text-navy-900">
+      <label className="flex items-start gap-2.5 pt-1 text-[14px] leading-relaxed text-navy-900">
         <input type="checkbox" checked={f.consent} onChange={(e) => set('consent', e.target.checked)}
           className={`mt-0.5 h-4 w-4 shrink-0 rounded-none border ${touched && bad.consent ? 'border-rose-500' : 'border-slate-700'} text-brand focus:ring-brand`} />
         <span>
@@ -133,7 +133,7 @@ export default function EnquireForm({ propertyId, propertyTitle }) {
       {error && <p className="bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">{error}</p>}
 
       <button type="submit" disabled={busy}
-        className="flex w-full items-center justify-center gap-2 bg-cyan py-3 text-[13.5px] font-bold text-navy-900 transition hover:bg-cyan-600 disabled:opacity-60">
+        className="flex w-full items-center justify-center gap-2 bg-brand-800 py-3.5 text-[16px] font-bold text-white transition hover:bg-navy-700 disabled:opacity-60">
         {busy && <Loader2 className="h-4 w-4 animate-spin" />} Submit
       </button>
     </form>
@@ -141,4 +141,4 @@ export default function EnquireForm({ propertyId, propertyTitle }) {
 }
 
 const control =
-  'w-full border bg-white px-3 py-2.5 text-[13px] text-navy-900 outline-none placeholder:text-slate-600'
+  'w-full border bg-white px-3.5 py-3 text-[15px] text-navy-900 outline-none placeholder:text-slate-600'

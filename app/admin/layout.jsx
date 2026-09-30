@@ -119,7 +119,7 @@ export default function AdminLayout({ children }) {
 
   return (
     <AdminStatsCtx.Provider value={{ data, loading: statsLoading, error: statsError, refresh }}>
-      <div className="min-h-screen bg-[#f4f6fb] text-slate-900">
+      <div data-admin className="min-h-screen bg-[#f4f6fb] text-slate-900">
         <Sidebar badges={badges} user={user} drawer={drawer} onClose={() => setDrawer(false)} />
         <div className="lg:pl-64">
           <Topbar onMenu={() => setDrawer(true)} />

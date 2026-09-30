@@ -240,14 +240,21 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   Typography: every heading is set in the display face (Syne), body copy in
-   Inter. Doing it here means a new section picks it up automatically instead
+   Typography: headings and body copy are both set in Stolzl. Doing it here
+   means a new section picks it up automatically instead
    of each component having to remember a font-display class.
 --------------------------------------------------------------------------- */
+/* Heading style taken from suntap.in: Stolzl Medium, tight tracking, close
+   leading. Weight and tracking are forced so the utility classes components
+   carry (font-bold, tracking-tight…) cannot drift away from it. */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display), var(--font-inter), ui-sans-serif, sans-serif;
-  letter-spacing: -0.015em;
+  font-family: stolzl, sans-serif;
+  font-weight: 500 !important;
+  letter-spacing: -0.03em !important;
 }
+h1 { line-height: 1.053 !important; }
+h2 { line-height: 1.021 !important; }
+h3 { line-height: 1.086 !important; }
 
 /* ---------------------------------------------------------------------------
    Help Desk assistant (components/assistant/)
@@ -275,4 +282,50 @@ h1, h2, h3, h4, h5, h6 {
 @media (prefers-reduced-motion: reduce) {
   .mwc-assistant { animation: none; }
   .mwc-dots i { animation: none; opacity: 0.6; }
+}
+
+/* ---------------------------------------------------------------------------
+   Home-page header (components/Navbar.jsx with `overlay`).
+   Transparent over the hero video with white ink and the white logo; once
+   NavScrollWatcher adds .is-scrolled it becomes the fixed white bar.
+--------------------------------------------------------------------------- */
+.mwc-nav-overlay {
+  background: transparent;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+.mwc-nav-overlay.is-scrolled {
+  position: fixed;
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06);
+}
+.mwc-nav-overlay:not(.is-scrolled) .nav-ink { color: #ffffff; }
+.mwc-nav-overlay:not(.is-scrolled) .nav-ink:hover { color: #3fd0e0; }
+.mwc-nav-overlay:not(.is-scrolled) .nav-outline { border-color: #ffffff; color: #ffffff; }
+.mwc-nav-overlay:not(.is-scrolled) .nav-outline:hover { background: #ffffff; color: #081a33; }
+.mwc-nav-overlay:not(.is-scrolled) .nav-logo-dark { display: none; }
+.mwc-nav-overlay.is-scrolled .nav-logo-light { display: none; }
+
+/* ---------------------------------------------------------------------------
+   No grey body text on the public site: every slate-toned text utility reads
+   as near-black. Icons keep their tone, hover colours still win (their
+   variant classes are more specific), and the admin console is left alone
+   via the [data-admin] root. Dark sections mark themselves with
+   [data-dark] so their muted white text is not turned black.
+--------------------------------------------------------------------------- */
+:where(body:not(:has([data-admin])))
+  :is(.text-slate-400, .text-slate-500, .text-slate-600, .text-slate-700):where(:not(svg)):where(:not([data-dark] *)) {
+  color: #0a0a0a;
+}
+
+/* Help Desk: messages rise in, brief chips pop, result cards arrive in turn */
+.mwc-msg-in  { animation: mwc-msg-in 320ms cubic-bezier(0.22, 0.75, 0.3, 1) both; }
+.mwc-chip-in { animation: mwc-chip-in 300ms cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.mwc-card-in { animation: mwc-card-in 420ms cubic-bezier(0.22, 0.75, 0.3, 1) both; }
+@keyframes mwc-msg-in  { from { opacity: 0; transform: translate3d(0, 10px, 0); } to { opacity: 1; transform: none; } }
+@keyframes mwc-chip-in { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
+@keyframes mwc-card-in { from { opacity: 0; transform: translate3d(24px, 0, 0) scale(0.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .mwc-msg-in, .mwc-chip-in, .mwc-card-in { animation: none; }
 }

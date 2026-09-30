@@ -72,7 +72,7 @@ export default function Insights() {
     'grid h-12 w-12 place-items-center rounded-full transition disabled:cursor-not-allowed disabled:opacity-35'
 
   return (
-    <section className="bg-[#f5f6f8]">
+    <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         {/* Heading */}
         <div className="text-center">

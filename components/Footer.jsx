@@ -33,7 +33,7 @@ const cols = [
 
 export default function Footer() {
   return (
-    <footer className="bg-navy-900 text-slate-300">
+    <footer data-dark className="bg-navy-900 text-slate-300">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div>
           <Link href="/" aria-label="My World City — home" className="inline-flex items-center">
