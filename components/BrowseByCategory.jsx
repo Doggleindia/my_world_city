@@ -9,7 +9,7 @@ export default function BrowseByCategory() {
           Browse by Category
         </h2>
 
-        <div className="mt-8 grid grid-cols-2 gap-5 sm:gap-6 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           {categories.map((c) => (
             <Link
               key={c.title}
@@ -28,11 +28,11 @@ export default function BrowseByCategory() {
                   backgroundImage: `linear-gradient(180deg, ${c.tint[0]} 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 52%, ${c.tint[1]} 100%)`,
                 }}
               />
-              <div className="absolute inset-x-0 bottom-0 p-6">
-                <h3 className="text-[26px] font-bold leading-tight text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.25)]">
+              <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-6">
+                <h3 className="text-[clamp(15px,4.6vw,26px)] font-bold leading-tight text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.25)]">
                   {c.title}
                 </h3>
-                <p className="mt-1 text-[13px] font-semibold text-white/90">{c.listings}</p>
+                <p className="mt-1 text-[11.5px] font-semibold text-white/90 sm:text-[13px]">{c.listings}</p>
               </div>
             </Link>
           ))}

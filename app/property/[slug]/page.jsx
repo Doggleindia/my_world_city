@@ -377,7 +377,7 @@ function Contact({ c, compact = false }) {
         <p className="text-[17px] font-bold text-navy-900">{c.name}</p>
         <p className="mt-0.5 text-[15px] text-[#0A0A0A]">{c.role}</p>
         {compact ? (
-          <p className="mt-1.5 text-[14px] text-navy-900">
+          <p className="mt-1.5 text-[14px] text-navy-900 [overflow-wrap:anywhere]">
             {c.phone && <a href={`tel:+91${c.phone}`} className="hover:underline">+91 {c.phone}</a>}
             {c.phone && c.email && ' • '}
             {c.email && <a href={`mailto:${c.email}`} className="hover:underline">{c.email}</a>}

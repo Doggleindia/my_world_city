@@ -27,7 +27,7 @@ export default function AuthButtons({ cta = 'navy' }) {
   return (
     <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
       {loading ? (
-        <span className="h-8 w-20 animate-pulse rounded-full bg-slate-100" />
+        <span className="h-8 w-16 animate-pulse rounded-full bg-slate-300/40 sm:w-20" />
       ) : user ? (
         <div className="relative flex items-center gap-2" ref={ref}>
           {isAdmin && (
