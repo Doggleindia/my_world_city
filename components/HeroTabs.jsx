@@ -1,26 +1,58 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useAssistant } from '@/components/assistant/AssistantProvider'
+import AssistantPanel from '@/components/assistant/AssistantPanel'
 
+// The two hero tabs. "Find Solution" opens the AI Help Desk as a section that
+// drops down right beneath the tabs (the floating "Find property" button opens
+// the same one and scrolls here), and closes it again on a second click.
 export default function HeroTabs() {
-  const { openAssistant } = useAssistant()
+  const { open, session, toggleAssistant, closeAssistant, setInlineHost } = useAssistant()
+  const ref = useRef(null)
+
+  // Tell the provider this page shows the chat inline, not as a floating panel.
+  useEffect(() => {
+    setInlineHost(true)
+    return () => setInlineHost(false)
+  }, [setInlineHost])
+
+  // Bring the dropdown into view whichever button opened it.
+  useEffect(() => {
+    if (open) ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [open, session])
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl gap-2 rounded-full bg-slate-100 p-1.5">
-      <button
-        type="button"
-        onClick={openAssistant}
-        className="flex-1 rounded-full bg-brand-800 px-6 py-3 text-center text-[15px] font-semibold text-white shadow-sm transition hover:bg-navy-700"
-      >
-        Find Solution
-      </button>
-      <Link
-        href="/list-property"
-        className="flex-1 rounded-full border border-slate-200 bg-white px-6 py-3 text-center text-[15px] font-semibold text-navy-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-      >
-        List Property
-      </Link>
+    <div ref={ref} id="find-solution" className="scroll-mt-24">
+      <div className="mx-auto flex w-full max-w-3xl gap-2 rounded-full bg-slate-100 p-1.5">
+        <button
+          type="button"
+          onClick={toggleAssistant}
+          aria-expanded={open}
+          aria-controls="find-solution-panel"
+          className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-brand-800 px-3 py-3 text-center text-[14px] font-semibold text-white shadow-sm transition hover:bg-navy-700 sm:gap-2 sm:px-6 sm:text-[15px]"
+        >
+          Find Solution
+        </button>
+        <Link
+          href="/list-property"
+          className="flex-1 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-3 text-center text-[14px] font-semibold text-navy-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:px-6 sm:text-[15px]"
+        >
+          List Property
+        </Link>
+      </div>
+
+      {open && (
+        <div
+          id="find-solution-panel"
+          role="region"
+          aria-label="My World City Help Desk"
+          className="mwc-assistant mx-auto mt-5 h-[680px] max-h-[calc(100vh-170px)] min-h-[440px] w-full max-w-3xl"
+        >
+          <AssistantPanel key={session} onClose={closeAssistant} />
+        </div>
+      )}
     </div>
   )
 }

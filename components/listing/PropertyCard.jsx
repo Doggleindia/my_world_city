@@ -69,7 +69,6 @@ export default function PropertyCard({
         <p className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-[16px] text-[#0A0A0A]">
           {availability && <span className="font-bold">{availability}</span>}
           {type && <span>{type}</span>}
-          {priceLabel && <span className="font-bold text-brand-800">{priceLabel}</span>}
         </p>
 
         {size && (

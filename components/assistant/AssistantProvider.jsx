@@ -3,23 +3,39 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import AssistantPanel from './AssistantPanel'
 
-const Ctx = createContext({ open: false, openAssistant: () => {}, closeAssistant: () => {} })
+const Ctx = createContext({
+  open: false,
+  session: 0,
+  openAssistant: () => {},
+  closeAssistant: () => {},
+  toggleAssistant: () => {},
+  setInlineHost: () => {},
+})
 
 export const useAssistant = () => useContext(Ctx)
 
 // Holds the Help Desk for the whole site, so any button — the hero's
-// "Find Solution", the "Find property" button on Why Join Us — opens the same
+// "Find Solution", the floating "Find property" — opens the same
 // conversation rather than each one carrying its own copy.
+//
+// Where it appears depends on the page: the home page's hero tabs register
+// themselves as an inline host and the chat drops down beneath them; on a
+// page with no host it falls back to a floating panel.
 export default function AssistantProvider({ children }) {
   const [open, setOpen] = useState(false)
   // Remounts the panel on each open so a new visit starts a fresh conversation.
   const [session, setSession] = useState(0)
+  const [inlineHost, setInlineHost] = useState(false)
 
   const openAssistant = useCallback(() => {
     setSession((n) => n + 1)
     setOpen(true)
   }, [])
   const closeAssistant = useCallback(() => setOpen(false), [])
+  const toggleAssistant = useCallback(
+    () => (open ? closeAssistant() : openAssistant()),
+    [open, openAssistant, closeAssistant],
+  )
 
   useEffect(() => {
     if (!open) return
@@ -29,10 +45,10 @@ export default function AssistantProvider({ children }) {
   }, [open])
 
   return (
-    <Ctx.Provider value={{ open, openAssistant, closeAssistant }}>
+    <Ctx.Provider value={{ open, session, openAssistant, closeAssistant, toggleAssistant, setInlineHost }}>
       {children}
 
-      {open && (
+      {open && !inlineHost && (
         <>
           {/* dim the page on phones, where the panel covers most of the screen */}
           <div

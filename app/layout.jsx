@@ -1,23 +1,12 @@
-import { Inter, Syne } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { SavedProvider } from '@/components/saved/SavedProvider'
 import AssistantProvider from '@/components/assistant/AssistantProvider'
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
-// Display face for every heading on the site.
-const display = Syne({
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
-  variable: '--font-display',
-  display: 'swap',
-})
+// Stolzl (weights 300 / 400 / 500 / 700) comes from an Adobe Fonts web
+// project — the same way suntap.in loads it. To move it to your own Adobe
+// account, create a web project there with Stolzl and swap the kit id below.
+const ADOBE_FONTS_KIT = 'pjg1ebb'
 
 export const metadata = {
   title: 'My World City — Property Platform for Modern Jaipur',
@@ -27,7 +16,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${display.variable}`}>
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={`https://use.typekit.net/${ADOBE_FONTS_KIT}.css`} />
+      </head>
       <body className="font-sans antialiased">
         <AuthProvider>
           <SavedProvider>

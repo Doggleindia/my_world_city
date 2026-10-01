@@ -17,8 +17,10 @@ module.exports = {
       // default sm/md/lg/xl breakpoints are kept, not replaced.
       screens: { xs: '400px' },
       fontFamily: {
-        sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'var(--font-inter)', 'ui-sans-serif', 'sans-serif'],
+        // Stolzl is the one typeface on the site (self-hosted from
+        // public/fonts/stolzl), with the plain system sans-serif behind it.
+        sans: ['Stolzl', 'sans-serif'],
+        display: ['Stolzl', 'sans-serif'],
       },
       colors: {
         // the pink full-stop that ends the hero headline

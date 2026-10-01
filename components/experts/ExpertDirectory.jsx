@@ -3,28 +3,24 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 import ExpertCard from './ExpertCard'
-import ExpertFilters from './ExpertFilters'
 import { expertList, expertCategories } from '@/data'
 
-// AFTER
 export default function ExpertDirectory({ experts, categories, initialCat = 'All' }) {
   const source = experts?.length ? experts : expertList
   const cats = categories?.length ? categories : expertCategories
   const [query, setQuery] = useState('')
   const [cat, setCat] = useState(initialCat)
-  const [domains, setDomains] = useState([]) // applied from sidebar
 
   const q = query.trim().toLowerCase()
   const filtered = source.filter((e) => {
     const matchesChip = cat === 'All' || e.cat === cat
-    const matchesDomain = domains.length === 0 || domains.includes(e.cat)
     const matchesQuery =
       !q ||
       e.name.toLowerCase().includes(q) ||
       e.role.toLowerCase().includes(q) ||
       e.specialty.toLowerCase().includes(q) ||
       e.cat.toLowerCase().includes(q)
-    return matchesChip && matchesDomain && matchesQuery
+    return matchesChip && matchesQuery
   })
 
   return (
@@ -55,22 +51,18 @@ export default function ExpertDirectory({ experts, categories, initialCat = 'All
         ))}
       </div>
 
-      {/* Sidebar + grid */}
-      <div className="mt-7 flex flex-col gap-7 lg:flex-row">
-        <aside className="lg:w-[280px] lg:shrink-0">
-          <ExpertFilters onApply={setDomains} />
-        </aside>
-
-        <div className="min-w-0 flex-1">
+      {/* grid */}
+      <div className="mt-7">
+        <div className="min-w-0">
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filtered.map((e) => (
                 <ExpertCard key={e.id || e.slug || e.name} {...e} />
               ))}
             </div>
           ) : (
             <p className="py-16 text-center text-[14px] text-slate-500">
-              No experts match your filters.
+              No experts match your search.
             </p>
           )}
         </div>

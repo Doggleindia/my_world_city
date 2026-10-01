@@ -2,8 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Bookmark, ChevronLeft, ChevronRight, RotateCw, Send, X } from 'lucide-react'
-import { STEPS, searchParamsFor, summaryRows, parseFreeText } from '@/lib/assistantFlow'
+import {
+  ArrowRight, BadgeCheck, Building2, Check, Factory, Hammer, Home, KeyRound, MapPin, PhoneCall,
+  RotateCw, Search, Send, Settings, Sparkles, Sprout, Store, TrendingUp, Wallet, Warehouse, X,
+} from 'lucide-react'
+import {
+  STEPS, searchParamsFor, summaryRows, parseFreeText, showcaseFor, rankByKind, nounFor,
+} from '@/lib/assistantFlow'
 
 const time = () =>
   new Date().toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true })
@@ -14,6 +19,37 @@ const greeting = () => {
 }
 
 const PHONE_RE = /^[6-9]\d{9}$/
+
+/* ---------------- colour + icon for each answer ---------------- */
+
+// The four journeys use the same colours as the icons under the hero, so the
+// chat feels like part of the page rather than a bolt-on.
+const TEAL = '#17838c', BLUE = '#2b5fc9', RED = '#c0392b', ORANGE = '#e8811c'
+const GREEN = '#2e9e5b', INDIGO = '#4f46e5', AMBER = '#c77700', BRAND = '#0b3f80'
+
+const LOOKS = [
+  [/^buy or lease|^buy$|residential|villa|apartment|home/i, Home, TEAL],
+  [/lease|rent/i, KeyRound, INDIGO],
+  [/build|architect|contractor/i, Hammer, BLUE],
+  [/manage|maintain|both/i, Settings, RED],
+  [/invest|income|appreciation|returns/i, TrendingUp, ORANGE],
+  [/factory|industrial/i, Factory, RED],
+  [/warehouse/i, Warehouse, RED],
+  [/shop|showroom/i, Store, BLUE],
+  [/commercial|office|building/i, Building2, BLUE],
+  [/farm|plot|land/i, Sprout, GREEN],
+  [/₹|budget/i, Wallet, AMBER],
+  [/call me|specialist/i, PhoneCall, GREEN],
+  [/new search|other options|change my search/i, Search, INDIGO],
+  [/^yes|own it/i, Check, GREEN],
+  [/jaipur|nagar|road|pura|scheme|sarovar/i, MapPin, INDIGO],
+]
+const lookFor = (label) => {
+  const hit = LOOKS.find(([re]) => re.test(label))
+  return hit ? { Icon: hit[1], color: hit[2] } : { Icon: Sparkles, color: BRAND }
+}
+const CATEGORY_COLOR = { RESIDENTIAL: TEAL, COMMERCIAL: BLUE, INDUSTRIAL: RED, 'FARM & AGRI': GREEN }
+const CHIP_COLORS = [TEAL, BLUE, ORANGE, INDIGO, GREEN, RED, AMBER]
 
 export default function AssistantPanel({ onClose }) {
   const [items, setItems] = useState([])      // the conversation, oldest first
@@ -43,17 +79,25 @@ export default function AssistantPanel({ onClose }) {
 
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
+  // Follow the conversation down — except right after results arrive: then
+  // hold the view on the property cards so the follow-up question beneath
+  // them doesn't push them out of sight.
   useEffect(() => {
     const el = scroller.current
-    if (el) el.scrollTop = el.scrollHeight
+    if (!el) return
+    const messages = el.querySelectorAll('[data-msg]')
+    const recent = [...messages].slice(-2).find((m) => m.hasAttribute('data-results'))
+    const top = recent ? recent.offsetTop - 8 : el.scrollHeight
+    el.scrollTo({ top, behavior: 'smooth' })
   }, [items, typing])
 
   /* ---------------- running the script ---------------- */
 
   const runStep = useCallback(
     async (id, ans) => {
-      // These four aren't questions, so they are handled before the lookup.
+      // These aren't questions, so they are handled before the lookup.
       if (id === 'results') return showResults(ans)
+      if (id === 'showcase') return showShowcase(ans)
       if (id === 'lead') return say({ lead: true, text: 'Just two details and we will take it from here.' })
       if (id === 'restart_search') {
         await say({ text: 'No problem — let’s adjust the search.' })
@@ -69,11 +113,17 @@ export default function AssistantPanel({ onClose }) {
         return runStep(step.next, ans)
       }
 
-      await say({ text: step.ask, options: step.options })
+      await say({
+        text: typeof step.ask === 'function' ? step.ask(ans) : step.ask,
+        options: typeof step.options === 'function' ? step.options(ans) : step.options,
+      })
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [say],
   )
 
+  // Buy / invest: real listings that fit, topped up with curated picks of the
+  // same kind so the visitor always has something concrete to look at.
   const showResults = useCallback(
     async (ans) => {
       setTyping(true)
@@ -100,34 +150,57 @@ export default function AssistantPanel({ onClose }) {
       }
       setTyping(false)
 
-      if (!list.length) {
-        await say({
-          text: 'I couldn’t find a match for that combination yet. A specialist can look for you — shall I arrange a call?',
-          options: [
-            { label: 'Yes, call me', next: 'lead' },
-            { label: 'Change my search', next: 'restart_search' },
-          ],
-        })
-        return
-      }
+      const real = rankByKind(list, ans.kind).slice(0, 6)
+      const picks = real.length < 3 ? showcaseFor(ans, 3 - real.length + (real.length ? 0 : 1)) : []
+      const cards = [...real, ...picks]
+      const noun = nounFor(ans)
+      const where = ans.locality && ans.locality !== 'Anywhere in Jaipur' ? ` in ${ans.locality}` : ' in Jaipur'
 
-      const headline = widened
-        ? `Nothing sits exactly in ${ans.budget}, but here ${list.length === 1 ? 'is a close option' : 'are close options'} for you:`
-        : ans.intent === 'invest'
-          ? 'These are verified, income-ready options in your range:'
-          : `Here ${list.length === 1 ? 'is 1 verified match' : `are ${list.length} verified matches`} for you:`
+      const headline = !real.length
+        ? `Here are ${noun}${where} our team can arrange for you:`
+        : widened
+          ? `Nothing sits exactly in ${ans.budget}, but here are close ${noun}${where}:`
+          : ans.intent === 'invest'
+            ? `These are income-ready ${noun} in your range:`
+            : `Here ${cards.length === 1 ? 'is a match' : `are ${cards.length} ${noun}`}${where} for you:`
 
-      await say({ text: headline, results: list })
+      await say({ text: headline, results: cards })
       await runStep('offer_call', ans)
     },
-    [say, runStep],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [say],
+  )
+
+  // Build / manage: show what comparable properties look like, then take
+  // the callback details.
+  const showShowcase = useCallback(
+    async (ans) => {
+      const cards = showcaseFor(ans, 3)
+      if (cards.length) {
+        await say({
+          text:
+            ans.intent === 'build'
+              ? `For inspiration, here are ${nounFor(ans)} we have delivered and listed in Jaipur:`
+              : `Here are ${nounFor(ans)} like yours that we currently manage in Jaipur:`,
+          results: cards,
+        })
+      }
+      return runStep('lead', ans)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [say],
+  )
+
+  const welcome = useCallback(
+    () => say({ text: `${greeting()}! I’m your My World City guide — tell me what you need and I’ll find it.` }, 400),
+    [say],
   )
 
   // first run
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      await say({ text: `${greeting()}! Welcome to My World City — Jaipur's verified property platform.` }, 400)
+      await welcome()
       if (!cancelled) await runStep('start', {})
     })()
     return () => { cancelled = true }
@@ -149,6 +222,7 @@ export default function AssistantPanel({ onClose }) {
     if (!text) return
     setDraft('')
     push({ from: 'user', text })
+    setItems((c) => c.map((m) => (m.options ? { ...m, options: null } : m)))
 
     if (/^(hi|hello|hey|start over|restart)\b/i.test(text)) {
       setAnswers({})
@@ -208,41 +282,74 @@ export default function AssistantPanel({ onClose }) {
     timers.current.forEach(clearTimeout)
     setItems([]); setAnswers({}); setTyping(false); setDraft('')
     ;(async () => {
-      await say({ text: `${greeting()}! Welcome to My World City — Jaipur's verified property platform.` }, 300)
+      await welcome()
       await runStep('start', {})
     })()
   }
 
+  const chips = summaryRows(answers)
+
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_-20px_rgba(8,26,51,0.45)] ring-1 ring-slate-200">
+    <div className="flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-[0_24px_60px_-20px_rgba(8,26,51,0.45)] ring-1 ring-slate-200">
       {/* header */}
-      <div className="flex shrink-0 items-center justify-between gap-3 bg-brand-800 px-4 py-3 text-white sm:px-5">
-        <div className="min-w-0">
-          <p className="truncate text-[16px] font-bold">My World City Help Desk</p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-[12px] text-white/75">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" /> Online · replies instantly
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <button onClick={reset} aria-label="Start over"
-            className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15">
-            <RotateCw className="h-[18px] w-[18px]" />
-          </button>
-          <button onClick={onClose} aria-label="Close"
-            className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15">
-            <X className="h-[19px] w-[19px]" />
-          </button>
+      <div data-dark className="relative shrink-0 overflow-hidden bg-gradient-to-r from-[#0b3f80] via-[#1f5fbf] to-[#22b9cb] px-4 py-3.5 text-white sm:px-5">
+        {/* soft colour blooms */}
+        <span className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/15 blur-2xl" />
+        <span className="pointer-events-none absolute -bottom-12 left-1/3 h-28 w-28 rounded-full bg-[#ef8f2a]/30 blur-2xl" />
+
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/20 ring-2 ring-white/40">
+              <Sparkles className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-[16px] font-bold">My World City Help Desk</p>
+              <p className="mt-0.5 flex items-center gap-1.5 text-[12px] text-white/85">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
+                </span>
+                Online · replies instantly
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <button onClick={reset} aria-label="Start over"
+              className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/20">
+              <RotateCw className="h-[18px] w-[18px]" />
+            </button>
+            <button onClick={onClose} aria-label="Close"
+              className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/20">
+              <X className="h-[19px] w-[19px]" />
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* what we know so far */}
+      {chips.length > 0 && (
+        <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto whitespace-nowrap border-b border-slate-100 bg-white px-4 py-2.5 [scrollbar-width:none] sm:px-5 [&::-webkit-scrollbar]:hidden">
+          <span className="mr-1 shrink-0 text-[11.5px] font-bold uppercase tracking-wide text-navy-900">Your brief</span>
+          {chips.map(([k, v], i) => (
+            <span
+              key={k}
+              style={{ '--c': CHIP_COLORS[i % CHIP_COLORS.length] }}
+              className="mwc-chip-in shrink-0 rounded-full bg-[color-mix(in_srgb,var(--c)_12%,white)] px-3 py-1 text-[12px] font-bold text-[color:var(--c)]"
+            >
+              {v}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* conversation */}
-      <div ref={scroller} className="mwc-scrollbar flex-1 space-y-4 overflow-y-auto bg-slate-100 px-4 py-4 sm:px-5">
+      <div ref={scroller} className="mwc-scrollbar relative flex-1 space-y-4 overflow-y-auto bg-gradient-to-b from-[#eef4ff] via-white to-[#fff5ea] px-4 py-4 sm:px-5">
         {items.map((m, i) =>
           m.from === 'user' ? (
-            <div key={i}>
+            <div key={i} data-msg className="mwc-msg-in">
               <p className="mb-1 text-right text-[11.5px] text-slate-500">You · {m.at}</p>
               <div className="flex justify-end">
-                <p className="max-w-[80%] rounded bg-brand-800 px-4 py-2.5 text-[14px] font-semibold text-white">
+                <p className="max-w-[80%] rounded-3xl rounded-br-lg bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm">
                   {m.text}
                 </p>
               </div>
@@ -253,9 +360,9 @@ export default function AssistantPanel({ onClose }) {
         )}
 
         {typing && (
-          <div>
-            <p className="mb-1 text-[11.5px] text-slate-500">My World City · Typing…</p>
-            <div className="inline-flex border-l-[3px] border-brand-800 bg-white px-4 py-3">
+          <div className="flex items-end gap-2.5">
+            <Avatar />
+            <div className="inline-flex rounded-3xl rounded-bl-lg bg-white px-4 py-3.5 shadow-sm ring-1 ring-slate-100">
               <span className="mwc-dots"><i /><i /><i /></span>
             </div>
           </div>
@@ -268,12 +375,12 @@ export default function AssistantPanel({ onClose }) {
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Type your message..."
+            placeholder="Try “villa in Jagatpura under 1 cr”…"
             aria-label="Type your message"
-            className="min-w-0 flex-1 rounded border border-slate-300 px-3.5 py-3 text-[14px] text-navy-900 outline-none transition placeholder:text-slate-400 focus:border-brand"
+            className="min-w-0 flex-1 rounded-full border border-slate-300 bg-slate-50 px-5 py-3 text-[14px] text-navy-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:bg-white"
           />
           <button type="submit" aria-label="Send"
-            className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded bg-cyan text-navy-900 transition hover:bg-cyan-600 disabled:opacity-50"
+            className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-white shadow-sm transition hover:brightness-110 disabled:opacity-40"
             disabled={!draft.trim()}>
             <Send className="h-5 w-5" />
           </button>
@@ -284,32 +391,47 @@ export default function AssistantPanel({ onClose }) {
   )
 }
 
+function Avatar() {
+  return (
+    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-white shadow-sm">
+      <Sparkles className="h-4 w-4" />
+    </span>
+  )
+}
+
 /* ---------------- one message from the assistant ---------------- */
 
 function BotMessage({ m, onChoose, onLead }) {
   return (
-    <div>
-      <p className="mb-1 text-[11.5px] text-slate-500">My World City · {m.at}</p>
-      <div className="border-l-[3px] border-brand-800 bg-white px-4 py-3.5">
-        {m.text && <p className="text-[14px] leading-relaxed text-navy-900">{m.text}</p>}
+    <div data-msg data-results={m.results ? '' : undefined} className="mwc-msg-in flex items-start gap-2.5">
+      <Avatar />
+      <div className="min-w-0 flex-1">
+        <p className="mb-1 text-[11.5px] text-slate-500">My World City · {m.at}</p>
+        <div className={`rounded-3xl rounded-tl-lg bg-white px-4 py-3.5 shadow-sm ring-1 ring-slate-100 ${m.results ? 'block' : 'inline-block max-w-full sm:max-w-[92%]'}`}>
+          {m.text && <p className="text-[14.5px] leading-relaxed text-navy-900">{m.text}</p>}
 
-        {m.options && (
-          <div className="mt-3 grid grid-cols-2 gap-2.5">
-            {m.options.map((o) => (
-              <button
-                key={o.label}
-                onClick={() => onChoose(o)}
-                className="rounded border-[1.5px] border-brand-800 px-3 py-2.5 text-[13.5px] font-bold text-brand-800 transition hover:bg-brand-800 hover:text-white"
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-        )}
+          {m.options && (
+            <div className="mt-3 flex flex-wrap gap-2.5">
+              {m.options.map((o) => {
+                const { Icon, color } = lookFor(o.label)
+                return (
+                  <button
+                    key={o.label}
+                    onClick={() => onChoose(o)}
+                    style={{ '--c': color }}
+                    className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[color:var(--c)] bg-[color-mix(in_srgb,var(--c)_9%,white)] px-4 py-2.5 text-[13.5px] font-bold text-[color:var(--c)] transition hover:-translate-y-0.5 hover:bg-[color:var(--c)] hover:text-white hover:shadow-md"
+                  >
+                    <Icon className="h-4 w-4 shrink-0" /> {o.label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
 
-        {m.results && <ResultCarousel items={m.results} />}
-        {m.summary && <SummaryTable rows={m.summary} />}
-        {m.lead && <LeadForm onSubmit={onLead} />}
+          {m.results && <ResultRow items={m.results} />}
+          {m.summary && <SummaryTable rows={m.summary} />}
+          {m.lead && <LeadForm onSubmit={onLead} />}
+        </div>
       </div>
     </div>
   )
@@ -317,45 +439,48 @@ function BotMessage({ m, onChoose, onLead }) {
 
 /* ---------------- property results ---------------- */
 
-function ResultCarousel({ items }) {
-  const [i, setI] = useState(0)
-  const p = items[i]
-  const many = items.length > 1
-
+// A swipeable row of cards — two or three are in view at once in the panel.
+function ResultRow({ items }) {
   return (
-    <div className="relative mt-3">
-      <article className="mx-auto w-full max-w-[260px] bg-white p-3 shadow-[0_2px_14px_-6px_rgba(8,26,51,0.3)] ring-1 ring-slate-200">
-        <div className="relative">
-          <img src={p.img} alt={p.title} className="aspect-[16/11] w-full object-cover" />
-          <span className="absolute right-0 top-0 grid h-9 w-9 place-items-center bg-cyan">
-            <Bookmark className="h-4 w-4 text-navy-900" />
-          </span>
-        </div>
-        <h4 className="mt-2.5 text-[15px] font-bold leading-snug text-navy-900">{p.title}</h4>
-        {p.loc && <p className="mt-1 text-[12px] leading-relaxed text-slate-500">{p.loc}</p>}
-        <p className="mt-2 flex flex-wrap items-center gap-x-3 text-[12px]">
-          <span className="font-bold text-navy-900">{p.priceLabel || 'Enquire'}</span>
-          {p.tag && <span className="text-slate-500">{p.tag}</span>}
-        </p>
-        <Link href={p.href || `/property/${p.slug}`}
-          className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-bold text-brand-800 hover:text-brand">
-          Read more <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-      </article>
-
-      {many && (
-        <>
-          <button onClick={() => setI((n) => (n - 1 + items.length) % items.length)} aria-label="Previous"
-            className="absolute left-0 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-slate-300 bg-white text-navy-800 shadow-sm transition hover:border-brand hover:text-brand">
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button onClick={() => setI((n) => (n + 1) % items.length)} aria-label="Next"
-            className="absolute right-0 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-slate-300 bg-white text-navy-800 shadow-sm transition hover:border-brand hover:text-brand">
-            <ChevronRight className="h-5 w-5" />
-          </button>
-          <p className="mt-2 text-center text-[11.5px] text-slate-500">{i + 1} of {items.length}</p>
-        </>
-      )}
+    <div className="mwc-scrollbar -mx-1 mt-3.5 flex snap-x gap-3 overflow-x-auto px-1 pb-2">
+      {items.map((p, i) => {
+        const color = CATEGORY_COLOR[p.tag] || BRAND
+        return (
+          <article
+            key={p.id || `${p.title}-${i}`}
+            style={{ '--c': color, animationDelay: `${i * 90}ms` }}
+            className="mwc-card-in group w-[218px] shrink-0 snap-start overflow-hidden rounded-2xl bg-white shadow-[0_4px_18px_-10px_rgba(8,26,51,0.4)] ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-[0_12px_26px_-12px_rgba(8,26,51,0.45)]"
+          >
+            <div className="relative overflow-hidden">
+              <img src={p.img} alt={p.title} loading="lazy" className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105" />
+              <span className="absolute left-2.5 top-2.5 rounded-full bg-[color:var(--c)] px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-white shadow-sm">
+                {p.type || p.tag}
+              </span>
+              {!p.sample && (
+                <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[10.5px] font-bold text-emerald-700 shadow-sm">
+                  <BadgeCheck className="h-3.5 w-3.5" /> Verified
+                </span>
+              )}
+            </div>
+            <div className="p-3.5">
+              <h4 className="truncate text-[15px] text-navy-900">{p.title}</h4>
+              <p className="mt-1 flex items-center gap-1 truncate text-[12.5px] text-slate-600">
+                <MapPin className="h-3.5 w-3.5 shrink-0 text-[color:var(--c)]" /> {p.address || p.loc}
+              </p>
+              <p className="mt-1.5 truncate text-[12.5px] font-bold text-navy-900">
+                {p.availability || 'Available'}
+                {(p.detail || p.size) && <span className="font-normal text-slate-600"> · {p.detail || p.size}</span>}
+              </p>
+              <Link
+                href={p.href || `/property/${p.slug}`}
+                className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[color-mix(in_srgb,var(--c)_10%,white)] py-2 text-[12.5px] font-bold text-[color:var(--c)] transition hover:bg-[color:var(--c)] hover:text-white"
+              >
+                {p.sample ? 'See similar' : 'View details'} <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </article>
+        )
+      })}
     </div>
   )
 }
@@ -363,9 +488,9 @@ function ResultCarousel({ items }) {
 function SummaryTable({ rows }) {
   if (!rows.length) return null
   return (
-    <dl className="mt-3 divide-y divide-slate-200 border-y border-slate-200">
+    <dl className="mt-3 divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200">
       {rows.map(([k, v]) => (
-        <div key={k} className="flex items-center justify-between gap-4 py-2.5">
+        <div key={k} className="flex items-center justify-between gap-4 bg-white px-3.5 py-2.5">
           <dt className="text-[13px] text-slate-500">{k}</dt>
           <dd className="text-[13px] font-bold text-navy-900">{v}</dd>
         </div>
@@ -394,23 +519,23 @@ function LeadForm({ onSubmit }) {
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 space-y-3">
+    <form onSubmit={submit} className="mt-3.5 max-w-sm space-y-3">
       <Field label="Your name" bad={nameBad}>
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name"
-          autoComplete="name" className="w-full bg-transparent px-3 py-2.5 text-[14px] text-navy-900 outline-none placeholder:text-slate-400" />
+          autoComplete="name" className="w-full bg-transparent px-4 py-2.5 text-[14px] text-navy-900 outline-none placeholder:text-slate-400" />
       </Field>
       {nameBad && <p className="text-[12px] font-medium text-rose-600">Enter your name</p>}
 
       <Field label="Mobile number" bad={phoneBad}>
         <input value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
           placeholder="10-digit number" inputMode="numeric" autoComplete="tel"
-          className="w-full bg-transparent px-3 py-2.5 text-[14px] text-navy-900 outline-none placeholder:text-slate-400" />
+          className="w-full bg-transparent px-4 py-2.5 text-[14px] text-navy-900 outline-none placeholder:text-slate-400" />
       </Field>
       {phoneBad && <p className="text-[12px] font-medium text-rose-600">Enter a valid 10-digit Indian mobile number</p>}
 
       <button type="submit" disabled={busy}
-        className="w-full rounded bg-cyan py-3 text-[14.5px] font-bold text-navy-900 transition hover:bg-cyan-600 disabled:opacity-60">
-        Request callback
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] py-3 text-[14.5px] font-bold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60">
+        <PhoneCall className="h-4 w-4" /> Request callback
       </button>
     </form>
   )
@@ -419,8 +544,8 @@ function LeadForm({ onSubmit }) {
 // Outlined box with the label notched into the top border.
 function Field({ label, bad, children }) {
   return (
-    <div className={`relative rounded border ${bad ? 'border-rose-500' : 'border-slate-300'}`}>
-      <span className={`absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] font-medium ${bad ? 'text-rose-600' : 'text-slate-500'}`}>
+    <div className={`relative rounded-full border ${bad ? 'border-rose-500' : 'border-slate-300'}`}>
+      <span className={`absolute -top-[9px] left-4 bg-white px-1 text-[11px] font-medium ${bad ? 'text-rose-600' : 'text-slate-500'}`}>
         {label}
       </span>
       {children}

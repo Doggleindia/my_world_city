@@ -1,6 +1,6 @@
 import { gallery } from '../data'
 
-export default function Gallery({ bg = 'bg-[#f5f6f8]' }) {
+export default function Gallery({ bg = 'bg-white' }) {
   return (
     <section className={bg}>
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">

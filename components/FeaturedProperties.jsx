@@ -46,7 +46,7 @@ export default async function FeaturedProperties() {
   const featured = await getFeatured()
 
   return (
-    <section className="bg-[#f6f7f9]">
+    <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-[#0A0A0A]">

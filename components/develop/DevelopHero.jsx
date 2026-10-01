@@ -1,54 +1,13 @@
-// import { developHeroImg } from '@/data'
-// import ContactButton from '@/components/contact/ContactButton'
-
-// export default function DevelopHero() {
-//   return (
-//     <section className="relative overflow-hidden bg-slate-900">
-//       <img
-//         src={developHeroImg}
-//         alt="Luxury property"
-//         className="absolute inset-0 h-full w-full object-cover"
-//       />
-//       {/* light wash on the left for the text */}
-//       <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-transparent" />
-
-//       <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24">
-//         <div className="max-w-xl">
-//           <h1 className="text-[32px] font-extrabold leading-tight tracking-tight text-navy-900 sm:text-[42px]">
-//             Developing a property?
-//             <br />
-//             The whole process handled.
-//           </h1>
-//           <p className="mt-5 max-w-md text-[15px] leading-relaxed text-slate-700">
-//             From legal clearances to the final Vastu check, we orchestrate every professional and
-//             permit required to turn your land into a masterpiece.
-//           </p>
-//           <ContactButton
-//             topic="Develop a property"
-//             title="Talk to our team"
-//             subtitle="Tell us about your land or project and we’ll guide you through the build."
-//             className="mt-7 rounded-full border border-slate-300 bg-white/90 px-6 py-3 text-[14px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
-//           >
-//             Talk to our team
-//           </ContactButton>
-//         </div>
-//       </div>
-//     </section>
-//   )
-// }
-
-
-
-
-// components/develop/DevelopHero.jsx
 import { developHeroImg, developHeroVideo } from '@/data'
 import ContactButton from '@/components/contact/ContactButton'
 
+// Build Property hero: the clip plays behind a dark wash on the left, so the
+// headline is set in white exactly like the home-page hero.
 export default function DevelopHero() {
   return (
-    <section className="relative overflow-hidden bg-slate-900">
-      {/* Background video. Muted + playsInline so mobile browsers allow autoplay;
-          the poster carries the section if the video is blocked or still loading. */}
+    <section data-dark className="relative overflow-hidden bg-navy-900">
+      {/* Muted + playsInline so mobile browsers allow autoplay; the poster
+          carries the section if the video is blocked or still loading. */}
       <video
         className="absolute inset-0 h-full w-full object-cover"
         src={developHeroVideo}
@@ -61,18 +20,23 @@ export default function DevelopHero() {
         aria-hidden="true"
         tabIndex={-1}
       />
-      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24">
-        <div className="max-w-xl">
-          {/* No wash over the video, so the headline carries its own soft halo
-              to stay readable as the clip pans across bright frames. */}
-          <h1 className="text-[32px] font-extrabold leading-tight tracking-tight text-navy-900 drop-shadow-[0_1px_10px_rgba(255,255,255,0.7)] sm:text-[42px]">
+      <div className="absolute inset-0 bg-gradient-to-r from-navy-900/75 via-navy-900/40 to-navy-900/10" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-navy-900/50 to-transparent" />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+        <div className="max-w-2xl">
+          <h1 className="text-[clamp(30px,4.6vw,57px)] text-white drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)]">
             Developing a property?<br />The whole process handled.
           </h1>
+          <p className="mt-5 max-w-xl text-[clamp(14px,1.5vw,19px)] font-medium text-white/85 drop-shadow-[0_1px_8px_rgba(8,26,51,0.5)]">
+            From legal clearances to the final Vastu check, we orchestrate every
+            professional and permit required to turn your land into a masterpiece.
+          </p>
           <ContactButton
             topic="Develop a property"
             title="Talk to our team"
             subtitle="Tell us about your land or project and we'll guide you through the build."
-            className="mt-7 rounded-full border border-slate-300 bg-white/90 px-6 py-3 text-[14px] font-semibold text-navy-800 transition hover:border-brand hover:text-brand"
+            className="mt-8 inline-flex items-center rounded-full bg-cyan px-7 py-3.5 text-[15px] font-bold text-navy-900 transition hover:bg-cyan-600"
           >
             Talk to our team
           </ContactButton>

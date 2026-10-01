@@ -22,7 +22,7 @@ export const heroRotatingWords = [
 export const hero = {
   // `bg` doubles as the video poster: it holds the frame while the clip loads
   // and stays put if the browser blocks autoplay.
-  bg: img('1503387762-592deb58ef4e', 1600),
+  bg: img('1600596542815-ffad4c1539a9', 1600),
   video: '/videos/home-hero.mp4',
 }
 

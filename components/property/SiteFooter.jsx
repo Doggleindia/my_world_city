@@ -30,7 +30,7 @@ const WHATSAPP = 'https://wa.me/919000000000'
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-navy-900 text-slate-300">
+    <footer data-dark className="bg-navy-900 text-slate-300">
       {/* Dealer CTA strip */}
       <div className="border-b border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 py-3.5 text-center text-[13px] sm:flex-row sm:px-6">

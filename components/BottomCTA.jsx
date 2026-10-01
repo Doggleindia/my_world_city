@@ -4,7 +4,7 @@ export default function BottomCTA() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
-        <div className="overflow-hidden rounded-3xl bg-[#0a2a52] text-white shadow-card">
+        <div data-dark className="overflow-hidden rounded-3xl bg-[#0a2a52] text-white shadow-card">
           <div className="grid items-center gap-8 p-6 sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-12">
             <div className="overflow-hidden rounded-2xl">
               <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80"
