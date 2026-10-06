@@ -116,7 +116,7 @@ export async function generateMetadata({ params }) {
 }
 
 const chip =
-  'inline-flex items-center gap-2 border border-white bg-white px-4 py-2.5 text-[15px] font-bold text-brand-800 shadow-sm transition hover:bg-slate-50'
+  'inline-flex min-w-[112px] items-center gap-1.5 border border-white bg-white px-2.5 py-1.5 text-[12px] font-bold text-brand-800 shadow-sm transition hover:bg-slate-50 sm:min-w-0 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-[15px]'
 const outlined =
   'inline-flex items-center gap-2 border border-brand-800 bg-white px-5 py-3 text-[15px] font-bold text-brand-800 transition hover:bg-brand-800 hover:text-white'
 
@@ -160,9 +160,10 @@ export default async function PropertyDetailPage({ params }) {
             alt={p.title}
             className="h-[260px] w-full object-cover sm:h-[380px] lg:h-[450px]"
           />
-          <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-3 p-4 sm:p-7">
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 sm:flex-wrap sm:gap-3 sm:p-7">
             <PropertyHeroBar id={p.id} />
-            <div className="flex flex-wrap gap-4">
+            {/* on phones the chips stack in a column against the right edge */}
+            <div className="ml-auto flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:flex-wrap sm:justify-end sm:gap-4">
               {p.photos.length > 0 && (
                 <PhotoLightbox images={p.photos} count={p.photoCount} trigger="chip" />
               )}
@@ -335,12 +336,12 @@ function FeatureList({ title, items }) {
   return (
     <section className="mt-10 border-t border-slate-200 pt-10">
       <h2 className="text-[26px] text-navy-900">{title}</h2>
-      <ul className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((a, i) => {
           const Icon = iconFor(a.icon)
           return (
-            <li key={i} className="flex items-center gap-4 text-[18px] text-navy-900">
-              <Icon className="h-6 w-6 shrink-0 text-[#a3163c]" strokeWidth={2.25} /> {a.label}
+            <li key={i} className="flex items-center gap-3 text-[15px] text-navy-900">
+              <Icon className="h-5 w-5 shrink-0 text-[#a3163c]" strokeWidth={2.25} /> {a.label}
             </li>
           )
         })}

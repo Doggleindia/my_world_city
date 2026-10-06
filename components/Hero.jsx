@@ -18,7 +18,7 @@ export default function Hero() {
           <div className="max-w-5xl">
             {/* Fluid size, computed from the width of the longest line so it
                 always fits: two lines from tablets up, three on phones. */}
-            <h1 className="pb-1 text-[length:clamp(22px,calc((100vw-2.5rem)/11.8),34px)] sm:text-[length:clamp(14px,calc((100vw-2.5rem)/19),57px)] text-white drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)]">
+            <h1 className="pb-1 text-[length:clamp(22px,calc((100vw-2.5rem)/11.8),38px)] sm:text-[length:clamp(14px,calc((100vw-2.5rem)/17.4),64px)] text-[#ffb020] drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)]">
               <span className="block whitespace-nowrap">Space and investment</span>
               <span className="block whitespace-nowrap">
                 solutions for{" "}

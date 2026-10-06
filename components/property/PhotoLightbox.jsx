@@ -36,9 +36,9 @@ export default function PhotoLightbox({ images = [], count, trigger }) {
         <button
           type="button"
           onClick={() => { setIdx(0); setOpen(true) }}
-          className="relative inline-flex items-center gap-2 border border-white bg-white px-4 py-2.5 text-[13.5px] font-bold text-brand-800 shadow-sm transition hover:bg-slate-50"
+          className="relative inline-flex min-w-[112px] items-center gap-1.5 border border-white bg-white px-2.5 py-1.5 text-[12px] font-bold text-brand-800 shadow-sm transition hover:bg-slate-50 sm:min-w-0 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-[15px]"
         >
-          <ImageIcon className="h-[18px] w-[18px]" /> Photos
+          <ImageIcon className="h-4 w-4 sm:h-[18px] sm:w-[18px]" /> Photos
           {/* count badge sits on the chip's corner, as in the design */}
           <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-brand-800 px-1 text-[11px] font-bold text-white">
             {count || photos.length}

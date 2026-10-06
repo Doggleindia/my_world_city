@@ -31,7 +31,11 @@ export default function HeroTabs() {
           onClick={toggleAssistant}
           aria-expanded={open}
           aria-controls="find-solution-panel"
-          className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-brand-800 px-3 py-3 text-center text-[14px] font-semibold text-white shadow-sm transition hover:bg-navy-700 sm:gap-2 sm:px-6 sm:text-[15px]"
+          className={`flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-3 text-center text-[14px] font-semibold shadow-sm transition sm:gap-2 sm:px-6 sm:text-[15px] ${
+            open
+              ? 'bg-[#ffb020] text-navy-900 ring-2 ring-[#ffb020]/40 ring-offset-2 ring-offset-slate-100 hover:bg-[#f0a30f]'
+              : 'bg-brand-800 text-white hover:bg-navy-700'
+          }`}
         >
           Find Solution
         </button>

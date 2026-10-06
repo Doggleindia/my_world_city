@@ -226,7 +226,7 @@ export default function ExportPdfButton({ data, variant = 'brochure', icon = 'do
 
   return (
     <button type="button" onClick={run} disabled={busy} className={`relative ${className}`}>
-      <Icon className={`h-[18px] w-[18px] ${busy ? 'animate-spin' : ''}`} />
+      <Icon className={`h-4 w-4 sm:h-[18px] sm:w-[18px] ${busy ? 'animate-spin' : ''}`} />
       {children}
       {badge != null && (
         <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-brand-800 px-1 text-[11px] font-bold text-white">

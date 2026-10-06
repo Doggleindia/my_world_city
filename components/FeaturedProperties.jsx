@@ -46,7 +46,7 @@ export default async function FeaturedProperties() {
   const featured = await getFeatured()
 
   return (
-    <section className="bg-white">
+    <section className="bg-[#f3f5f8]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-[#0A0A0A]">
@@ -61,7 +61,7 @@ export default async function FeaturedProperties() {
         </div>
 
         {/* three across on desktop, two rows of three */}
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-8">
+        <div className="mt-10 grid gap-7 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-8">
           {featured.slice(0, 6).map((p, i) => (
             <PropertyCard key={p.id || i} {...p} />
           ))}

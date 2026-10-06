@@ -7,7 +7,7 @@ import {
   RotateCw, Search, Send, Settings, Sparkles, Sprout, Store, TrendingUp, Wallet, Warehouse, X,
 } from 'lucide-react'
 import {
-  STEPS, searchParamsFor, summaryRows, parseFreeText, showcaseFor, rankByKind, nounFor,
+  STEPS, searchParamsFor, summaryRows, parseFreeText, showcaseFor, rankByKind, nounFor, answerQuestion,
 } from '@/lib/assistantFlow'
 
 const time = () =>
@@ -209,6 +209,8 @@ export default function AssistantPanel({ onClose }) {
 
   const choose = async (option) => {
     push({ from: 'user', text: option.label })
+    // some answers are plain links out of the chat (e.g. "Open List Property")
+    if (option.href) { window.location.assign(option.href); return }
     const next = { ...answers, ...(option.patch || {}) }
     setAnswers(next)
     // once an option is taken, the buttons on that message are spent
@@ -228,6 +230,10 @@ export default function AssistantPanel({ onClose }) {
       setAnswers({})
       return runStep('start', {})
     }
+
+    // a question ("how to buy industrial land?") gets a guide, not a search
+    const guide = answerQuestion(text)
+    if (guide) return say({ ...guide }, 700)
 
     const parsed = parseFreeText(text)
     if (!parsed) {
@@ -377,7 +383,7 @@ export default function AssistantPanel({ onClose }) {
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Try “villa in Jagatpura under 1 cr”…"
             aria-label="Type your message"
-            className="min-w-0 flex-1 rounded-full border border-slate-300 bg-slate-50 px-5 py-3 text-[14px] text-navy-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:bg-white"
+            className="min-w-0 flex-1 rounded-full border border-slate-300 bg-slate-50 px-5 py-3 text-[16px] text-navy-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:bg-white sm:text-[14px]"
           />
           <button type="submit" aria-label="Send"
             className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-white shadow-sm transition hover:brightness-110 disabled:opacity-40"
@@ -403,7 +409,7 @@ function Avatar() {
 
 function BotMessage({ m, onChoose, onLead }) {
   return (
-    <div data-msg data-results={m.results ? '' : undefined} className="mwc-msg-in flex items-start gap-2.5">
+    <div data-msg data-results={m.results || m.steps ? '' : undefined} className="mwc-msg-in flex items-start gap-2.5">
       <Avatar />
       <div className="min-w-0 flex-1">
         <p className="mb-1 text-[11.5px] text-slate-500">My World City · {m.at}</p>
@@ -426,6 +432,19 @@ function BotMessage({ m, onChoose, onLead }) {
                 )
               })}
             </div>
+          )}
+
+          {m.steps && (
+            <ol className="mt-3 space-y-2">
+              {m.steps.map((s, i) => (
+                <li key={i} className="flex gap-3 text-[14px] leading-relaxed text-navy-900">
+                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-[12px] font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ol>
           )}
 
           {m.results && <ResultRow items={m.results} />}
