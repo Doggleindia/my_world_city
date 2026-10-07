@@ -9,30 +9,25 @@ import AssistantPanel from '@/components/assistant/AssistantPanel'
 // drops down right beneath the tabs (the floating "Find property" button opens
 // the same one and scrolls here), and closes it again on a second click.
 export default function HeroTabs() {
-  const { open, session, toggleAssistant, closeAssistant, setInlineHost } = useAssistant()
+  const { open, mode, session, toggleInline, closeAssistant } = useAssistant()
+  const inline = open && mode === 'inline'
   const ref = useRef(null)
 
-  // Tell the provider this page shows the chat inline, not as a floating panel.
+  // Bring the dropdown into view when it opens.
   useEffect(() => {
-    setInlineHost(true)
-    return () => setInlineHost(false)
-  }, [setInlineHost])
-
-  // Bring the dropdown into view whichever button opened it.
-  useEffect(() => {
-    if (open) ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }, [open, session])
+    if (inline) ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [inline, session])
 
   return (
     <div ref={ref} id="find-solution" className="scroll-mt-24">
       <div className="mx-auto flex w-full max-w-3xl gap-2 rounded-full bg-slate-100 p-1.5">
         <button
           type="button"
-          onClick={toggleAssistant}
-          aria-expanded={open}
+          onClick={toggleInline}
+          aria-expanded={inline}
           aria-controls="find-solution-panel"
           className={`flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-3 text-center text-[14px] font-semibold shadow-sm transition sm:gap-2 sm:px-6 sm:text-[15px] ${
-            open
+            inline
               ? 'bg-[#ffb020] text-navy-900 ring-2 ring-[#ffb020]/40 ring-offset-2 ring-offset-slate-100 hover:bg-[#f0a30f]'
               : 'bg-brand-800 text-white hover:bg-navy-700'
           }`}
@@ -47,7 +42,7 @@ export default function HeroTabs() {
         </Link>
       </div>
 
-      {open && (
+      {inline && (
         <div
           id="find-solution-panel"
           role="region"

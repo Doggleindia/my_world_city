@@ -78,7 +78,8 @@ export default function RotatingWords({ items }) {
           with the word instead of spanning the whole reserved width. */}
       <span className="absolute inset-0 flex items-start">
         <span className="relative inline-block">
-          <span>{shown}</span>
+          {/* the changing phrase in its own colour: white fading to cyan */}
+          <span className="bg-gradient-to-r from-white via-white to-[#7fe3f0] bg-clip-text text-transparent">{shown}</span>
           {complete && <span className="text-accent">.</span>}
         </span>
         {!reduced && !complete && <span aria-hidden="true" className="mwc-caret" />}

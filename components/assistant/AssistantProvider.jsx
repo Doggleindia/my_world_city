@@ -1,41 +1,47 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import AssistantPanel from './AssistantPanel'
+import AssistantLauncher from './AssistantLauncher'
 
 const Ctx = createContext({
   open: false,
+  mode: 'floating',
   session: 0,
   openAssistant: () => {},
   closeAssistant: () => {},
-  toggleAssistant: () => {},
-  setInlineHost: () => {},
+  toggleInline: () => {},
 })
 
 export const useAssistant = () => useContext(Ctx)
 
-// Holds the Help Desk for the whole site, so any button — the hero's
-// "Find Solution", the floating "Find property" — opens the same
-// conversation rather than each one carrying its own copy.
-//
-// Where it appears depends on the page: the home page's hero tabs register
-// themselves as an inline host and the chat drops down beneath them; on a
-// page with no host it falls back to a floating panel.
+// Holds the Help Desk for the whole site. It can show in two places:
+//   inline   — the home page's "Find Solution" tab drops it down beneath the tabs
+//   floating — the round launcher (on every page) opens it as a panel right
+//              where the visitor is, without scrolling them anywhere
+// Either way it is the same conversation component.
 export default function AssistantProvider({ children }) {
   const [open, setOpen] = useState(false)
+  const [mode, setMode] = useState('floating')
   // Remounts the panel on each open so a new visit starts a fresh conversation.
   const [session, setSession] = useState(0)
-  const [inlineHost, setInlineHost] = useState(false)
+  const pathname = usePathname()
 
-  const openAssistant = useCallback(() => {
+  const openAssistant = useCallback((where = 'floating') => {
+    setMode(where)
     setSession((n) => n + 1)
     setOpen(true)
   }, [])
   const closeAssistant = useCallback(() => setOpen(false), [])
-  const toggleAssistant = useCallback(
-    () => (open ? closeAssistant() : openAssistant()),
-    [open, openAssistant, closeAssistant],
-  )
+  // the Find Solution tab: open inline, or close if already open inline
+  const toggleInline = useCallback(() => {
+    if (open && mode === 'inline') closeAssistant()
+    else openAssistant('inline')
+  }, [open, mode, openAssistant, closeAssistant])
+
+  // close on navigation
+  useEffect(() => { setOpen(false) }, [pathname])
 
   useEffect(() => {
     if (!open) return
@@ -44,11 +50,16 @@ export default function AssistantProvider({ children }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [open])
 
+  const inAdmin = pathname?.startsWith('/admin')
+
   return (
-    <Ctx.Provider value={{ open, session, openAssistant, closeAssistant, toggleAssistant, setInlineHost }}>
+    <Ctx.Provider value={{ open, mode, session, openAssistant, closeAssistant, toggleInline }}>
       {children}
 
-      {open && !inlineHost && (
+      {/* the round launcher, on every public page */}
+      {!inAdmin && <AssistantLauncher />}
+
+      {open && mode === 'floating' && (
         <>
           {/* dim the page on phones, where the panel covers most of the screen */}
           <div

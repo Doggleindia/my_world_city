@@ -12,6 +12,7 @@ void Expert
 function categoryOf(l) {
   if (l.type === 'service') return 'service'
   if (l.type === 'expert') return 'expert'
+  if (l.type === 'query') return 'query'
   if (l.propertyId) return 'property'
   return 'solution'
 }
