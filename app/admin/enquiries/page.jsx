@@ -13,6 +13,8 @@ const CAT_META = {
   property: { label: 'PROPERTY', cls: 'bg-blue-50 text-blue-600' },
   service: { label: 'SERVICE', cls: 'bg-amber-50 text-amber-700' },
   expert: { label: 'EXPERT', cls: 'bg-rose-50 text-rose-500' },
+  // raised from the Help Desk chat when the visitor could not find what they wanted
+  query: { label: 'QUERY', cls: 'bg-violet-50 text-violet-700' },
 }
 
 const STATUS_META = {

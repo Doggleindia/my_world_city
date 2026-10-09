@@ -31,7 +31,7 @@ export default async function ExpertsPage({ searchParams }) {
           Trusted professionals for every step of buying, building and owning
           property in the Pink City.
         </p>
-        <ExpertStepper />
+        <ExpertStepper experts={experts} />
         <div id="experts-directory" className="scroll-mt-24">
           <ExpertDirectory
             experts={experts}

@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
-  ArrowRight, BadgeCheck, Building2, Check, Factory, Hammer, Home, KeyRound, MapPin, PhoneCall,
+  ArrowRight, BadgeCheck, Building2, Check, Factory, Hammer, HelpCircle, Home, KeyRound, MapPin, PhoneCall,
   RotateCw, Search, Send, Settings, Sparkles, Sprout, Store, TrendingUp, Wallet, Warehouse, X,
 } from 'lucide-react'
 import {
-  STEPS, searchParamsFor, summaryRows, parseFreeText, showcaseFor, rankByKind, nounFor,
+  STEPS, searchParamsFor, summaryRows, parseFreeText, showcaseFor, rankByKind, nounFor, answerQuestion,
 } from '@/lib/assistantFlow'
 
 const time = () =>
@@ -40,6 +40,7 @@ const LOOKS = [
   [/farm|plot|land/i, Sprout, GREEN],
   [/₹|budget/i, Wallet, AMBER],
   [/call me|specialist/i, PhoneCall, GREEN],
+  [/query/i, HelpCircle, INDIGO],
   [/new search|other options|change my search/i, Search, INDIGO],
   [/^yes|own it/i, Check, GREEN],
   [/jaipur|nagar|road|pura|scheme|sarovar/i, MapPin, INDIGO],
@@ -99,6 +100,7 @@ export default function AssistantPanel({ onClose }) {
       if (id === 'results') return showResults(ans)
       if (id === 'showcase') return showShowcase(ans)
       if (id === 'lead') return say({ lead: true, text: 'Just two details and we will take it from here.' })
+      if (id === 'query') return say({ query: true, text: 'Tell us exactly what you’re looking for and our team will get back to you personally.' })
       if (id === 'restart_search') {
         await say({ text: 'No problem — let’s adjust the search.' })
         return runStep('buy_area', ans)
@@ -209,6 +211,8 @@ export default function AssistantPanel({ onClose }) {
 
   const choose = async (option) => {
     push({ from: 'user', text: option.label })
+    // some answers are plain links out of the chat (e.g. "Open List Property")
+    if (option.href) { window.location.assign(option.href); return }
     const next = { ...answers, ...(option.patch || {}) }
     setAnswers(next)
     // once an option is taken, the buttons on that message are spent
@@ -229,11 +233,15 @@ export default function AssistantPanel({ onClose }) {
       return runStep('start', {})
     }
 
+    // a question ("how to buy industrial land?") gets a guide, not a search
+    const guide = answerQuestion(text)
+    if (guide) return say({ ...guide }, 700)
+
     const parsed = parseFreeText(text)
     if (!parsed) {
       await say({
-        text: 'I can help you buy, build, manage or invest. Which one sounds right?',
-        options: STEPS.start.options,
+        text: 'I can help you buy, build, manage or invest. Which one sounds right? Or raise a query and our team will reply personally.',
+        options: [...STEPS.start.options, { label: 'Raise a query', next: 'query' }],
       })
       return
     }
@@ -248,6 +256,39 @@ export default function AssistantPanel({ onClose }) {
       return showResults(next)
     }
     return runStep(next.intent === 'build' ? 'build_land' : 'manage_need', next)
+  }
+
+  // "Raise a query": files a lead of type 'query' so it lands in the admin
+  // console's Enquiries with everything the visitor told us so far.
+  const submitQuery = async ({ name, phone, email, need }) => {
+    push({ from: 'user', text: need })
+    setItems((c) => c.map((m) => (m.query ? { ...m, query: false, done: true } : m)))
+    let refId = ''
+    try {
+      const brief = summaryRows(answers)
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'query',
+          name,
+          phone,
+          email: email || '',
+          budget: answers.budget || undefined,
+          message: [need, brief.length ? 'Chat so far — ' + brief.map(([k, v]) => k + ': ' + v).join(', ') : '']
+            .filter(Boolean)
+            .join('\n'),
+        }),
+      })
+      const data = await res.json()
+      if (res.ok) refId = data.refId || ''
+    } catch {
+      // the confirmation below still shows; a failed post is logged server-side
+    }
+    await say({
+      text: `Thanks, ${name.split(' ')[0]}. Your query${refId ? ` (ref ${refId})` : ''} has reached our team — a My World City specialist will contact you on ${phone.slice(0, 2)}XXXXXX${phone.slice(-2)} within 2 working hours.`,
+    })
+    await runStep('again', answers)
   }
 
   const submitLead = async ({ name, phone }) => {
@@ -298,13 +339,13 @@ export default function AssistantPanel({ onClose }) {
         <span className="pointer-events-none absolute -bottom-12 left-1/3 h-28 w-28 rounded-full bg-[#ef8f2a]/30 blur-2xl" />
 
         <div className="relative flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/20 ring-2 ring-white/40">
               <Sparkles className="h-5 w-5" />
             </span>
-            <div className="min-w-0">
-              <p className="truncate text-[16px] font-bold">My World City Help Desk</p>
-              <p className="mt-0.5 flex items-center gap-1.5 text-[12px] text-white/85">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[15px] font-medium">My World City Help Desk</p>
+              <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11.5px] font-light text-white/85">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
@@ -329,12 +370,12 @@ export default function AssistantPanel({ onClose }) {
       {/* what we know so far */}
       {chips.length > 0 && (
         <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto whitespace-nowrap border-b border-slate-100 bg-white px-4 py-2.5 [scrollbar-width:none] sm:px-5 [&::-webkit-scrollbar]:hidden">
-          <span className="mr-1 shrink-0 text-[11.5px] font-bold uppercase tracking-wide text-navy-900">Your brief</span>
+          <span className="mr-1 shrink-0 text-[11px] font-medium uppercase tracking-wide text-navy-900">Your brief</span>
           {chips.map(([k, v], i) => (
             <span
               key={k}
               style={{ '--c': CHIP_COLORS[i % CHIP_COLORS.length] }}
-              className="mwc-chip-in shrink-0 rounded-full bg-[color-mix(in_srgb,var(--c)_12%,white)] px-3 py-1 text-[12px] font-bold text-[color:var(--c)]"
+              className="mwc-chip-in shrink-0 rounded-full bg-[color-mix(in_srgb,var(--c)_12%,white)] px-3 py-1 text-[11.5px] font-medium text-[color:var(--c)]"
             >
               {v}
             </span>
@@ -347,15 +388,15 @@ export default function AssistantPanel({ onClose }) {
         {items.map((m, i) =>
           m.from === 'user' ? (
             <div key={i} data-msg className="mwc-msg-in">
-              <p className="mb-1 text-right text-[11.5px] text-slate-500">You · {m.at}</p>
+              <p className="mb-1 text-right text-[11px] font-light text-slate-500">You · {m.at}</p>
               <div className="flex justify-end">
-                <p className="max-w-[80%] rounded-3xl rounded-br-lg bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm">
+                <p className="max-w-[80%] rounded-3xl rounded-br-lg bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] px-5 py-2.5 text-[13.5px] font-normal text-white shadow-sm">
                   {m.text}
                 </p>
               </div>
             </div>
           ) : (
-            <BotMessage key={i} m={m} onChoose={choose} onLead={submitLead} />
+            <BotMessage key={i} m={m} onChoose={choose} onLead={submitLead} onQuery={submitQuery} />
           ),
         )}
 
@@ -369,15 +410,30 @@ export default function AssistantPanel({ onClose }) {
         )}
       </div>
 
+      {/* can't find it? — a standing offer above the message box */}
+      <div className="flex shrink-0 items-center justify-between gap-3 border-t border-amber-200 bg-amber-50 px-4 py-2 sm:px-5">
+        <p className="min-w-0 text-[12.5px] font-light text-navy-900">
+          <span className="font-medium">Can’t find what you need?</span>
+          <span className="hidden sm:inline"> Tell us and our team will contact you.</span>
+        </p>
+        <button
+          type="button"
+          onClick={() => { setItems((c) => c.map((m) => (m.options ? { ...m, options: null } : m))); runStep('query', answers) }}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#ffb020] px-3.5 py-1.5 text-[12.5px] font-medium text-navy-900 shadow-sm transition hover:bg-[#f0a30f]"
+        >
+          <HelpCircle className="h-4 w-4" /> Raise a query
+        </button>
+      </div>
+
       {/* composer */}
-      <div className="shrink-0 border-t border-slate-200 bg-white px-4 pb-2 pt-3 sm:px-5">
+      <div className="shrink-0 bg-white px-4 pb-2 pt-3 sm:px-5">
         <form onSubmit={send} className="flex items-center gap-2">
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Try “villa in Jagatpura under 1 cr”…"
             aria-label="Type your message"
-            className="min-w-0 flex-1 rounded-full border border-slate-300 bg-slate-50 px-5 py-3 text-[14px] text-navy-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:bg-white"
+            className="min-w-0 flex-1 rounded-full border border-slate-300 bg-slate-50 px-5 py-3 text-[16px] font-light text-navy-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:bg-white sm:text-[13.5px]"
           />
           <button type="submit" aria-label="Send"
             className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-white shadow-sm transition hover:brightness-110 disabled:opacity-40"
@@ -385,7 +441,7 @@ export default function AssistantPanel({ onClose }) {
             <Send className="h-5 w-5" />
           </button>
         </form>
-        <p className="pb-1 pt-1.5 text-right text-[11px] text-slate-400">My World City Assistant</p>
+        <p className="pb-1 pt-1.5 text-right text-[10.5px] font-light text-slate-400">My World City Assistant</p>
       </div>
     </div>
   )
@@ -401,14 +457,14 @@ function Avatar() {
 
 /* ---------------- one message from the assistant ---------------- */
 
-function BotMessage({ m, onChoose, onLead }) {
+function BotMessage({ m, onChoose, onLead, onQuery }) {
   return (
-    <div data-msg data-results={m.results ? '' : undefined} className="mwc-msg-in flex items-start gap-2.5">
+    <div data-msg data-results={m.results || m.steps ? '' : undefined} className="mwc-msg-in flex items-start gap-2.5">
       <Avatar />
       <div className="min-w-0 flex-1">
-        <p className="mb-1 text-[11.5px] text-slate-500">My World City · {m.at}</p>
+        <p className="mb-1 text-[11px] font-light text-slate-500">My World City · {m.at}</p>
         <div className={`rounded-3xl rounded-tl-lg bg-white px-4 py-3.5 shadow-sm ring-1 ring-slate-100 ${m.results ? 'block' : 'inline-block max-w-full sm:max-w-[92%]'}`}>
-          {m.text && <p className="text-[14.5px] leading-relaxed text-navy-900">{m.text}</p>}
+          {m.text && <p className="text-[13.5px] font-light leading-relaxed text-navy-900">{m.text}</p>}
 
           {m.options && (
             <div className="mt-3 flex flex-wrap gap-2.5">
@@ -419,7 +475,7 @@ function BotMessage({ m, onChoose, onLead }) {
                     key={o.label}
                     onClick={() => onChoose(o)}
                     style={{ '--c': color }}
-                    className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[color:var(--c)] bg-[color-mix(in_srgb,var(--c)_9%,white)] px-4 py-2.5 text-[13.5px] font-bold text-[color:var(--c)] transition hover:-translate-y-0.5 hover:bg-[color:var(--c)] hover:text-white hover:shadow-md"
+                    className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[color:var(--c)] bg-[color-mix(in_srgb,var(--c)_9%,white)] px-4 py-2 text-[13px] font-medium text-[color:var(--c)] transition hover:-translate-y-0.5 hover:bg-[color:var(--c)] hover:text-white hover:shadow-md"
                   >
                     <Icon className="h-4 w-4 shrink-0" /> {o.label}
                   </button>
@@ -428,9 +484,23 @@ function BotMessage({ m, onChoose, onLead }) {
             </div>
           )}
 
+          {m.steps && (
+            <ol className="mt-3 space-y-2">
+              {m.steps.map((s, i) => (
+                <li key={i} className="flex gap-3 text-[13.5px] font-light leading-relaxed text-navy-900">
+                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-[11.5px] font-medium text-white">
+                    {i + 1}
+                  </span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+
           {m.results && <ResultRow items={m.results} />}
           {m.summary && <SummaryTable rows={m.summary} />}
           {m.lead && <LeadForm onSubmit={onLead} />}
+          {m.query && <QueryForm onSubmit={onQuery} />}
         </div>
       </div>
     </div>
@@ -453,27 +523,27 @@ function ResultRow({ items }) {
           >
             <div className="relative overflow-hidden">
               <img src={p.img} alt={p.title} loading="lazy" className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105" />
-              <span className="absolute left-2.5 top-2.5 rounded-full bg-[color:var(--c)] px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-white shadow-sm">
+              <span className="absolute left-2.5 top-2.5 rounded-full bg-[color:var(--c)] px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-white shadow-sm">
                 {p.type || p.tag}
               </span>
               {!p.sample && (
-                <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[10.5px] font-bold text-emerald-700 shadow-sm">
+                <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[10px] font-medium text-emerald-700 shadow-sm">
                   <BadgeCheck className="h-3.5 w-3.5" /> Verified
                 </span>
               )}
             </div>
             <div className="p-3.5">
-              <h4 className="truncate text-[15px] text-navy-900">{p.title}</h4>
-              <p className="mt-1 flex items-center gap-1 truncate text-[12.5px] text-slate-600">
+              <h4 className="truncate text-[14px] text-navy-900">{p.title}</h4>
+              <p className="mt-1 flex items-center gap-1 truncate text-[12px] font-light text-slate-600">
                 <MapPin className="h-3.5 w-3.5 shrink-0 text-[color:var(--c)]" /> {p.address || p.loc}
               </p>
-              <p className="mt-1.5 truncate text-[12.5px] font-bold text-navy-900">
+              <p className="mt-1.5 truncate text-[12px] font-medium text-navy-900">
                 {p.availability || 'Available'}
                 {(p.detail || p.size) && <span className="font-normal text-slate-600"> · {p.detail || p.size}</span>}
               </p>
               <Link
                 href={p.href || `/property/${p.slug}`}
-                className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[color-mix(in_srgb,var(--c)_10%,white)] py-2 text-[12.5px] font-bold text-[color:var(--c)] transition hover:bg-[color:var(--c)] hover:text-white"
+                className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[color-mix(in_srgb,var(--c)_10%,white)] py-2 text-[12px] font-medium text-[color:var(--c)] transition hover:bg-[color:var(--c)] hover:text-white"
               >
                 {p.sample ? 'See similar' : 'View details'} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
@@ -491,8 +561,8 @@ function SummaryTable({ rows }) {
     <dl className="mt-3 divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200">
       {rows.map(([k, v]) => (
         <div key={k} className="flex items-center justify-between gap-4 bg-white px-3.5 py-2.5">
-          <dt className="text-[13px] text-slate-500">{k}</dt>
-          <dd className="text-[13px] font-bold text-navy-900">{v}</dd>
+          <dt className="text-[12.5px] font-light text-slate-500">{k}</dt>
+          <dd className="text-[12.5px] font-medium text-navy-900">{v}</dd>
         </div>
       ))}
     </dl>
@@ -534,8 +604,75 @@ function LeadForm({ onSubmit }) {
       {phoneBad && <p className="text-[12px] font-medium text-rose-600">Enter a valid 10-digit Indian mobile number</p>}
 
       <button type="submit" disabled={busy}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] py-3 text-[14.5px] font-bold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60">
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] py-3 text-[14px] font-medium text-white shadow-sm transition hover:brightness-110 disabled:opacity-60">
         <PhoneCall className="h-4 w-4" /> Request callback
+      </button>
+    </form>
+  )
+}
+
+/* ---------------- query form ---------------- */
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+// "Raise a query": for anything the guided flow could not answer. Lands in the
+// admin console as a lead of type 'query'.
+function QueryForm({ onSubmit }) {
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [need, setNeed] = useState('')
+  const [touched, setTouched] = useState(false)
+  const [busy, setBusy] = useState(false)
+
+  const bad = {
+    name: touched && name.trim().length < 2,
+    phone: touched && !PHONE_RE.test(phone),
+    email: touched && email.trim() !== '' && !EMAIL_RE.test(email.trim()),
+    need: touched && need.trim().length < 10,
+  }
+
+  const submit = (e) => {
+    e.preventDefault()
+    setTouched(true)
+    if (name.trim().length < 2 || !PHONE_RE.test(phone) || need.trim().length < 10 || (email.trim() && !EMAIL_RE.test(email.trim()))) return
+    setBusy(true)
+    onSubmit({ name: name.trim(), phone, email: email.trim(), need: need.trim() })
+  }
+
+  const input = 'w-full bg-transparent px-4 py-2.5 text-[14px] text-navy-900 outline-none placeholder:text-slate-400'
+
+  return (
+    <form onSubmit={submit} className="mt-3.5 max-w-sm space-y-3">
+      <Field label="Your name" bad={bad.name}>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" autoComplete="name" className={input} />
+      </Field>
+      {bad.name && <p className="text-[12px] font-medium text-rose-600">Enter your name</p>}
+
+      <Field label="Mobile number" bad={bad.phone}>
+        <input value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="10-digit number"
+          inputMode="numeric" autoComplete="tel" className={input} />
+      </Field>
+      {bad.phone && <p className="text-[12px] font-medium text-rose-600">Enter a valid 10-digit Indian mobile number</p>}
+
+      <Field label="Email (optional)" bad={bad.email}>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" className={input} />
+      </Field>
+      {bad.email && <p className="text-[12px] font-medium text-rose-600">Enter a valid email address</p>}
+
+      <div className={`relative rounded-2xl border ${bad.need ? 'border-rose-500' : 'border-slate-300'}`}>
+        <span className={`absolute -top-[9px] left-4 bg-white px-1 text-[11px] font-medium ${bad.need ? 'text-rose-600' : 'text-slate-500'}`}>
+          What are you looking for?
+        </span>
+        <textarea rows={4} value={need} onChange={(e) => setNeed(e.target.value)}
+          placeholder="e.g. A 3 BHK villa in Vaishali Nagar under 1.5 Cr with a garden, ready to move"
+          className={`${input} resize-y`} />
+      </div>
+      {bad.need && <p className="text-[12px] font-medium text-rose-600">Tell us a little more (at least 10 characters)</p>}
+
+      <button type="submit" disabled={busy}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] py-3 text-[14px] font-medium text-white shadow-sm transition hover:brightness-110 disabled:opacity-60">
+        <Send className="h-4 w-4" /> Submit query
       </button>
     </form>
   )

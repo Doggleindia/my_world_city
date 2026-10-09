@@ -20,7 +20,7 @@ const STEPS = [
   { title: 'About you', heading: 'Let’s get to know you', sub: 'We’ll use these details to set up your account and stay in touch.', icon: UserIcon },
   { title: 'Property basics', heading: 'Tell us about the property', sub: 'Just the essentials buyers care about — type, size, price and possession.', icon: Home },
   { title: 'Address', heading: 'Where is the property located?', sub: 'Add the address so we can match buyers in the right area.', icon: MapPin },
-  { title: 'Photos', heading: 'Add photos of the property', sub: 'Upload one clear photo for each space. Well-labelled listings get more high-intent leads.', icon: Camera },
+  { title: 'Photos', heading: 'Add photos of the property', sub: 'Upload one clear photo for each space — listings with photos get more high-intent leads. You can skip this and add photos later.', icon: Camera },
   { title: 'Nearby & connectivity', heading: 'What’s nearby?', sub: 'Add nearby landmarks buyers care about — schools, hospitals, transport. You can skip this.', icon: Compass },
   { title: 'Your goals', heading: 'What are your goals?', sub: 'Set your monthly lead target — and optionally tell us where you’d like leads from.', icon: Target },
   { title: 'Review & submit', heading: 'Review & submit', sub: 'Quick check before you send this to our team for approval.', icon: CheckCircle2 },
@@ -69,9 +69,9 @@ export default function ListPropertyPage() {
     if (step === 1) return form.title.trim().length >= 3 && !!form.propertyType
     if (step === 2) {
       const pinOk = !form.pincode || /^[1-9][0-9]{5}$/.test(form.pincode)
-      return form.locality.trim().length >= 2 && form.city.trim().length >= 2 && pinOk
+      return form.address.trim().length >= 2 && form.city.trim().length >= 2 && pinOk
     }
-    if (step === 3) return Object.keys(form.photos).length >= 1
+    if (step === 3) return true // photos are optional — the owner can skip and add them later
     return true
   }, [step, form])
 
@@ -94,7 +94,7 @@ export default function ListPropertyPage() {
       const photos = PHOTO_SLOTS.filter((s) => form.photos[s.key]).map((s) => ({
         slot: s.key, label: s.label, url: form.photos[s.key],
       }))
-      if (!photos.length) throw new Error('Add at least one photo before submitting')
+      const cover = photos[0]?.url || PLACEHOLDER[meta.category] || PLACEHOLDER.Residential
 
       const payload = {
         title: form.title.trim(),
@@ -102,8 +102,8 @@ export default function ListPropertyPage() {
         listingType: meta.listingType,
         priceLabel: form.priceLabel || undefined,
         area: form.area || undefined,
-        location: { locality: form.locality.trim(), city: form.city.trim() },
-        gallery: { main: photos[0].url, thumbs: photos.slice(1).map((p) => p.url) },
+        location: { locality: (form.locality || form.address).trim(), city: form.city.trim() },
+        gallery: { main: cover, thumbs: photos.slice(1).map((p) => p.url) },
         description: form.description || undefined,
         profession: form.profession,
         propertyType: form.propertyType,
@@ -216,12 +216,22 @@ export default function ListPropertyPage() {
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
               {step < STEPS.length - 1 ? (
-                <button
-                  type="button" onClick={next}
-                  className="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-[14.5px] font-semibold text-white transition hover:bg-brand-700"
-                >
-                  Continue <ArrowRight className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-4">
+                  {step === 3 && Object.keys(form.photos).length === 0 && (
+                    <button
+                      type="button" onClick={next}
+                      className="text-[14px] font-semibold text-slate-500 underline-offset-4 transition hover:text-navy-800 hover:underline"
+                    >
+                      Skip for now
+                    </button>
+                  )}
+                  <button
+                    type="button" onClick={next}
+                    className="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-[14.5px] font-semibold text-white transition hover:bg-brand-700"
+                  >
+                    Continue <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button" onClick={submit} disabled={busy}
@@ -248,12 +258,21 @@ function hint(step) {
   return [
     'Add your name, a valid email address, and tell us what you do.',
     'Give the property a name and pick its type.',
-    'Add at least the area/street and city — and a 6-digit pincode if you enter one.',
-    'Upload at least one photo.',
+    'Add at least the building / house and city — and a 6-digit pincode if you enter one.',
+    'Upload a photo, or use Skip for now.',
   ][step] || 'Please complete this step.'
 }
 
 /* ---------------- shared bits ---------------- */
+
+// Cover image used when the owner skips the photo step, so the card and the
+// property page still have a picture until real photos are added.
+const PLACEHOLDER = {
+  Residential: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+  Commercial: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+  Industrial: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+  'Farm & Agri': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
+}
 
 const field =
   'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-[14px] text-navy-900 outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/15'
@@ -499,12 +518,6 @@ function Address({ form, set }) {
       <Field label="Flat / House no. / Building">
         <input value={form.address} onChange={(e) => set('address', e.target.value)} placeholder="Tower B-1204, Skyline Residences" className={field} />
       </Field>
-      <Field label="Area / Street / Sector">
-        <input value={form.locality} onChange={(e) => set('locality', e.target.value)} placeholder="Sitapura, Tonk Road" className={field} />
-      </Field>
-      <Field label="Landmark (optional)">
-        <input value={form.landmark} onChange={(e) => set('landmark', e.target.value)} placeholder="e.g. near World Trade Park" className={field} />
-      </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Pincode">
           <input value={form.pincode} onChange={(e) => set('pincode', e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="302017" className={field} />
@@ -516,16 +529,6 @@ function Address({ form, set }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="State"><input value={form.state} onChange={(e) => set('state', e.target.value)} className={field} /></Field>
         <Field label="Country"><input value={form.country} onChange={(e) => set('country', e.target.value)} className={field} /></Field>
-      </div>
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5">
-        <span className="flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-white text-brand shadow-sm"><MapPin className="h-4 w-4" /></span>
-          <span>
-            <span className="block text-[13.5px] font-semibold text-navy-800">Pin exact location on map</span>
-            <span className="block text-[12px] text-slate-500">Helps buyers find your entrance</span>
-          </span>
-        </span>
-        <span className="text-[13px] font-semibold text-slate-400">Coming soon</span>
       </div>
     </div>
   )
@@ -713,7 +716,7 @@ function Review({ form }) {
     ['Property & type', `${form.title || '—'} · ${t.label}`],
     ['Configuration', form.configuration.join(', ') || '—'],
     ['Price', `${form.priceLabel || '—'}${form.negotiable ? ' · Negotiable' : ''}`],
-    ['Location', [form.locality, form.city].filter(Boolean).join(', ') || '—'],
+    ['Location', [form.locality || form.address, form.city].filter(Boolean).join(', ') || '—'],
   ]
   return (
     <div>
