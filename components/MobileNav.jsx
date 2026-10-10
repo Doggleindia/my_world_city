@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X, Heart, LayoutDashboard, Shield, LogOut } from 'lucide-react'
@@ -19,6 +20,14 @@ export default function MobileNav({ links }) {
     }
   }, [open])
 
+  // Close on Escape, and on any route change.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open])
+
   const close = () => setOpen(false)
 
   return (
@@ -31,8 +40,8 @@ export default function MobileNav({ links }) {
         <Menu className="h-5 w-5" />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-[70]">
+      {open && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100]">
           <div
             className="absolute inset-0 bg-navy-900/40 backdrop-blur-sm"
             onClick={close}
@@ -98,7 +107,8 @@ export default function MobileNav({ links }) {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )

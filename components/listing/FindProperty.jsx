@@ -6,6 +6,7 @@ import { Loader2, SearchX, SlidersHorizontal } from 'lucide-react'
 import FilterChipsBar from './FilterChipsBar'
 import FilterSidebar from './FilterSidebar'
 import PropertyCard from './PropertyCard'
+import CategoryChips from '@/components/CategoryChips'
 
 const CATEGORIES = ['All', 'Residential', 'Commercial', 'Industrial', 'Farm & Agri']
 
@@ -77,21 +78,7 @@ export default function FindProperty() {
 
           <div className="min-w-0 flex-1">
             {/* Category tabs */}
-            <div className="mb-5 flex flex-wrap gap-2.5">
-              {CATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCat(c)}
-                  className={`rounded-full px-4 py-2 text-[13px] font-semibold transition ${
-                    c === cat
-                      ? 'bg-navy-800 text-white'
-                      : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:ring-slate-300'
-                  }`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
+            <CategoryChips items={CATEGORIES} value={cat} onChange={setCat} className="mb-5" />
 
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-[15px] font-semibold text-navy-800">

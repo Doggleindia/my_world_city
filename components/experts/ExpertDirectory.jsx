@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 import ExpertCard from './ExpertCard'
+import CategoryChips from '@/components/CategoryChips'
 import { expertList, expertCategories } from '@/data'
 
 export default function ExpertDirectory({ experts, categories, initialCat = 'All' }) {
@@ -37,19 +38,7 @@ export default function ExpertDirectory({ experts, categories, initialCat = 'All
       </div>
 
       {/* Category chips */}
-      <div className="mt-5 flex flex-wrap gap-2.5">
-        {cats.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCat(c)}
-            className={`rounded-full px-4 py-2 text-[13px] font-semibold transition ${
-              c === cat ? 'bg-navy-800 text-white' : 'bg-slate-200/70 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            {c}
-          </button>
-        ))}
-      </div>
+      <CategoryChips items={cats} value={cat} onChange={setCat} className="mt-5" />
 
       {/* grid */}
       <div className="mt-7">
