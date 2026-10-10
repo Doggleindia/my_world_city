@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { Download, FileText, Loader2, Map } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { Check, Copy, Download, FileText, Link2, Loader2, Mail, Map, MessageCircle, Share2, X } from 'lucide-react'
 
-// Builds a PDF of the listing in the browser and downloads it.
+// Builds a PDF of the listing in the browser, then opens a share sheet so it
+// can go straight to WhatsApp, Drive, Mail… or be downloaded.
 //   variant "brochure" — the full property brochure (Export pdf / Brochures)
 //   variant "siteplan" — the unit schedule + location sheet (Plans / Download Site Plans)
 // jsPDF is imported on click so it never lands in the page bundle.
@@ -209,6 +211,7 @@ function build(jsPDF, raw, variant) {
 
 export default function ExportPdfButton({ data, variant = 'brochure', icon = 'download', badge, className = '', children }) {
   const [busy, setBusy] = useState(false)
+  const [sheet, setSheet] = useState(null) // { file, filename, doc } once the PDF is built
 
   const run = async () => {
     if (busy) return
@@ -216,7 +219,9 @@ export default function ExportPdfButton({ data, variant = 'brochure', icon = 'do
     try {
       const [{ jsPDF }, photo] = await Promise.all([import('jspdf'), loadImage(data.photoUrl)])
       const doc = build(jsPDF, { ...data, photo, url: window.location.href }, variant)
-      doc.save(`${data.slug || 'property'}-${variant === 'siteplan' ? 'site-plans' : 'brochure'}.pdf`)
+      const filename = `${data.slug || 'property'}-${variant === 'siteplan' ? 'site-plans' : 'brochure'}.pdf`
+      const file = new File([doc.output('blob')], filename, { type: 'application/pdf' })
+      setSheet({ file, filename, doc })
     } finally {
       setBusy(false)
     }
@@ -225,14 +230,135 @@ export default function ExportPdfButton({ data, variant = 'brochure', icon = 'do
   const Icon = busy ? Loader2 : icon === 'file' ? FileText : icon === 'map' ? Map : Download
 
   return (
-    <button type="button" onClick={run} disabled={busy} className={`relative ${className}`}>
-      <Icon className={`h-4 w-4 sm:h-[18px] sm:w-[18px] ${busy ? 'animate-spin' : ''}`} />
-      {children}
-      {badge != null && (
-        <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-brand-800 px-1 text-[11px] font-bold text-white">
-          {badge}
-        </span>
+    <>
+      <button type="button" onClick={run} disabled={busy} className={`relative ${className}`}>
+        <Icon className={`h-4 w-4 sm:h-[18px] sm:w-[18px] ${busy ? 'animate-spin' : ''}`} />
+        {children}
+        {badge != null && (
+          <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-brand-800 px-1 text-[11px] font-bold text-white">
+            {badge}
+          </span>
+        )}
+      </button>
+      {/* Kept outside the button: React events bubble through the component
+          tree even across a portal, so a sheet nested in the button would
+          re-fire the export on every click inside it. */}
+      {sheet && (
+        <ShareSheet
+          file={sheet.file}
+          filename={sheet.filename}
+          title={data.title}
+          label={variant === 'siteplan' ? 'Site plans' : 'Brochure'}
+          plural={variant === 'siteplan'}
+          onDownload={() => sheet.doc.save(sheet.filename)}
+          onClose={() => setSheet(null)}
+        />
       )}
-    </button>
+    </>
+  )
+}
+
+/* ---------------- share sheet ---------------- */
+
+// Shown as soon as the PDF is ready. "Share file" hands the actual PDF to the
+// device's share sheet (WhatsApp, Drive, Gmail, AirDrop…) where the browser
+// supports it; the other buttons work everywhere — WhatsApp and Email open
+// with a ready-made message and the property link, and the file itself is a
+// one-tap download for attaching.
+function ShareSheet({ file, filename, title, label, plural = false, onDownload, onClose }) {
+  const [copied, setCopied] = useState(false)
+  const [canShareFile, setCanShareFile] = useState(false)
+  const [note, setNote] = useState('')
+
+  useEffect(() => {
+    try { setCanShareFile(!!(navigator.canShare && navigator.canShare({ files: [file] }))) } catch { setCanShareFile(false) }
+    const onKey = (e) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
+  }, [file, onClose])
+
+  const url = typeof window !== 'undefined' ? window.location.href : ''
+  const text = `${title} — ${label} from My World City\n${url}`
+
+  const shareFile = async () => {
+    try {
+      await navigator.share({ files: [file], title, text: `${title} — My World City` })
+      onClose()
+    } catch (err) {
+      if (err?.name !== 'AbortError') setNote('Sharing the file is not available here — download it and attach it instead.')
+    }
+  }
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800) } catch { /* ignore */ }
+  }
+
+  const row = 'flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-[14px] font-medium text-navy-900 transition hover:border-brand hover:bg-brand/5'
+  const ico = 'grid h-10 w-10 shrink-0 place-items-center rounded-full text-white'
+
+  return createPortal(
+    <div className="fixed inset-0 z-[110] flex items-end justify-center bg-navy-900/55 p-3 backdrop-blur-[2px] sm:items-center" onMouseDown={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Share ${label}`}
+        className="mwc-assistant w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl sm:p-6"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[17px] font-bold text-navy-900">Your {label.toLowerCase()} {plural ? 'are' : 'is'} ready</p>
+            <p className="mt-0.5 truncate text-[13px] text-slate-600">{filename}</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close" className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-2.5">
+          {canShareFile && (
+            <button type="button" onClick={shareFile} className={row}>
+              <span className={`${ico} bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb]`}><Share2 className="h-5 w-5" /></span>
+              <span className="min-w-0 flex-1">
+                <span className="block">Share the PDF…</span>
+                <span className="block text-[12px] font-normal text-slate-500">WhatsApp, Drive, Gmail and more</span>
+              </span>
+            </button>
+          )}
+          <button type="button" onClick={onDownload} className={row}>
+            <span className={`${ico} bg-brand-800`}><Download className="h-5 w-5" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block">Download PDF</span>
+              <span className="block text-[12px] font-normal text-slate-500">Save it to this device</span>
+            </span>
+          </button>
+          <a href={`https://wa.me/?text=${encodeURIComponent(text)}`} target="_blank" rel="noreferrer" className={row}>
+            <span className={`${ico} bg-[#25d366]`}><MessageCircle className="h-5 w-5" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block">WhatsApp</span>
+              <span className="block text-[12px] font-normal text-slate-500">Send the property link{canShareFile ? '' : ' — attach the downloaded PDF'}</span>
+            </span>
+          </a>
+          <a href={`mailto:?subject=${encodeURIComponent(`${title} — ${label}`)}&body=${encodeURIComponent(text)}`} className={row}>
+            <span className={`${ico} bg-[#ea4335]`}><Mail className="h-5 w-5" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block">Email</span>
+              <span className="block text-[12px] font-normal text-slate-500">Opens your mail app with the link</span>
+            </span>
+          </a>
+          <button type="button" onClick={copy} className={row}>
+            <span className={`${ico} bg-slate-700`}>{copied ? <Check className="h-5 w-5" /> : <Link2 className="h-5 w-5" />}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block">{copied ? 'Link copied' : 'Copy property link'}</span>
+              <span className="block text-[12px] font-normal text-slate-500">Paste it anywhere</span>
+            </span>
+            {!copied && <Copy className="h-4 w-4 text-slate-400" />}
+          </button>
+        </div>
+
+        {note && <p className="mt-3 text-[12.5px] text-rose-600">{note}</p>}
+      </div>
+    </div>,
+    document.body,
   )
 }

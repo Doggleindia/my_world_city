@@ -54,7 +54,7 @@ export default function AssistantLauncher() {
         className="group relative grid h-[60px] w-[60px] shrink-0 place-items-center rounded-full bg-white shadow-[0_12px_30px_-8px_rgba(8,26,51,0.55)] ring-1 ring-slate-200 transition hover:scale-105 sm:h-16 sm:w-16"
       >
         {/* soft pulse so the eye finds it */}
-        {!seen && <span aria-hidden="true" className="absolute inset-0 animate-ping rounded-full bg-brand/20 [animation-duration:2.4s]" />}
+        {!seen && <span aria-hidden="true" className="mwc-pulse absolute inset-0 rounded-full bg-brand/25" />}
 
         {/* brand mark: the orange house outline with MWC inside */}
         <svg viewBox="0 0 64 64" className="relative h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true">
