@@ -45,6 +45,7 @@ export const GET = handler(async (req) => {
     email: l.email || null,
     budget: l.budget || null,
     message: l.message || null,
+    attachments: (l.attachments || []).map((a) => ({ url: a.url, name: a.name, type: a.type, size: a.size })),
     serviceKey: l.serviceKey || null,
     about: {
       primary: l.propertyId?.title || l.serviceKey || 'General enquiry',
