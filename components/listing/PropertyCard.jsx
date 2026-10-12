@@ -9,6 +9,8 @@ import SaveButton from '@/components/SaveButton'
 //   type         — the category (Residential, Commercial, …)
 //   size         — the area the owner entered
 //
+// `flush` (Find Property on phones) bleeds the card to the screen edges with a
+// taller photo; from tablet up it is the normal rounded card.
 // `onUnsave` (Saved page) swaps the save toggle for a remove button.
 // Cards without an id (static fallback content) show a plain bookmark.
 
@@ -30,6 +32,7 @@ export default function PropertyCard({
   img,
   href = '/find-property',
   onUnsave,
+  flush = false,
   className = '',
 }) {
   const accent = ACCENT[type] || '#0b3f80'
@@ -37,14 +40,14 @@ export default function PropertyCard({
   return (
     <article
       style={{ '--c': accent }}
-      className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_-18px_rgba(8,26,51,0.45)] transition duration-300 hover:-translate-y-1 hover:border-[color:var(--c)]/40 hover:shadow-[0_22px_40px_-20px_rgba(8,26,51,0.5)] ${className}`}
+      className={`group flex flex-col overflow-hidden border border-slate-200/80 bg-white ${flush ? 'rounded-none border-x-0 sm:rounded-2xl sm:border-x' : 'rounded-2xl'} shadow-[0_10px_30px_-18px_rgba(8,26,51,0.45)] transition duration-300 hover:-translate-y-1 hover:border-[color:var(--c)]/40 hover:shadow-[0_22px_40px_-20px_rgba(8,26,51,0.5)] ${className}`}
     >
       <div className="relative overflow-hidden">
         <Link href={href} className="block">
           <img
             src={img}
             alt={title}
-            className="aspect-[3/2] w-full object-cover transition duration-500 group-hover:scale-105"
+            className={`w-full object-cover transition duration-500 group-hover:scale-105 ${flush ? 'aspect-[4/3] sm:aspect-[3/2]' : 'aspect-[3/2]'}`}
           />
         </Link>
         {/* category ribbon, coloured per category */}

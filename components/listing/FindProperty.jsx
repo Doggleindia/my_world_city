@@ -103,9 +103,9 @@ export default function FindProperty() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="-mx-4 grid grid-cols-1 gap-6 sm:mx-0 sm:grid-cols-2 xl:grid-cols-3">
                 {items.map((p) => (
-                  <PropertyCard key={p.id} {...p} className="w-full" />
+                  <PropertyCard key={p.id} {...p} flush className="w-full" />
                 ))}
               </div>
             )}

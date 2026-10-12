@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   Loader2, ChevronDown, ChevronRight, ChevronLeft, Calendar,
-  AlertCircle, Inbox,
+  AlertCircle, Inbox, Paperclip,
 } from 'lucide-react'
 import { useAdminStats } from '../layout'
 
@@ -229,6 +229,23 @@ function Row({ l, showType, onStatus }) {
       <td className="px-3 py-4">
         <p className="text-[13.5px] font-semibold text-navy-800">{l.about.primary}</p>
         {l.about.secondary && <p className="text-[12px] text-slate-400">{l.about.secondary}</p>}
+        {l.attachments?.length > 0 && (
+          <p className="mt-1.5 flex flex-wrap gap-1.5">
+            {l.attachments.map((a, i) => (
+              <a
+                key={i}
+                href={a.url}
+                target="_blank"
+                rel="noreferrer"
+                download={a.url.startsWith('data:') ? a.name : undefined}
+                title={a.name}
+                className="inline-flex max-w-[180px] items-center gap-1 rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-semibold text-brand hover:bg-brand/20"
+              >
+                <Paperclip className="h-3 w-3 shrink-0" /> <span className="truncate">{a.name}</span>
+              </a>
+            ))}
+          </p>
+        )}
       </td>
       <td className="px-3 py-4 text-[13.5px] text-slate-600">{l.locality || '—'}</td>
       <td className="px-3 py-4">
