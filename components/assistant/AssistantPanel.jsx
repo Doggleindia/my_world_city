@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
-  ArrowRight, BadgeCheck, Building2, Check, Factory, Hammer, HelpCircle, Home, KeyRound, MapPin, PhoneCall,
+  ArrowRight, BadgeCheck, Building2, Check, Factory, FileText, Hammer, HelpCircle, Home, Image as ImageIcon, KeyRound, Loader2, MapPin, Paperclip, PhoneCall,
   RotateCw, Search, Send, Settings, Sparkles, Sprout, Store, TrendingUp, Wallet, Warehouse, X,
 } from 'lucide-react'
 import {
@@ -260,12 +260,28 @@ export default function AssistantPanel({ onClose }) {
 
   // "Raise a query": files a lead of type 'query' so it lands in the admin
   // console's Enquiries with everything the visitor told us so far.
-  const submitQuery = async ({ name, phone, email, need }) => {
-    push({ from: 'user', text: need })
+  const submitQuery = async ({ name, phone, email, need, file }) => {
+    push({ from: 'user', text: file ? `${need}\n📎 ${file.name}` : need })
     setItems((c) => c.map((m) => (m.query ? { ...m, query: false, done: true } : m)))
     let refId = ''
+    let attachNote = ''
     try {
       const brief = summaryRows(answers)
+      // the attachment (optional) goes up first; the query still goes
+      // through if the upload fails, and the visitor is told
+      let attachments
+      if (file) {
+        try {
+          const body = new FormData()
+          body.append('file', file)
+          const up = await fetch('/api/leads/attachment', { method: 'POST', body })
+          const meta = await up.json()
+          if (!up.ok) throw new Error(meta.error || 'Upload failed')
+          attachments = [{ url: meta.url, name: meta.name, type: meta.type, size: meta.size }]
+        } catch (err) {
+          attachNote = ` We couldn’t attach ${file.name} (${err.message}) — please send it again or mention it when we call.`
+        }
+      }
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -275,6 +291,7 @@ export default function AssistantPanel({ onClose }) {
           phone,
           email: email || '',
           budget: answers.budget || undefined,
+          attachments,
           message: [need, brief.length ? 'Chat so far — ' + brief.map(([k, v]) => k + ': ' + v).join(', ') : '']
             .filter(Boolean)
             .join('\n'),
@@ -286,7 +303,7 @@ export default function AssistantPanel({ onClose }) {
       // the confirmation below still shows; a failed post is logged server-side
     }
     await say({
-      text: `Thanks, ${name.split(' ')[0]}. Your query${refId ? ` (ref ${refId})` : ''} has reached our team — a My World City specialist will contact you on ${phone.slice(0, 2)}XXXXXX${phone.slice(-2)} within 2 working hours.`,
+      text: `Thanks, ${name.split(' ')[0]}. Your query${refId ? ` (ref ${refId})` : ''} has reached our team — a My World City specialist will contact you on ${phone.slice(0, 2)}XXXXXX${phone.slice(-2)} within 2 working hours.${attachNote}`,
     })
     await runStep('again', answers)
   }
@@ -622,6 +639,8 @@ function QueryForm({ onSubmit }) {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [need, setNeed] = useState('')
+  const [file, setFile] = useState(null) // optional PDF or image
+  const [fileError, setFileError] = useState('')
   const [touched, setTouched] = useState(false)
   const [busy, setBusy] = useState(false)
 
@@ -637,8 +656,18 @@ function QueryForm({ onSubmit }) {
     setTouched(true)
     if (name.trim().length < 2 || !PHONE_RE.test(phone) || need.trim().length < 10 || (email.trim() && !EMAIL_RE.test(email.trim()))) return
     setBusy(true)
-    onSubmit({ name: name.trim(), phone, email: email.trim(), need: need.trim() })
+    onSubmit({ name: name.trim(), phone, email: email.trim(), need: need.trim(), file })
   }
+
+  const pick = (e) => {
+    const f = e.target.files?.[0]
+    e.target.value = ''
+    if (!f) return
+    if (f.size > 8 * 1024 * 1024) { setFileError('That file is over 8 MB — please choose a smaller one.'); return }
+    if (!(f.type === 'application/pdf' || f.type.startsWith('image/'))) { setFileError('Please attach a PDF or an image.'); return }
+    setFileError(''); setFile(f)
+  }
+  const sizeLabel = (n) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`)
 
   const input = 'w-full bg-transparent px-4 py-2.5 text-[14px] text-navy-900 outline-none placeholder:text-slate-400'
 
@@ -670,9 +699,35 @@ function QueryForm({ onSubmit }) {
       </div>
       {bad.need && <p className="text-[12px] font-medium text-rose-600">Tell us a little more (at least 10 characters)</p>}
 
+      {/* optional attachment: a PDF or image, up to 8 MB */}
+      {file ? (
+        <div className="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-3.5 py-2.5">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-brand shadow-sm">
+            {file.type === 'application/pdf' ? <FileText className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-medium text-navy-900">{file.name}</p>
+            <p className="text-[11.5px] text-slate-500">{sizeLabel(file.size)}</p>
+          </div>
+          <button type="button" onClick={() => { setFile(null); setFileError('') }} aria-label="Remove attachment" className="grid h-8 w-8 place-items-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      ) : (
+        <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-slate-300 px-3.5 py-2.5 transition hover:border-brand hover:bg-brand/5">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-600"><Paperclip className="h-4 w-4" /></span>
+          <span className="min-w-0">
+            <span className="block text-[13px] font-medium text-navy-900">Attach a file <span className="font-light text-slate-400">(optional)</span></span>
+            <span className="block text-[11.5px] font-light text-slate-500">PDF or image, up to 8 MB</span>
+          </span>
+          <input type="file" accept="application/pdf,image/*" className="sr-only" onChange={pick} />
+        </label>
+      )}
+      {fileError && <p className="text-[12px] font-medium text-rose-600">{fileError}</p>}
+
       <button type="submit" disabled={busy}
         className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] py-3 text-[14px] font-medium text-white shadow-sm transition hover:brightness-110 disabled:opacity-60">
-        <Send className="h-4 w-4" /> Submit query
+        {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> {file ? 'Uploading & sending…' : 'Sending…'}</> : <><Send className="h-4 w-4" /> Submit query</>}
       </button>
     </form>
   )
