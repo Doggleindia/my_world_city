@@ -1,5 +1,6 @@
 import { developHeroImg, developHeroVideo } from '@/data'
 import ContactButton from '@/components/contact/ContactButton'
+import AttachFileButton from '@/components/contact/AttachFileButton'
 
 // Build Property hero: the clip plays behind a dark wash on the left, so the
 // headline is set in white exactly like the home-page hero.
@@ -40,6 +41,16 @@ export default function DevelopHero() {
           >
             Talk to our team
           </ContactButton>
+          {/* send a site plan, document or photo straight to the team */}
+          <div className="mt-4">
+            <AttachFileButton
+              variant="light"
+              topic="Develop a property"
+              title="Talk to our team"
+              subtitle="Your file is attached — add your details and we’ll get back to you."
+            />
+            <p className="mt-2 text-[12.5px] text-white/70">Have a site plan, title document or photo? Send it to our team.</p>
+          </div>
         </div>
       </div>
     </section>

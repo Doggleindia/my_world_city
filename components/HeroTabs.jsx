@@ -38,7 +38,7 @@ export default function HeroTabs() {
           href="/list-property"
           className="flex-1 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-3 text-center text-[14px] font-semibold text-navy-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:px-6 sm:text-[15px]"
         >
-          List Property
+          Post Requirement
         </Link>
       </div>
 

@@ -1,5 +1,6 @@
 import { ClipboardList, Handshake, MessageSquare } from 'lucide-react'
 import { serviceSteps } from '@/data'
+import AttachFileButton from '@/components/contact/AttachFileButton'
 
 const iconMap = { ClipboardList, Handshake, MessageSquare }
 
@@ -31,6 +32,20 @@ export default function ServicesHero() {
                 </div>
               )
             })}
+          </div>
+
+          {/* send a document or photo straight to the concierge team */}
+          <div className="mt-3 flex flex-col items-center justify-between gap-3 rounded-xl border border-dashed border-brand/30 bg-brand/5 px-4 py-3.5 text-left sm:flex-row sm:px-5">
+            <div className="min-w-0">
+              <p className="text-[14px] font-bold text-navy-800">Have a document or photo to share?</p>
+              <p className="text-[12.5px] text-slate-500">Attach a site plan, agreement or picture and our concierge team will take it from there.</p>
+            </div>
+            <AttachFileButton
+              className="shrink-0"
+              topic="Concierge service request"
+              title="Connect to us"
+              subtitle="Your file is attached — add your details and our concierge team will source it."
+            />
           </div>
         </div>
       </div>
