@@ -5,7 +5,7 @@ import { useAssistant } from './AssistantProvider'
 
 // Floating Help Desk launcher in the lower-right of the home page: a round
 // white button carrying the brand mark, a red "1" badge, and a greeting
-// bubble ("Hello there 👋, chat with us!") that slides in a moment after the
+// bubble ("Hello 👋 can connect for solution") that slides in a moment after the
 // page loads. Both open the chat as a floating panel right where the visitor
 // is, on every page; once opened, the badge and greeting stay away for the
 // rest of the visit.
@@ -38,9 +38,9 @@ export default function AssistantLauncher() {
         <button
           type="button"
           onClick={launch}
-          className="mwc-greet relative max-w-[230px] rounded-2xl bg-white px-4 py-2.5 text-left text-[13.5px] font-bold leading-snug text-navy-900 shadow-[0_10px_30px_-10px_rgba(8,26,51,0.45)] ring-1 ring-slate-200 sm:max-w-none sm:text-[14.5px]"
+          className="mwc-greet relative max-w-[200px] rounded-2xl bg-white px-3.5 py-2 text-left text-[12.5px] font-medium leading-snug text-navy-900 shadow-[0_10px_30px_-10px_rgba(8,26,51,0.45)] ring-1 ring-slate-200 sm:max-w-none sm:text-[13px]"
         >
-          Hello there <span aria-hidden="true">👋</span>, looking for a property? Chat with us!
+          Hello <span aria-hidden="true">👋</span> can connect for solution
           {/* little tail pointing at the button */}
           <span aria-hidden="true" className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 bg-white ring-1 ring-slate-200 [clip-path:polygon(100%_0,100%_100%,0_100%)]" />
         </button>

@@ -19,7 +19,7 @@ export default function Hero() {
             {/* Poster-scale headline: four short lines, bold and tight, with the
                 size computed from the longest line (the rotating phrase) so it
                 always fits the screen. */}
-            <h1 className="!font-bold !leading-[0.98] text-[length:clamp(22px,calc((100vw-2.5rem)/10.6),42px)] sm:text-[length:clamp(14px,min(calc((100vw-2.5rem)/11.8),12.5vh),92px)] text-[#ffb020] drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)]">
+            <h1 className="!font-bold !leading-[0.98] text-[length:clamp(26px,calc((100vw-2.5rem)/9.4),48px)] sm:text-[length:clamp(14px,min(calc((100vw-2.5rem)/11.8),12.5vh),92px)] text-[#ffb020] drop-shadow-[0_2px_14px_rgba(8,26,51,0.45)]">
               <span className="block whitespace-nowrap">Space and</span>
               <span className="block whitespace-nowrap">investment</span>
               <span className="block whitespace-nowrap">solutions for</span>

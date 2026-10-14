@@ -35,7 +35,7 @@ export default function ContactButton({
   )
 }
 
-function ContactModal({ open, onClose, topic, title, subtitle }) {
+export function ContactModal({ open, onClose, topic, title, subtitle, initialFile = null }) {
   const [sent, setSent] = useState(false)
   const [refId, setRefId] = useState('')
   const [busy, setBusy] = useState(false)
@@ -43,8 +43,8 @@ function ContactModal({ open, onClose, topic, title, subtitle }) {
   const [fileError, setFileError] = useState('')
 
   useEffect(() => {
-    if (open) { setSent(false); setFile(null); setFileError('') }
-  }, [open])
+    if (open) { setSent(false); setFile(initialFile); setFileError('') }
+  }, [open, initialFile])
 
   useEffect(() => {
     if (!open) return
