@@ -401,13 +401,13 @@ export default function AssistantPanel({ onClose }) {
       )}
 
       {/* conversation */}
-      <div ref={scroller} className="mwc-scrollbar relative flex-1 space-y-4 overflow-y-auto bg-gradient-to-b from-[#eef4ff] via-white to-[#fff5ea] px-4 py-4 sm:px-5">
+      <div ref={scroller} data-dark className="mwc-scrollbar relative flex-1 space-y-4 overflow-y-auto bg-gradient-to-b from-[#0b3f80] via-[#123f86] to-[#1a4f9e] px-4 py-4 sm:px-5">
         {items.map((m, i) =>
           m.from === 'user' ? (
             <div key={i} data-msg className="mwc-msg-in">
-              <p className="mb-1 text-right text-[11px] font-light text-slate-500">You · {m.at}</p>
+              <p className="mb-1 text-right text-[11px] font-light text-white/65">You · {m.at}</p>
               <div className="flex justify-end">
-                <p className="max-w-[80%] rounded-3xl rounded-br-lg bg-gradient-to-r from-[#0b3f80] to-[#1f5fbf] px-5 py-2.5 text-[13.5px] font-normal text-white shadow-sm">
+                <p className="max-w-[80%] rounded-3xl rounded-br-lg bg-gradient-to-r from-[#3fd0e0] to-[#7fe3f0] px-5 py-2.5 text-[13.5px] font-medium text-navy-900 shadow-sm">
                   {m.text}
                 </p>
               </div>
@@ -420,7 +420,7 @@ export default function AssistantPanel({ onClose }) {
         {typing && (
           <div className="flex items-end gap-2.5">
             <Avatar />
-            <div className="inline-flex rounded-3xl rounded-bl-lg bg-white px-4 py-3.5 shadow-sm ring-1 ring-slate-100">
+            <div className="inline-flex rounded-3xl rounded-bl-lg bg-white/15 px-4 py-3.5 ring-1 ring-white/20">
               <span className="mwc-dots"><i /><i /><i /></span>
             </div>
           </div>
@@ -466,7 +466,7 @@ export default function AssistantPanel({ onClose }) {
 
 function Avatar() {
   return (
-    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-white shadow-sm">
+    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-white shadow-sm ring-2 ring-white/40">
       <Sparkles className="h-4 w-4" />
     </span>
   )
@@ -475,13 +475,16 @@ function Avatar() {
 /* ---------------- one message from the assistant ---------------- */
 
 function BotMessage({ m, onChoose, onLead, onQuery }) {
+  const card = !!(m.results || m.lead || m.query || m.summary)
   return (
     <div data-msg data-results={m.results || m.steps ? '' : undefined} className="mwc-msg-in flex items-start gap-2.5">
       <Avatar />
       <div className="min-w-0 flex-1">
-        <p className="mb-1 text-[11px] font-light text-slate-500">My World City · {m.at}</p>
-        <div className={`rounded-3xl rounded-tl-lg bg-white px-4 py-3.5 shadow-sm ring-1 ring-slate-100 ${m.results ? 'block' : 'inline-block max-w-full sm:max-w-[92%]'}`}>
-          {m.text && <p className="text-[13.5px] font-light leading-relaxed text-navy-900">{m.text}</p>}
+        <p className="mb-1 text-[11px] font-light text-white/65">My World City · {m.at}</p>
+        {/* plain messages sit on the blue as glassy bubbles with light text;
+            forms, results and summaries keep a white card */}
+        <div className={`rounded-3xl rounded-tl-lg px-4 py-3.5 ${card ? 'bg-white shadow-sm ring-1 ring-slate-100' : 'bg-white/[0.12] ring-1 ring-white/20 backdrop-blur-sm'} ${m.results ? 'block' : 'inline-block max-w-full sm:max-w-[92%]'}`}>
+          {m.text && <p className={`text-[13.5px] leading-relaxed ${card ? 'font-light text-navy-900' : 'font-normal text-white'}`}>{m.text}</p>}
 
           {m.options && (
             <div className="mt-3 flex flex-wrap gap-2.5">
@@ -504,7 +507,7 @@ function BotMessage({ m, onChoose, onLead, onQuery }) {
           {m.steps && (
             <ol className="mt-3 space-y-2">
               {m.steps.map((s, i) => (
-                <li key={i} className="flex gap-3 text-[13.5px] font-light leading-relaxed text-navy-900">
+                <li key={i} className={`flex gap-3 text-[13.5px] leading-relaxed ${card ? 'font-light text-navy-900' : 'font-normal text-white/95'}`}>
                   <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#1f5fbf] to-[#22b9cb] text-[11.5px] font-medium text-white">
                     {i + 1}
                   </span>

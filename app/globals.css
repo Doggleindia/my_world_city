@@ -344,10 +344,10 @@ h3 { line-height: 1.086 !important; }
 @media (prefers-reduced-motion: reduce) { .mwc-slide-in { animation: none; } }
 
 /* Help Desk launcher pulse: a gentle ring that never grows past the screen edge */
-.mwc-pulse { animation: mwc-pulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite; }
-@keyframes mwc-pulse {
+.mwc-launcher-pulse { animation: mwc-launcher-pulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite; }
+@keyframes mwc-launcher-pulse {
   0%   { transform: scale(1);    opacity: 0.7; }
   70%  { transform: scale(1.35); opacity: 0; }
   100% { transform: scale(1.35); opacity: 0; }
 }
-@media (prefers-reduced-motion: reduce) { .mwc-pulse { animation: none; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .mwc-launcher-pulse { animation: none; opacity: 0; } }
