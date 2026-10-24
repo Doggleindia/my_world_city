@@ -59,6 +59,7 @@ export const GET = handler(async (_req, { params }) => {
       views: d.views || 0,
       enquiries,
       owner: d.ownerId ? { name: d.ownerId.name || 'Owner', phone: d.ownerId.phone || '', email: d.ownerId.email || '' } : null,
+      contact: { name: d.contact?.name || '', role: d.contact?.role || '', phone: d.contact?.phone || '', email: d.contact?.email || '' },
       createdAt: d.createdAt,
     },
   })
@@ -96,6 +97,15 @@ export const PATCH = handler(async (req, { params }) => {
       city: body.location.city ?? doc.location?.city,
       lat: body.location.lat === '' ? undefined : body.location.lat ?? doc.location?.lat,
       lng: body.location.lng === '' ? undefined : body.location.lng ?? doc.location?.lng,
+    }
+  }
+  if (body.contact) {
+    const t = (v) => (typeof v === 'string' ? v.trim() : '')
+    doc.contact = {
+      name: t(body.contact.name) || undefined,
+      role: t(body.contact.role) || undefined,
+      phone: t(body.contact.phone).replace(/\D/g, '').slice(-10) || undefined,
+      email: t(body.contact.email).toLowerCase() || undefined,
     }
   }
   if (Array.isArray(body.badges)) doc.badges = body.badges

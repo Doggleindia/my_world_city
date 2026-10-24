@@ -19,6 +19,7 @@ import User from '@/lib/models/User' // registered for populate
 import { getSession } from '@/lib/auth/session'
 import { formatPrice } from '@/lib/formatPrice'
 import { withDefaults } from '@/lib/propertyDefaults'
+import ContactReveal from '@/components/property/ContactReveal'
 import { getPublicExperts } from '@/lib/experts'
 
 export const dynamic = 'force-dynamic'
@@ -76,6 +77,15 @@ function toDetail(doc) {
     photos: [doc.gallery?.main, ...(doc.gallery?.thumbs || [])].filter(Boolean),
     photoCount: doc.photoCount || (doc.gallery?.thumbs?.length || 0) + 1,
     nearby,
+    contact: doc.contact?.phone || doc.contact?.email
+      ? {
+          name: doc.contact.name || 'Listing contact',
+          role: doc.contact.role || 'Property contact',
+          phone: doc.contact.phone || null,
+          email: doc.contact.email || null,
+          avatar: null,
+        }
+      : null,
     owner: owner
       ? {
           name: owner.name || 'Property owner',
@@ -289,11 +299,12 @@ export default async function PropertyDetailPage({ params }) {
       <section id="availability" className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <h2 className="text-[30px] text-navy-900 sm:text-[34px]">Availability</h2>
         <div className="mt-7 overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse text-left">
+          <table className="w-full min-w-[640px] border-collapse text-left">
             <thead>
               <tr className="bg-brand-800 text-white">
                 <th className="px-5 py-4 text-[14px] font-bold">Unit Name</th>
                 <th className="px-5 py-4 text-[14px] font-bold">Lettable Area (sq.m)</th>
+                <th className="px-5 py-4 text-[14px] font-bold">Layout</th>
                 <th className="px-5 py-4 text-[14px] font-bold">Availability Status</th>
               </tr>
             </thead>
@@ -302,6 +313,12 @@ export default async function PropertyDetailPage({ params }) {
                 <tr key={u.name} className="border-b border-slate-300">
                   <td className="px-5 py-5 text-[16px] font-bold text-navy-900">{u.name}</td>
                   <td className="px-5 py-5 text-[16px] text-[#0A0A0A]">{u.area}</td>
+                  <td className="px-5 py-5">
+                    {/* the unit's layout / floor plan as a PDF to view or share */}
+                    <ExportPdfButton data={pdf} variant="siteplan" icon="map" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-brand-800 px-3.5 py-1.5 text-[13px] font-semibold text-brand-800 transition hover:bg-brand-800 hover:text-white">
+                      View layout
+                    </ExportPdfButton>
+                  </td>
                   <td className="px-5 py-5 text-[16px] font-bold text-brand-800">{u.status}</td>
                 </tr>
               ))}
@@ -381,26 +398,8 @@ function Contact({ c, compact = false }) {
       <div className="min-w-0">
         <p className="text-[17px] font-bold text-navy-900">{c.name}</p>
         <p className="mt-0.5 text-[15px] text-[#0A0A0A]">{c.role}</p>
-        {compact ? (
-          <p className="mt-1.5 text-[14px] text-navy-900 [overflow-wrap:anywhere]">
-            {c.phone && <a href={`tel:+91${c.phone}`} className="hover:underline">+91 {c.phone}</a>}
-            {c.phone && c.email && ' • '}
-            {c.email && <a href={`mailto:${c.email}`} className="hover:underline">{c.email}</a>}
-          </p>
-        ) : (
-          <>
-            {c.phone && (
-              <a href={`tel:+91${c.phone}`} className="mt-2.5 flex items-center gap-2 text-[15px] text-navy-900 hover:underline">
-                <Phone className="h-4 w-4 shrink-0 text-brand-800" /> +91 {c.phone}
-              </a>
-            )}
-            {c.email && (
-              <a href={`mailto:${c.email}`} className="mt-1.5 flex items-center gap-2 text-[15px] text-navy-900 hover:underline">
-                <Mail className="h-4 w-4 shrink-0 text-brand-800" /> <span className="truncate">{c.email}</span>
-              </a>
-            )}
-          </>
-        )}
+        {/* hidden until the visitor taps "View contact" */}
+        <ContactReveal phone={c.phone} email={c.email} compact={compact} />
       </div>
     </div>
   )

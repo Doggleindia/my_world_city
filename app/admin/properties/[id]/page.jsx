@@ -28,6 +28,7 @@ export default function PropertyEditor() {
   const set = (k, v) => setP((s) => ({ ...s, [k]: v }))
   const setLoc = (k, v) => setP((s) => ({ ...s, location: { ...s.location, [k]: v } }))
   const setDet = (k, v) => setP((s) => ({ ...s, details: { ...s.details, [k]: v } }))
+  const setContact = (k, v) => setP((s) => ({ ...s, contact: { ...(s.contact || {}), [k]: v } }))
   const toggleAmenity = (a) => setP((s) => ({ ...s, amenities: s.amenities.includes(a) ? s.amenities.filter((x) => x !== a) : [...s.amenities, a] }))
 
   const save = useCallback(async (patch) => {
@@ -37,6 +38,7 @@ export default function PropertyEditor() {
       address: p.address, pincode: p.pincode, description: p.description,
       location: p.location, amenities: p.amenities, gallery: p.gallery,
       featured: p.featured, verified: p.verified, flagged: p.flagged, details: p.details,
+      contact: p.contact,
     }
     const res = await fetch(`/api/admin/properties/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     setSaving(false)
@@ -137,6 +139,18 @@ export default function PropertyEditor() {
               <Field label="Built-up Area"><input value={p.details.builtUpArea} onChange={(e) => setDet('builtUpArea', e.target.value)} placeholder="2100 sqft" className={inp} /></Field>
               <Field label="Age"><input value={p.details.age} onChange={(e) => setDet('age', e.target.value)} placeholder="2 Years" className={inp} /></Field>
               <Field label="Possession"><input value={p.details.possession} onChange={(e) => setDet('possession', e.target.value)} placeholder="Ready to move" className={inp} /></Field>
+            </div>
+          </Section>
+
+          <Section title="Listing Contact">
+            <p className="mb-4 text-[13px] text-slate-500">
+              Shown on this property's page (hidden until the visitor taps “View contact”). Leave blank to use the owner, or the My World City desk for this category.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Contact Name"><input value={p.contact?.name || ''} onChange={(e) => setContact('name', e.target.value)} placeholder="e.g. Amit Verma" className={inp} /></Field>
+              <Field label="Role"><input value={p.contact?.role || ''} onChange={(e) => setContact('role', e.target.value)} placeholder="e.g. Sales Manager" className={inp} /></Field>
+              <Field label="Phone"><input value={p.contact?.phone || ''} onChange={(e) => setContact('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="10-digit mobile" inputMode="numeric" className={inp} /></Field>
+              <Field label="Email"><input type="email" value={p.contact?.email || ''} onChange={(e) => setContact('email', e.target.value)} placeholder="name@example.com" className={inp} /></Field>
             </div>
           </Section>
 
