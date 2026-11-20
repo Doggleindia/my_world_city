@@ -1,23 +1,43 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAssistant } from './AssistantProvider'
 
 // Floating Help Desk launcher in the lower-right of the home page: a round
-// white button carrying the brand mark, a red "1" badge, and a greeting
+// button carrying the help-desk agent's photo, a red "1" badge, and a greeting
 // bubble ("Hello 👋 can connect for solution") that slides in a moment after the
 // page loads. Both open the chat as a floating panel right where the visitor
 // is, on every page; once opened, the badge and greeting stay away for the
 // rest of the visit.
+//
+// Five seconds after the site loads (or is reloaded) the chat also opens by
+// itself. The launcher lives in the root layout, so moving between pages inside
+// the site doesn't restart the timer — it pops up once per load, not per page.
+const AUTO_OPEN_MS = 5000
+
 export default function AssistantLauncher() {
   const { open, openAssistant } = useAssistant()
   const [greet, setGreet] = useState(false)
   const [seen, setSeen] = useState(false)
+  // read inside the auto-open timer without restarting it on every open/close
+  const openRef = useRef(open)
+  openRef.current = open
 
   useEffect(() => {
     const t = setTimeout(() => setGreet(true), 1400)
     return () => clearTimeout(t)
   }, [])
+
+  // auto-open once per load, unless the chat is already open by then
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (openRef.current) return
+      setSeen(true)
+      setGreet(false)
+      openAssistant('floating')
+    }, AUTO_OPEN_MS)
+    return () => clearTimeout(t)
+  }, [openAssistant])
 
   const launch = () => {
     setSeen(true)
@@ -56,12 +76,16 @@ export default function AssistantLauncher() {
         {/* soft pulse so the eye finds it */}
         {!seen && <span aria-hidden="true" className="mwc-launcher-pulse absolute inset-0 rounded-full bg-brand/25" />}
 
-        {/* brand mark: the orange house outline with MWC inside */}
-        <svg viewBox="0 0 64 64" className="relative h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true">
-          <path d="M8 29 L32 10 L56 29" fill="none" stroke="#FF9800" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M14 27 V52 H50 V27" fill="none" stroke="#FF9800" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
-          <text x="32" y="46" textAnchor="middle" fontFamily="stolzl, sans-serif" fontWeight="700" fontSize="15" fill="#0b2a5c">MWC</text>
-        </svg>
+        {/* the help-desk agent */}
+        <img
+          src="/helpdesk-agent.jpg"
+          alt=""
+          aria-hidden="true"
+          className="relative h-full w-full rounded-full object-cover ring-2 ring-white"
+        />
+
+        {/* online dot */}
+        <span aria-hidden="true" className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-white" />
 
         {/* unread badge */}
         {!seen && (

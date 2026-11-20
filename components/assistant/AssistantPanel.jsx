@@ -357,9 +357,8 @@ export default function AssistantPanel({ onClose }) {
 
         <div className="relative flex items-center justify-between gap-3">
           <div className="flex min-w-0 flex-1 items-center gap-3">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/20 ring-2 ring-white/40">
-              <Sparkles className="h-5 w-5" />
-            </span>
+            <img src="/helpdesk-agent.jpg" alt="" aria-hidden="true"
+              className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-white/60" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-[15px] font-medium">My World City Help Desk</p>
               <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11.5px] font-light text-white/85">

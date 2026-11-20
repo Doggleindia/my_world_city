@@ -66,7 +66,7 @@ export default function StepAccordion({ faqs, active = false }) {
               aria-expanded={isOpen}
               className="flex w-full items-center justify-between gap-3 py-3 text-left"
             >
-              <span className="text-[13.5px] font-medium text-navy-800">
+              <span className="text-[15.5px] font-medium text-navy-800 sm:text-[16.5px]">
                 <span className={isOpen ? 'text-brand' : 'text-slate-400'}>{i + 1}. </span>
                 {f.q}
               </span>
@@ -90,7 +90,7 @@ function AnswerPanel({ open, children }) {
   useEffect(() => { setMax(open && ref.current ? ref.current.scrollHeight : 0) }, [open, children])
   return (
     <div style={{ maxHeight: max }} className="overflow-hidden transition-[max-height] duration-300 ease-out">
-      <p ref={ref} className="pb-4 text-[13px] leading-relaxed text-slate-500">{children}</p>
+      <p ref={ref} className="pb-4 text-[14.5px] leading-relaxed text-slate-600 sm:text-[15.5px]">{children}</p>
     </div>
   )
 }

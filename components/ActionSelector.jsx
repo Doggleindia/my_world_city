@@ -12,20 +12,21 @@ const hrefs = {
 
 // The four journeys, as cards that read as buttons: a coloured icon disc,
 // the two-tone rule as the card's top edge, and an arrow pill that fills with
-// the card's colour on hover while the whole card lifts.
+// the card's colour on hover while the whole card lifts. On phones/tablets the
+// cards' borders glow one after another in their own colour (see globals.css).
 export default function ActionSelector() {
   return (
-    <section className="relative z-10 bg-white">
+    <section className="relative z-10 bg-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-          {actionCards.map((c) => {
+          {actionCards.map((c, i) => {
             const Icon = actionIcons[c.icon]
             return (
               <Link
                 key={c.key}
                 href={hrefs[c.key] || '/find-property'}
-                style={{ '--c': c.color, '--a': c.bar[0], '--b': c.bar[1] }}
-                className="group relative flex flex-col items-center overflow-hidden rounded-2xl border border-slate-200 bg-white px-4 pb-5 pt-7 text-center shadow-[0_8px_24px_-18px_rgba(8,26,51,0.35)] transition duration-300 hover:-translate-y-1.5 hover:border-[color:var(--c)]/40 hover:shadow-[0_22px_40px_-20px_rgba(8,26,51,0.45)] sm:px-6 sm:pb-7 sm:pt-9"
+                style={{ '--c': c.color, '--a': c.bar[0], '--b': c.bar[1], '--i': i }}
+                className="mwc-action-card group relative flex flex-col items-center overflow-hidden rounded-2xl border border-slate-200 bg-white px-4 pb-5 pt-7 text-center shadow-[0_8px_24px_-18px_rgba(8,26,51,0.35)] transition duration-300 hover:-translate-y-1.5 hover:border-[color:var(--c)]/40 hover:shadow-[0_22px_40px_-20px_rgba(8,26,51,0.45)] sm:px-6 sm:pb-7 sm:pt-9"
               >
                 {/* the two-tone rule, now the card's top edge */}
                 <span

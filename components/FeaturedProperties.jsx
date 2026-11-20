@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import PropertyCard from '@/components/listing/PropertyCard'
+import FeaturedRow from '@/components/FeaturedRow'
 import { featured as staticFeatured } from '../data'
 import { dbConnect } from '@/lib/db'
 import Property from '@/lib/models/Property'
@@ -7,7 +8,7 @@ import { toPropertyCard } from '@/lib/serialize'
 
 const COUNT = 6
 
-// Always a full two rows of three: featured listings first, then the newest
+// Always six cards: featured listings first, then the newest
 // active listings to top the grid up when fewer than six are flagged.
 async function getFeatured() {
   try {
@@ -48,9 +49,10 @@ export default async function FeaturedProperties() {
   return (
     <section className="bg-[#f3f5f8]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* heading and "View all" share one line on every screen size */}
+        <div className="flex items-center justify-between gap-4">
           <h2 className="text-[clamp(32px,4.6vw,58px)] font-bold leading-[1.1] text-[#0A0A0A]">
-            Featured Properties
+            Properties
           </h2>
           <Link
             href="/find-property"
@@ -60,12 +62,16 @@ export default async function FeaturedProperties() {
           </Link>
         </div>
 
-        {/* three across on desktop, two rows of three */}
-        <div className="mt-10 grid gap-7 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-8">
+        {/* one swipeable row: ~one card on phones, two on tablets, three on desktop */}
+        <FeaturedRow>
           {featured.slice(0, 6).map((p, i) => (
-            <PropertyCard key={p.id || i} {...p} />
+            <PropertyCard
+              key={p.id || i}
+              {...p}
+              className="w-[84%] shrink-0 snap-start sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
+            />
           ))}
-        </div>
+        </FeaturedRow>
       </div>
     </section>
   )
