@@ -51,6 +51,60 @@ body {
 
 
 
+/* ── Home action cards (Buy / Build / Operate & Manage / Invest) ──
+   On phones and tablets the four cards light up one after another, each in its
+   own colour (--c): Buy glows green, then Build blue, then Manage red, then
+   Invest orange, and round again. Only the border lights up (a coloured edge
+   with a soft glow just outside it); the inside of the card stays as it is.
+   Each card owns a quarter of the cycle; the delay (--i x step) hands the glow
+   from one card to the next. */
+@keyframes mwcCardGlow {
+  0%, 25%, 100% {
+    border-color: rgb(226 232 240);
+    box-shadow: 0 8px 24px -18px rgba(8, 26, 51, 0.35);
+  }
+  3%, 22% {
+    border-color: var(--c);
+    box-shadow:
+      0 0 0 1.5px var(--c),
+      0 0 22px 3px color-mix(in srgb, var(--c) 60%, transparent);
+  }
+}
+@media (max-width: 1023px) {
+  .mwc-action-card {
+    animation: mwcCardGlow 10s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 2.5s);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mwc-action-card { animation: none; }
+}
+
+/* Gallery: the reel strip glides left forever. The track holds two identical
+   copies, so sliding it by half its width lands exactly where it started. */
+@keyframes mwcMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.mwc-marquee-track { animation: mwcMarquee 40s linear infinite; }
+.mwc-marquee:hover .mwc-marquee-track,
+.mwc-marquee:active .mwc-marquee-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  /* no gliding: let people swipe the strip themselves instead */
+  .mwc-marquee { overflow-x: auto; }
+  .mwc-marquee-track { animation: none; }
+}
+
+/* Featured row: the "more this way" arrow nudges right while it is showing */
+@keyframes mwcSwipeNudge {
+  0%, 100% { transform: translate(0, -50%); }
+  50%      { transform: translate(6px, -50%); }
+}
+.mwc-swipe-hint { animation: mwcSwipeNudge 1.1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .mwc-swipe-hint { animation: none; }
+}
+
 /* ── Develop timeline: animated "loader" rail + step highlights ── */
 @keyframes mwcLoaderFill { from { width: 0%; } to { width: 100%; } }
 @keyframes mwcRailShimmer { 0% { transform: translateY(-100%); } 100% { transform: translateY(220%); } }

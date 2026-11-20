@@ -14,7 +14,12 @@ const GAP_MS = 180 // breath between erasing and the next word
 // The widest phrase is rendered invisibly underneath to reserve its width, so
 // the line never reflows — and never pushes the headline onto an extra line —
 // no matter which word is showing.
-export default function RotatingWords({ items }) {
+//
+// `phraseClassName` restyles the changing phrase (default: white fading to
+// cyan); `dot` adds the pink full stop once a phrase is fully typed.
+const DEFAULT_PHRASE = 'bg-gradient-to-r from-white via-white to-[#7fe3f0] bg-clip-text text-transparent'
+
+export default function RotatingWords({ items, phraseClassName = DEFAULT_PHRASE, dot = true }) {
   const [i, setI] = useState(0)
   const [text, setText] = useState(items[0])
   const [phase, setPhase] = useState('hold') // hold -> erase -> gap -> type
@@ -79,8 +84,8 @@ export default function RotatingWords({ items }) {
       <span className="absolute inset-0 flex items-start">
         <span className="relative inline-block">
           {/* the changing phrase in its own colour: white fading to cyan */}
-          <span className="bg-gradient-to-r from-white via-white to-[#7fe3f0] bg-clip-text text-transparent">{shown}</span>
-          {complete && <span className="text-accent">.</span>}
+          <span className={phraseClassName}>{shown}</span>
+          {dot && complete && <span className="text-accent">.</span>}
         </span>
         {!reduced && !complete && <span aria-hidden="true" className="mwc-caret" />}
       </span>
